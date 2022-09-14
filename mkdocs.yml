@@ -55,6 +55,6 @@ markdown_extensions:
     alternate_style: true
 - pymdownx.critic
 
-# nav:
-#   - Section:
-#     - index.md
+nav:
+  - Section:
+    - docs/index.md
