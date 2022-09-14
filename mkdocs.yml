@@ -38,7 +38,8 @@ edit_uri: edit/main/docs
 repo_name: cdoan1/examples.acm
 markdown_extensions:
 - toc:
-    toc_depth: "2-5"
+    # toc_depth: "2-5"
+    permalink: true
 - attr_list:
 - pymdownx.highlight
 - pymdownx.inlinehilite
@@ -58,8 +59,11 @@ markdown_extensions:
 nav:
   - Main:
     - index.md
-    - test.md
     - getting-started.md
     - references.md
   - Baremetal:
     - baremetal/assisted-installer.md
+  - Openshift-Pipelines:
+    - openshift-pipelines/tekton.md
+  - Argo:
+    - argo/argo.md
