@@ -58,3 +58,5 @@ markdown_extensions:
 nav:
   - Section:
     - docs/index.md
+    - docs/index.md
+    - docs/index.md
