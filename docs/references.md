@@ -1,0 +1,4 @@
+# References
+
+* https://openshift.tips/
+
