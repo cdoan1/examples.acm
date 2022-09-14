@@ -56,6 +56,6 @@ markdown_extensions:
 - pymdownx.critic
 
 nav:
-  - Section:
+  - Main:
     - index.md
     - test.md
