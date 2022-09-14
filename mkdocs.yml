@@ -5,10 +5,10 @@ site_url: https://cdoan1.github.io/examples.acm/
 theme:
   name: material
   features:
-  - navigation.tabs
-  - navigation.indexes
+  # - navigation.tabs
   - navigation.instant
   - navigation.top
+  - navigation.indexes
   - navigation.tracking
   - content.code.annotate
   - search.suggest
