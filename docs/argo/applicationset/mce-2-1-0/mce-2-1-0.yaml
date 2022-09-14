@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: mce
+  name: mce-remote
   namespace: openshift-gitops
 spec:
   generators:
