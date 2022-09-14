@@ -61,4 +61,5 @@ nav:
     - test.md
     - getting-started.md
     - references.md
-
+  - Baremetal:
+    - baremetal/assisted-installer.md
