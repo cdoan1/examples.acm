@@ -55,5 +55,6 @@ markdown_extensions:
     alternate_style: true
 - pymdownx.critic
 
-nav:
-  - Disconnected Install:
+# nav:
+#   - Section:
+#     - index.md
