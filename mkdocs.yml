@@ -35,7 +35,7 @@ plugins:
 docs_dir: docs
 repo_url: https://github.com/cdoan1/examples.acm
 edit_uri: edit/main/docs
-repo_name: cdoan1/example.acm
+repo_name: cdoan1/examples.acm
 markdown_extensions:
 - toc:
     toc_depth: "2-5"
