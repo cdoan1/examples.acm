@@ -7,6 +7,11 @@
 * Some customers have private clsuter deployments, where the respective git repo is not directly accessible.
 * ACM application component is a subscription pull model, but the channel selectors for git requires that the managed cluster will need access to the git repo as well.
 
+* With playback, we have an on-prem managed cluster that resides inside the VPN.
+* The manage cluster can access internal gitlab, so the argo application repo is taken from here.
+* This is an example of multiple clusters, and multiple git repos.
+* Policy deployment based on cluster labels can select applications for `on-prem=true` vs other clusters that are running in the cloud--AWS, ARO, ROSA, etc.
+
 ## Application
 
 Simple argo Applications can not be used with ACM Application placement.
