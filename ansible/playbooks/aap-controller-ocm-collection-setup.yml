@@ -1,0 +1,17 @@
+---
+#
+# Use this playbook to configure AAP controller using ansible.
+#
+- hosts: localhost
+  gather_facts: false
+  connection: local
+
+  collections:
+    - awx.awx
+    - azure.azcollection
+
+  tasks:
+    - name: Install ocm ansible collection
+      ansible.builtin.include_role:
+        name: ../roles/aap_controller_ocm_collection_setup
+        tasks_from: main
