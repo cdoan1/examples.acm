@@ -61,6 +61,8 @@ nav:
     - index.md
     - getting-started.md
     - references.md
+  - Ansible:
+    - ansible.md
   - Baremetal:
     - baremetal/assisted-installer.md
   - Openshift-Pipelines:
