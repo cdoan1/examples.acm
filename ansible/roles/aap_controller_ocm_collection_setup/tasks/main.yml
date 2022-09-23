@@ -79,7 +79,7 @@
     organization: "{{ acm_organization }}"
     name: "{{ acm_sre_execution_environment }}"
     description: "Execution environment that contains ocm collection"
-    image: "quay.io/adecorte/ansible_ee_acm:0.1"
+    image: "quay.io/cdoan_rh22/stolostron-core-ee:stable-2.10-latest"
     controller_host: "{{ controller_host }}"
     controller_username: "{{ controller_host_username }}"
     controller_password: "{{ controller_host_password }}"
