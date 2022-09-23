@@ -33,3 +33,19 @@ With dyanmic inventory and the cluster-proxy we can achieve this.
 4.2 The ansible job will be run, and include the extra_vars variable ansible_limit=<managed cluster name>
 4.3 The job template should run against ansible host in question.
 
+### Connecting the dots
+
+When we create a cluster with an ansible post install job through the CONSOLE, these are the related CR.
+
+```mermaid
+graph LR
+    NS:acmsre-cluster-proxy-23 --> managedcluster
+    NS:acmsre-cluster-proxy-23 --> clustercurator
+    NS:acmsre-cluster-proxy-23 --> job ---> acmsre-cluster-proxy-23-0-hg27h-provision
+    job --> curator-job-pk256 --> ansiblejob
+    job --> posthookjob-w4bpv
+    ansiblejob ---> posthookjob-gb6qd
+```
+
+* If we want to run a playbook against a specific managed cluster, the playback has to be written where the inventory host needs to be passed as a variable to the playbook.
+* When ACM clustercurator creates the ansiblejob CR, it does not pass `--limit` variable. It is only aware of `extra_vars` variable list.
