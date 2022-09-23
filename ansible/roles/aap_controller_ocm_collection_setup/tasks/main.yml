@@ -138,6 +138,7 @@
     source_path: "ansible-playbooks/inventories/hub-cluster-inventory.yml"
     execution_environment: "{{ acm_sre_execution_environment }}"
     validate_certs: false
+    update_on_launch: true
     controller_host: "{{ controller_host }}"
     controller_username: "{{ controller_host_username }}"
     controller_password: "{{ controller_host_password }}"
