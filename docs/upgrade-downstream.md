@@ -171,3 +171,9 @@ install-t5jnb   advanced-cluster-management.v2.5.2   Manual     true
 NAME            CSV                          APPROVAL    APPROVED
 install-bw7b4   multicluster-engine.v2.0.2   Automatic   true
 ```
+
+# Automation
+
+* It is possible to automate the creation of an upgraded environment, starting with release-2.4.
+* We can leverage this same process, and upgrade to the latest release sprint drivers as well.
+* Once we capture the data wither any issues were seen in upgrade, we can revert back to reinstalling the current sprint driver as a fresh install.
