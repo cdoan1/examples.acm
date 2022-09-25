@@ -60,6 +60,7 @@ nav:
   - Main:
     - index.md
     - getting-started.md
+    - upgrade-downstream.md
     - references.md
   - Ansible:
     - ansible.md
