@@ -125,25 +125,49 @@ There was another issue we had, it was documented in our word document. todo(cdo
 
 17. Turns out, its very easy to delete manifestwork. Not sure what would require deleting the finalizer on the manifestwork resource. I found that these records can be deleted without any block.
 
-### Problems Observed
+## Problems Observed
 
 1. import controler pod was crashloop. One out of 2. Manually deleted the pod, and did not occur again.
 2. `local-cluster` is in `Ready` state, but mch still shows that local-cluster from `mch` is `Unknown` state.
 3. 3 out of n clusters is in `Unknown` state. 2 are pending import. This is likely due to the cluster itself.
 4. After testing deleting manifestwork, I think the reason why ALL managed cluster reached `Unknown` is because the klusterlet / klusterlet-crds manifestwork was deleted on the hub, and caused the klusterlet to be deleted on the managed cluster. The managedcluster and managedclusteraddons records should all be `Unknown`. Or, if you list them and they seem to be there, they might have been recreated, but if they were recreated, the klusterlet is probably already deleted on the remote.
 
-### Tools
+## Tools
 
 | description | tool |
 |-------------|------|
-| script to check the current status of ACM 2.5                | check-acm-status.sh |
-| script to delete all the manifestwork except klusterlet ones | chaos-delete-current-manifestwork.sh |
+| script to check the current status of ACM 2.5                | ./hack/check-acm-status.sh |
+| script to delete all the manifestwork except klusterlet ones | ./hack/chaos-delete-current-manifestwork.sh |
 
-### Monitoring
+## Monitoring
 
 While running this upgrade testing, its useful to monitor the resource changes using `watch`. You can run these watch commands in separate terminals.
 
 ```bash
 watch 'oc get managedclusters ; oc get managedclusteraddons -A'
 watch 'oc get manifestwork -A --sort-by=.metadata.creationTimestamp | tail -n 50; echo; echo "count manifestwork: " $(oc get manifestwork -A | wc -l)'
+
+stern import-con -n multicluster-engine
+```
+
+## Misc
+
+Example output from the `check-acm-status.sh`
+
+```bash
+current acm operator phase                   :  Updating ❌
+current acm subscription currentCSV version  :  advanced-cluster-management.v2.5.2
+current acm csv phase                        :  Succeeded ✅
+current mce operator phase                   :  Available ✅
+current mce subscription currentCSV version  :  multicluster-engine.v2.0.2
+current mce csv phase                        :  Succeeded ✅
+count current managed clusters               :  8
+count current manifestwork                   :  68
+Current InstallPlan State
+NAME            CSV                                  APPROVAL   APPROVED
+install-5mqxx   advanced-cluster-management.v2.4.0   Manual     true
+install-bgnqv   advanced-cluster-management.v2.4.5   Manual     true
+install-t5jnb   advanced-cluster-management.v2.5.2   Manual     true
+NAME            CSV                          APPROVAL    APPROVED
+install-bw7b4   multicluster-engine.v2.0.2   Automatic   true
 ```
