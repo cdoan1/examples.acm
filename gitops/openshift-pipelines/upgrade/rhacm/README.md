@@ -7,6 +7,10 @@ This folder contains the tekton pipeline manifests to setup an environment with 
 3. Upgrade to RHACM 2.4.5
 4. Upgrade to RHACM 2.5.0 (2.5.2 automatically)
 
+## Namespace
+
+Create a namespace for the project related to RHACM upgrade. For this example, we follow the existing pattern and create a namespace: `open-cluster-management-pipelines-upgrade`.
+
 ## Secrets
 
 ### Easy
