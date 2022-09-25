@@ -7,6 +7,7 @@ There was another issue we had, it was documented in our word document. todo(cdo
 
 ## Upgrading from RHACM 2.4 to RHACM 2.5
 
+0. 6 node OCP 4.9.48 cluster, 3 master, 3 worker.
 1. manually install RHACM 2.4.0 GA, via kustomizaton manifests, subscription for channel release-2.4, csv: 2.4.0
 2. manually approve install @ 2.4.0
 3. deployed 10 managed clusters, 20 applications, 20 policies
@@ -34,18 +35,18 @@ There was another issue we had, it was documented in our word document. todo(cdo
     * mch is currently Not Running, because the local-cluster has not completed.
 
     ```yaml
-        local-cluster:
-            lastTransitionTime: "2022-09-24T13:07:31Z"
-            message: No conditions available
-            reason: No conditions available
-            status: Unknown
-            type: Unknown
+    local-cluster:
+        lastTransitionTime: "2022-09-24T13:07:31Z"
+        message: No conditions available
+        reason: No conditions available
+        status: Unknown
+        type: Unknown
     ```
 
     ```yaml
-        currentVersion: 2.4.5
-        desiredVersion: 2.5.2
-        phase: Updating
+    currentVersion: 2.4.5
+    desiredVersion: 2.5.2
+    phase: Updating
     ```
 
 9. When I delete all the current manifestwork, the state of all managedclusters went to `Unknown`. I dumped out the current list of manifestwork, then iterated the list and deleted each manifestwork. The expectation is that that RHACM would get back to the desired state, and the manifestwork would be recreated. As I deleted the manifestwork list, RHACM detected the change, and gradually recreated the manifestwork. Ordering is not a requirement of k8s.
