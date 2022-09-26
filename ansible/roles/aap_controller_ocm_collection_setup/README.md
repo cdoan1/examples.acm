@@ -5,5 +5,6 @@
 ## Usage
 
 ```bash
-ansible-playbook playbooks/aap-controller-ocm-collection-setup.yml
+ansible-playbook playbooks/aap-controller-ocm-collection-setup.yml -e tanant=playback
 ```
+

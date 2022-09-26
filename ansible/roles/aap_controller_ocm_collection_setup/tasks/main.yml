@@ -128,6 +128,9 @@
     controller_password: "{{ controller_host_password }}"
     state: present
 
+# We need to ensure the two flags are set
+# overwrite the keep the inventory truthful
+# sync on launch, to ensure the truth is current
 - name: "Add dynamic inventory source to 'ACM Cluster Inventory'"
   awx.awx.inventory_source:
     name: "{{ phase }} ACM Dynamic Cluster Inventory"
@@ -139,6 +142,7 @@
     execution_environment: "{{ acm_sre_execution_environment }}"
     validate_certs: false
     update_on_launch: true
+    overwrite: true
     controller_host: "{{ controller_host }}"
     controller_username: "{{ controller_host_username }}"
     controller_password: "{{ controller_host_password }}"
