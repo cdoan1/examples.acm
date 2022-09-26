@@ -49,3 +49,19 @@ graph LR
 
 * If we want to run a playbook against a specific managed cluster, the playback has to be written where the inventory host needs to be passed as a variable to the playbook.
 * When ACM clustercurator creates the ansiblejob CR, it does not pass `--limit` variable. It is only aware of `extra_vars` variable list.
+
+
+
+# Explicitly enable the managed-serviceaccount addon
+
+```
+oc apply -f - <<EOF
+apiVersion: addon.open-cluster-management.io/v1alpha1
+kind: ManagedClusterAddOn
+metadata:
+  name: managed-serviceaccount
+  namespace: kind-cdoan-aap-integration-test-1
+spec:
+  installNamespace: open-cluster-management-agent-addon
+EOF
+```

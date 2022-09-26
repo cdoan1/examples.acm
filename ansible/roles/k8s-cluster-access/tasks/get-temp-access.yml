@@ -1,0 +1,47 @@
+---
+
+- name: Debug
+  debug:
+    msg: "{{ lookup('env', 'K8S_AUTH_KUBECONFIG') }}"
+
+- name: Debug
+  shell: |
+    cat $K8S_AUTH_KUBECONFIG
+  register: output
+
+- name: Debug
+  debug:
+    msg: "{{ output.stdout_lines }}"
+
+- name: "Get ClusterProxy URL"
+  stolostron.core.cluster_proxy:
+    hub_kubeconfig: "{{ lookup('env', 'K8S_AUTH_KUBECONFIG') }}"
+    managed_cluster: "{{ hostvars[inventory_hostname].cluster_name }}"
+    wait: true
+    timeout: 60
+  register: cluster_proxy
+
+- name: "Get managed ServiceAccount token for dynamic ServiceAccount"
+  stolostron.core.managed_serviceaccount:
+    state: present
+    generate_name: "{{ serviceaccount_generate_name }}"
+    hub_kubeconfig: "{{ lookup('env', 'K8S_AUTH_KUBECONFIG') }}"
+    managed_cluster: "{{ hostvars[inventory_hostname].cluster_name }}"
+    wait: true
+    timeout: 60
+    ttl_seconds_after_creation: "{{ ttl | default('3600') }}"
+  register: managed_serviceaccount
+  when: serviceaccount_generate_name is defined
+
+- name: "Configure ServiceAccount RBAC"
+  stolostron.core.managed_serviceaccount_rbac:
+    hub_kubeconfig: "{{ lookup('env', 'K8S_AUTH_KUBECONFIG') }}"
+    managed_cluster: "{{ hostvars[inventory_hostname].cluster_name }}"
+    managed_serviceaccount_name: "{{ managed_serviceaccount.name }}"
+    rbac_template: "{{ rbac_template }}"
+    wait: true
+    timeout: 60
+  register: result
+  until: result.failed == false
+  retries: 10
+  delay: 10
