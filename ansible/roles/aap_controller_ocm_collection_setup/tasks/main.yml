@@ -158,12 +158,12 @@
 
 - name: "Create 'ACM SRE Verify Cluster Proxy' Job Template"
   awx.awx.job_template:
-    name: "{{ phase }} ACM SRE Verify Cluster Proxy Manual"
+    name: "{{ phase }} ACM SRE Verify Cluster Proxy"
     job_type: "run"
     organization: "{{ acm_organization }}"
     inventory: "{{ phase }} ACM Cluster Inventory"
     project: "cdoan1/examples.acm"
-    playbook: "ansible/playbooks/aap-execute-action.yml"
+    playbook: "ansible/playbooks/aap-execute-action-clustername.yml"
     credentials:
       - "{{ phase }} ACM Hub"
     extra_vars:
