@@ -13,7 +13,7 @@
     msg: "{{ item.metadata.name }}"
   loop: "{{ ns_list.resources }}"
 
-- name: Get a list of all pods from any namespace
+- name: Get a list of all pods in namespace open-cluster-management-agent-addon
   kubernetes.core.k8s_info:
     kind: Pod
     namespace: open-cluster-management-agent-addon
@@ -22,6 +22,6 @@
     api_key: "{{ managed_serviceaccount.token }}"
   register: pod_list
 
-- name: Print pod list for open-cluster-management-agent-addon
+- name: Print pod list for namespace open-cluster-management-agent-addon
   ansible.builtin.debug:
     msg: "{{ pod_list }}"

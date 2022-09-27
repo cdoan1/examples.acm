@@ -37,27 +37,14 @@
     inventory_credentials: "{{ phase }} Azure Service Principal"
     azure_vars: "{{ phase }} Azure Vars"
 
-# - name: Create project for stolostron/acm-aap-aas-operations repository
-#   project:
-#     organization: "{{ acm_organization }}"
-#     name: "stolostron/acm-aap-aas-operations"
-#     controller_host: "{{ controller_host }}"
-#     controller_username: "{{ controller_host_username }}"
-#     controller_password: "{{ controller_host_password }}"
-#     scm_url: "https://github.com/stolostron/acm-aap-aas-operations.git"
-#     scm_type: git
-#     scm_update_on_launch: true
-#     scm_update_cache_timeout: 3600
-#     validate_certs: false
-
-- name: Create project for stolostron/acm-aap-aas-operations repository
+- name: Create project for cdoan1/examples.acm repository
   project:
     organization: "{{ acm_organization }}"
-    name: "cdoan1/acm-aap-aas-operations"
+    name: "cdoan1/examples.acm"
     controller_host: "{{ controller_host }}"
     controller_username: "{{ controller_host_username }}"
     controller_password: "{{ controller_host_password }}"
-    scm_url: "https://github.com/cdoan1/acm-aap-aas-operations.git"
+    scm_url: "https://github.com/cdoan1/examples.acm.git"
     scm_type: git
     scm_update_on_launch: true
     scm_update_cache_timeout: 3600
@@ -71,7 +58,7 @@
     team: "ACM SRE"
     role: "admin"
     projects:
-      - "cdoan1/acm-aap-aas-operations"
+      - "cdoan1/examples.acm"
     validate_certs: false
 
 - name: Configure execution environment
@@ -148,14 +135,35 @@
     controller_password: "{{ controller_host_password }}"
     state: present
 
-- name: "Create 'ACM SRE Debug Playbook' Job Template"
+- name: "Create 'ACM SRE Verify Cluster Proxy Manual' Job Template"
   awx.awx.job_template:
-    name: "{{ phase }} ACM SRE Debug Playbook"
+    name: "{{ phase }} ACM SRE Verify Cluster Proxy Manual"
     job_type: "run"
     organization: "{{ acm_organization }}"
     inventory: "{{ phase }} ACM Cluster Inventory"
-    project: "cdoan1/acm-aap-aas-operations"
-    playbook: "ansible-playbooks/playbooks/aap-execute-action.yml"
+    project: "cdoan1/examples.acm"
+    playbook: "ansible/playbooks/aap-execute-action.yml"
+    credentials:
+      - "{{ phase }} ACM Hub"
+    extra_vars:
+      target_hosts: all_managed_clusters
+    ask_variables_on_launch: true
+    ask_limit_on_launch: true
+    execution_environment: "{{ acm_sre_execution_environment }}"
+    validate_certs: false
+    controller_host: "{{ controller_host }}"
+    controller_username: "{{ controller_host_username }}"
+    controller_password: "{{ controller_host_password }}"
+    state: "present"
+
+- name: "Create 'ACM SRE Verify Cluster Proxy' Job Template"
+  awx.awx.job_template:
+    name: "{{ phase }} ACM SRE Verify Cluster Proxy Manual"
+    job_type: "run"
+    organization: "{{ acm_organization }}"
+    inventory: "{{ phase }} ACM Cluster Inventory"
+    project: "cdoan1/examples.acm"
+    playbook: "ansible/playbooks/aap-execute-action.yml"
     credentials:
       - "{{ phase }} ACM Hub"
     extra_vars:
