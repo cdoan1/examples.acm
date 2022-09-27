@@ -1,3 +1,21 @@
+---
+
+- name: "Enabled cluster-proxy addon"
+  stolostron.core.managedcluster_addon:
+    state: present
+    hub_kubeconfig: "{{ lookup('env', 'K8S_AUTH_KUBECONFIG') }}"
+    managed_cluster: "{{ hostvars[inventory_hostname].cluster_name }}"
+    addon_name: cluster-proxy
+    wait: True
+    timeout: 120
+- name: "Enabled managed-serviceaccount addon"
+  stolostron.core.managedcluster_addon:
+    state: present
+    hub_kubeconfig: "{{ lookup('env', 'K8S_AUTH_KUBECONFIG') }}"
+    managed_cluster: "{{ hostvars[inventory_hostname].cluster_name }}"
+    addon_name: managed-serviceaccount
+    wait: True
+    timeout: 120
 - name: "Get ClusterProxy URL"
   stolostron.core.cluster_proxy:
     hub_kubeconfig: "{{ lookup('env', 'K8S_AUTH_KUBECONFIG') }}"
