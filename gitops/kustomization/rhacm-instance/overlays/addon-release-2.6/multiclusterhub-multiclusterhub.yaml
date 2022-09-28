@@ -2,7 +2,7 @@ apiVersion: operator.open-cluster-management.io/v1
 kind: MultiClusterHub
 metadata:
   name: multiclusterhub
-  namespace: redhat-open-cluster-management
+  namespace: open-cluster-management
   annotations:
 spec:
   availabilityConfig: High
