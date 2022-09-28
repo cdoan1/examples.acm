@@ -1,0 +1,20 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: deploy-ocm-addon-automation
+  namespace: open-cluster-management-pipelines-ocm
+  labels:
+    tekton.dev/pipeline: deploy-ocm-addon
+spec:
+  params:
+    - name: cluster-name
+      value: '123'
+  pipelineRef:
+    name: deploy-ocm-addon
+  serviceAccountName: pipeline
+  timeout: 1h0m0s
+  workspaces:
+    - name: shared-workspace
+      persistentVolumeClaim:
+        claimName: shared-storage-pvc
