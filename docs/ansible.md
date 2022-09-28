@@ -33,7 +33,7 @@ With dyanmic inventory and the cluster-proxy we can achieve this.
 4.2 The ansible job will be run, and include the extra_vars variable ansible_limit=<managed cluster name>
 4.3 The job template should run against ansible host in question.
 
-### Connecting the dots
+## Connecting the dots
 
 When we create a cluster with an ansible post install job through the CONSOLE, these are the related CR.
 
@@ -52,7 +52,7 @@ graph LR
 
 
 
-# Explicitly enable the managed-serviceaccount addon
+## Explicitly enable the managed-serviceaccount addon
 
 The managed-serviceaccount addon needs to be explicitly enabled on a given managed cluster. 
 

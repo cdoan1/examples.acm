@@ -5,6 +5,8 @@ Setup a set of clusters to test upgrade of ACM 2.4 to ACM 2.5 from the perspecti
 We did have to disable backup operator.
 There was another issue we had, it was documented in our word document. todo(cdoan): #link
 
+> NOTE: Starting with release ACM 2.5, we split the original ACM into **TWO** products, and this means two separate `subscription.operators`. Even through you can trigger the deployment of ACM 2.5 with one `subscription`, internally, we define and apply a second `subscription` for the MCE product. MCE can be installed standalone, or it can be installed when ACM is freshly installed, or upgraded from ACM 2.4. This is seamless and somewhat transparent in a connected deployment where everything exists in the public registry.redhat.io container registry. When you are upgrading where the images are served from a private registry, the multiclusterhub operand needs to be aware of where the MCE catalogsource is located, otherwise, the upgrade will BLOCK, waiting for MCE to complete the install. TODO: Reference KCS.
+
 ## Upgrading from RHACM 2.4 to RHACM 2.5
 
 0. 6 node OCP 4.9.48 cluster, 3 master, 3 worker.
