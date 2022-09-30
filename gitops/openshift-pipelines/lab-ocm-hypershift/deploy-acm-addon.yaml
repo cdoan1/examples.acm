@@ -1,0 +1,515 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: deploy-ocm-addon
+spec:
+  params:
+  - name: cluster-name
+    type: string
+    description: name of the OCM cluster to create
+    default: ""
+  - name: oidc-bucket-name
+    type: string
+    description: "REQUIRED - name of the s3 bucket to store oidc data"
+    default: ""
+  tasks:
+  - name: fetch-repo
+    params:
+    - name: url
+      value: https://github.com/cdoan1/examples.acm.git
+    - name: revision
+      value: main
+    - name: deleteExisting
+      value: "true"
+    taskRef:
+      kind: ClusterTask
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-workspace
+  - name: deploy-ocm-addon
+    runAfter:
+    - fetch-repo
+    params:
+    - name: cluster-name
+      value: $(params.cluster-name)
+    taskRef:
+      name: task-deploy-ocm-addon
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: deploy-acm-addon
+    runAfter:
+    - deploy-ocm-addon
+    params:
+    - name: cluster-name
+      value: $(params.cluster-name)
+    taskRef:
+      name: task-deploy-acm-addon
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: 03-hypershift
+    runAfter:
+    - deploy-acm-addon
+    params:
+    - name: cluster-name
+      value: $(params.cluster-name)
+    taskRef:
+      name: task-deploy-hypershift
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: 04-hostedcluster
+    runAfter:
+    - 03-hypershift
+    params:
+    - name: cluster-name
+      value: $(params.cluster-name)
+    - name: oidc-bucket-name
+      value: $(params.oidc-bucket-name)
+    taskRef:
+      name: 04-hostedcluster
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  workspaces:
+  - name: shared-workspace
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-deploy-ocm-addon
+spec:
+  params:
+  - name: cluster-name
+    default: ""
+    description: name of cluster to install MGH
+    type: string
+  - name: GITOPS_SECRET_NAME
+    default: 'ocm-staging'
+    description: Name of the secret that contains credentials
+    type: string  
+  steps:
+  - args:
+    - |-
+      set -e
+
+      echo "Starting work ..."
+
+      # login to ocm staging
+      TOKEN=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.token}' | base64 --decode)
+      AWS_ACCOUNT_ID=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.AWS_ACCOUNT_ID}' | base64 --decode)
+      ACCESS_KEY_ID=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.ACCESS_KEY_ID}' | base64 --decode)
+      SECRET_ACCESS_KEY=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.SECRET_ACCESS_KEY}' | base64 --decode)
+
+      USER=admin-22
+      if oc get secret cdoanocm-kubeadmin-password; then
+        echo "Secret exists ..."
+        PW=$(oc get secret cdoanocm-kubeadmin-password -ojsonpath='{.data.password}')
+        
+      else
+        PW=$(openssl rand -base64 32)
+        
+        oc create secret generic cdoanocm-kubeadmin-password --from-literal=password=$PW
+        echo "Generated admin password for OCM cluster and saved as secret ..."
+      fi
+
+      ocm login --token=$TOKEN --url 'staging'
+      ocm get clusters
+      if ocm list clusters cdoanocm | grep cdoanocm; then
+        echo "cluster cdoanocm already exists ..."
+      else
+        echo "creating cluster cdoanocm in ocm ..."
+        ocm create cluster cdoanocm \
+          --aws-account-id $AWS_ACCOUNT_ID \
+          --aws-access-key-id $ACCESS_KEY_ID \
+          --aws-secret-access-key $SECRET_ACCESS_KEY \
+          --ccs \
+          --version 4.11.7 \
+          --provider aws \
+          --region us-east-1 \
+          --compute-nodes 3
+      fi
+
+      echo "Waiting for OCM cluster to be ready ..."
+      while true;
+      do
+        check=$(ocm list clusters cdoanocm --columns state --no-headers | tr -d " ")
+        if [[ "$check" != "ready" ]]; then
+          echo "waiting 60s ..."
+          sleep 60
+        else
+          echo "ocm cluster is ($check) ..."
+          break
+        fi
+      done
+
+      if ocm list idps --cluster cdoanocm | grep htpasswd; then
+        echo "htpasswd already defined ..."
+      else
+        echo "Setup IDP ..."
+        ocm create idp --cluster=cdoanocm \
+          --type=htpasswd \
+          --username $USER \
+          --password $PW \
+          --name htpasswd || true
+
+        ocm create user $USER \
+          --cluster=cdoanocm \
+          --group=cluster-admins || true
+
+        echo "Wait 60s for IDP to be setup ..."
+        sleep 90
+      fi
+
+      echo "Done task ..."
+      exit 0 
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/cdoan_rh22/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-deploy-acm-addon
+spec:
+  params:
+  - name: cluster-name
+    default: ""
+    description: name of cluster to install MGH
+    type: string
+  - name: GITOPS_SECRET_NAME
+    default: 'ocm-staging'
+    description: Name of the secret that contains credentials
+    type: string  
+  steps:
+  - args:
+    - |-
+      set -e
+
+      echo "Start task ..."
+
+      TOKEN=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.token}' | base64 --decode)
+      AWS_ACCOUNT_ID=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.AWS_ACCOUNT_ID}' | base64 --decode)
+      ACCESS_KEY_ID=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.ACCESS_KEY_ID}' | base64 --decode)
+      SECRET_ACCESS_KEY=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.SECRET_ACCESS_KEY}' | base64 --decode)
+
+      USER=admin-22
+      PW=$(oc get secret cdoanocm-kubeadmin-password -ojsonpath='{.data.password}')
+      echo "cluster ps: {$PW}"
+
+      ocm login --token=$TOKEN --url 'staging'
+      ocm get clusters
+      if ocm list clusters cdoanocm | grep cdoanocm; then
+        echo "cluster cdoanocm already exists ..."
+      else
+        echo "creating cluster cdoanocm in staging ..."
+      fi
+
+      # get the current id of the clusters
+      ID=$(ocm get /api/clusters_mgmt/v1/clusters | jq -r '.items[].id')
+
+      echo "cluster id: $ID"
+
+      cat > addon.json <<EOF
+      {
+        "kind": "AddOnInstallation",
+        "id": "advanced-cluster-management",
+        "href": "/api/clusters_mgmt/v1/clusters/$ID/addons/advanced-cluster-management",
+        "addon": {
+          "kind": "AddOnLink",
+          "href": "/api/clusters_mgmt/v1/addons/advanced-cluster-management",
+          "id": "advanced-cluster-management"
+        }
+      }
+      EOF
+
+      if [[ $(ocm get /api/clusters_mgmt/v1/clusters/$ID/addons/advanced-cluster-management | jq -r '.state') == "" ]]; then
+        echo "installing the latest ACM addon ..."
+        ocm post /api/clusters_mgmt/v1/clusters/$ID/addons --body=addon.json
+      fi
+
+      while [ $(ocm get /api/clusters_mgmt/v1/clusters/$ID/addons/advanced-cluster-management | jq -r '.state') != 'ready' ]
+      do
+        echo "waiting 60s"
+        sleep 60
+      done
+
+      oc extract secret/multiclusterhub-operator-pull-secret
+
+      API=$(ocm get /api/clusters_mgmt/v1/clusters/$ID | jq '.api.url' | tr -d '"')
+      export KUBECONFIG=local.kubeconfig
+      oc login -s $API -u $USER -p $PW --insecure-skip-tls-verify=true
+      oc cluster-info
+
+      oc create secret generic multiclusterhub-operator-pull-secret --from-file=.dockerconfigjson=.dockerconfigjson \
+        --type=kubernetes.io/dockerconfigjson \
+        -n redhat-open-cluster-management || true
+
+      oc apply -k gitops/kustomization/rhacm-instance/overlays/addon-release-2.6
+
+      echo "wait for mch ..."
+      oc wait --for="condition=complete" mch multiclusterhub -n redhat-open-cluster-management --timeout=600s
+
+      echo "Done task ..."
+      
+      set +e
+      exit 0 
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/cdoan_rh22/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source
+
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-deploy-hypershift
+spec:
+  params:
+  - name: cluster-name
+    default: ""
+    description: name of cluster to install MGH
+    type: string
+  - name: GITOPS_SECRET_NAME
+    default: 'ocm-staging'
+    description: Name of the secret that contains credentials
+    type: string  
+  steps:
+  - args:
+    - |-
+      set -e
+
+      echo "Start task ..."
+
+      TOKEN=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.token}' | base64 --decode)
+      AWS_ACCOUNT_ID=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.AWS_ACCOUNT_ID}' | base64 --decode)
+      ACCESS_KEY_ID=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.ACCESS_KEY_ID}' | base64 --decode)
+      SECRET_ACCESS_KEY=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.SECRET_ACCESS_KEY}' | base64 --decode)
+      
+      oc extract secret/aws-credentials
+      
+      USER=admin-22
+      PW=$(oc get secret cdoanocm-kubeadmin-password -ojsonpath='{.data.password}')
+      
+      ocm login --token=$TOKEN --url 'staging'
+      ocm get clusters
+
+      # normally we only have 1 cluster
+      ID=$(ocm get /api/clusters_mgmt/v1/clusters | jq -r '.items[].id')
+      API=$(ocm get /api/clusters_mgmt/v1/clusters/$ID | jq '.api.url' | tr -d '"')
+      
+      echo "cluster id: $ID"
+      export KUBECONFIG=local.kubeconfig
+      oc login -s $API -u $USER -p $PW --insecure-skip-tls-verify=true
+      oc cluster-info
+
+
+      oc patch mce multiclusterengine --type=merge \
+        -p '{"spec":{"overrides":{"components":[{"name":"hypershift-preview","enabled": true}]}}}'
+
+      BUCKET_NAME=cdoan-hypershift
+      REGION=us-west-1
+
+      aws s3api create-bucket --acl public-read --bucket $BUCKET_NAME \
+        --create-bucket-configuration LocationConstraint=$REGION \
+        --region $REGION || true
+
+      # use the ACM hub or MCE hub as the hosting cluster
+      oc create secret generic hypershift-operator-oidc-provider-s3-credentials \
+        --from-file=credentials=credentials \
+        --from-literal=bucket=$BUCKET_NAME \
+        --from-literal=region=$REGION \
+        -n local-cluster || true
+
+      oc apply -f - <<EOF
+      apiVersion: addon.open-cluster-management.io/v1alpha1
+      kind: ManagedClusterAddOn
+      metadata:
+        name: hypershift-addon
+        namespace: local-cluster
+      spec:
+        installNamespace: open-cluster-management-agent-addon
+      EOF
+      
+      # verify
+      oc get managedclusteraddons -n local-cluster hypershift-addon
+
+      echo "Done task ..."
+      set +e
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/acm-sre/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source
+
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: 04-hostedcluster
+spec:
+  params:
+  - name: cluster-name
+    default: ""
+    description: name of cluster to install MGH
+    type: string
+  - name: GITOPS_SECRET_NAME
+    default: 'ocm-staging'
+    description: Name of the secret that contains credentials
+    type: string
+  - name: oidc-bucket-name
+    default: ''
+    description: oidc bucket name
+    type: string
+  steps:
+  - args:
+    - |-
+      set -e
+      echo "Start task ..."
+
+      TOP=$(pwd)
+      TOKEN=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.token}' | base64 --decode)
+      AWS_ACCOUNT_ID=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.AWS_ACCOUNT_ID}' | base64 --decode)
+      ACCESS_KEY_ID=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.ACCESS_KEY_ID}' | base64 --decode)
+      SECRET_ACCESS_KEY=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.SECRET_ACCESS_KEY}' | base64 --decode)
+      PULL_SECRET=$TOP/pull-secret-hypershift.json
+
+      oc get secret multiclusterhub-operator-pull-secret -ojsonpath='{.data.\.dockerconfigjson}' | base64 --decode > $PULL_SECRET 
+      mkdir ~/.aws
+      cp credentials ~/.aws
+      
+      export KUBECONFIG=local.kubeconfig
+      oc cluster-info
+      
+      CLUSTER_NAME=cdoanocm-hostedcluster
+      OIDC_BUCKET_NAME=$(params.oidc-bucket-name)
+      OIDC_BUCKET_REGION=us-west-1
+      BASE_DOMAIN=demo.red-chesterfield.com
+      REGION=us-east-1
+
+      AWS_CREDS=credentials
+      OUTPUT_INFRA_FILE=$TOP/hypershift_test_infra.json
+      OUTPUT_IAM_FILE=$TOP/hypershift_test_iam.json
+
+      # get the hypershift cli
+      git clone https://github.com/openshift/hypershift.git
+      cd hypershift
+      git checkout -b release-11
+      make build
+      install -m 0755 bin/hypershift /usr/local/bin/hypershift
+      hypershift version
+      cd $TOP
+
+      echo "creating infra aws $CLUSTER_NAME"
+      hypershift create infra aws --name $CLUSTER_NAME \
+        --aws-creds $AWS_CREDS \
+        --base-domain $BASE_DOMAIN \
+        --infra-id $CLUSTER_NAME \
+        --region $REGION \
+        --output-file $OUTPUT_INFRA_FILE
+
+      PUBLIC_ZONE_ID=$(cat $OUTPUT_INFRA_FILE | jq '.publicZoneID' | tr -d '"')
+      PRIVATE_ZONE_ID=$(cat $OUTPUT_INFRA_FILE | jq '.privateZoneID' | tr -d '"')
+      PRIVATE_ZONE_ID=$(cat $OUTPUT_INFRA_FILE | jq '.localZoneID' | tr -d '"')
+
+      echo "creating iam aws $CLUSTER_NAME"
+      hypershift create iam aws --infra-id $CLUSTER_NAME \
+        --aws-creds $AWS_CREDS \
+        --oidc-storage-provider-s3-bucket-name $OIDC_BUCKET_NAME \
+        --oidc-storage-provider-s3-region $OIDC_BUCKET_REGION \
+        --region $REGION \
+        --public-zone-id $PUBLIC_ZONE_ID \
+        --private-zone-id $PRIVATE_ZONE_ID \
+        --local-zone-id $PRIVATE_ZONE_ID \
+        --output-file $OUTPUT_IAM_FILE
+
+      echo "creating hostedcluster aws $CLUSTER_NAME"
+      hypershift create cluster aws \
+        --name $CLUSTER_NAME \
+        --infra-id $CLUSTER_NAME \
+        --infra-json $OUTPUT_INFRA_FILE \
+        --iam-json $OUTPUT_IAM_FILE \
+        --aws-creds $AWS_CREDS \
+        --pull-secret $PULL_SECRET \
+        --region $REGION \
+        --generate-ssh \
+        --node-pool-replicas 3 \
+        --namespace local-cluster \
+        --render > hosted-cluster.yaml
+
+      oc apply -f hosted-cluster.yaml
+      oc annotate hostedcluster $CLUSTER_NAME "cluster.open-cluster-management.io/hypershiftdeployment=default/local-cluster" -n local-cluster --overwrite
+
+      echo "wait 60s for hostedcluser CR to init ..."
+      sleep 60
+
+      export INFRA_ID=$CLUSTER_NAME
+
+      echo "create MC CR ..."
+      cat <<EOF | oc apply -f -
+      apiVersion: cluster.open-cluster-management.io/v1
+      kind: ManagedCluster
+      metadata:
+        annotations:
+          import.open-cluster-management.io/hosting-cluster-name: local-cluster
+          import.open-cluster-management.io/klusterlet-deploy-mode: Hosted
+          open-cluster-management/created-via: other
+      labels:
+        cloud: auto-detect
+        cluster.open-cluster-management.io/clusterset: default
+        name: $INFRA_ID
+        vendor: OpenShift
+      name: $INFRA_ID
+      spec:
+        hubAcceptsClient: true
+        leaseDurationSeconds: 60
+      EOF
+
+      echo "wait for hostedcluster to be available"
+      oc wait --for="condition=Available" hostedcluster cdoanocm-hostedcluster -n local-cluster --timeout=600s
+
+      echo "extract the hostedcluster kubeconfig"
+      oc get secret cdoanocm-hostedcluster-admin-kubeconfig -n local-cluster -ojsonpath='{.data.kubeconfig}' | base64 --decode > hostedcluster.kubeconfig
+
+      export KUBECONFIG=hostedcluster.kubeconfig
+      oc cluster-info
+      oc get co
+      
+      # disable the console
+      oc patch console cluster -p '{"spec":{"managementState": "Removed"}}' --type=merge
+
+      echo "Done with hostedcluster task ..."
+      set +e
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/acm-sre/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source
