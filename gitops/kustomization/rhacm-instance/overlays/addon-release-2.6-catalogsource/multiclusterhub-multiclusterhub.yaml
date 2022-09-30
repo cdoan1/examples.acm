@@ -4,7 +4,7 @@ metadata:
   name: multiclusterhub
   namespace: open-cluster-management
   annotations:
-    "installer.open-cluster-management.io/mce-subscription-spec": "{'channel':'beta', 'installPlanApproval':'Automatic', 'name': 'multicluster-engine', 'source': 'addon-advanced-cluster-management-catalog','sourceNamespace': 'openshift-marketplace'}",
+    installer.open-cluster-management.io/mce-subscription-spec: '{"channel": "beta","installPlanApproval": "Automatic","name": "multicluster-engine","source": "addon-advanced-cluster-management-catalog","sourceNamespace": "openshift-marketplace"}'
 spec:
   availabilityConfig: High
   imagePullSecret: multiclusterhub-operator-pull-secret
