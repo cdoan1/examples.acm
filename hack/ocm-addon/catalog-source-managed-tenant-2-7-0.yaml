@@ -1,0 +1,9 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: acm-custom-registry-2-7-0
+spec:
+  displayName": "Advanced Cluster Management for Kubernetes - 2.7.0"
+  image: quay.io/osd-addons/advanced-cluster-management-index@sha256:f9a473a16d2176b3525d535872845ba709c1b9282a5859e5cc542d24a55e771a
+  publisher": "OSD Red Hat Addons"
+  sourceType: grpc
