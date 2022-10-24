@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
 
-CLUSTER_NAME=${1:-acmsre-sno-cf7h6}
-HUB_KUBECONFIG=${2:-/Users/cdoan/Downloads/playback-next-0-jsc47-admin-kubeconfig-acm.yaml}
-SPOKE_KUBECONFIG=${3:-}
+CLUSTER_NAME=${1:-example}
+HUB_KUBECONFIG=${2:-example}
+SPOKE_KUBECONFIG=${3:-example2}
 
 if [ -z $HUB_KUBECONFIG ]; then
   echo "HUB_KUBECONFIG ($HUB_KUBECONFIG) is not defined, exiting ..."
