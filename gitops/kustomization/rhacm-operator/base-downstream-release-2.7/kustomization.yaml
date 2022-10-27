@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: open-cluster-management
+# namespace: open-cluster-management
 
 generatorOptions:
   disableNameSuffixHash: true
@@ -9,7 +9,10 @@ generatorOptions:
 images:
   - name: acm-custom-registry
     newName: quay.io:443/acm-d/acm-custom-registry
-    newTag: 2.7.0-DOWNSTREAM-2022-09-26-17-43-53
+    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54
+  - name: mce-custom-registry
+    newName: quay.io:443/acm-d/mce-custom-registry
+    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54
 
 resources:
   - open-cluster-management-ns.yaml

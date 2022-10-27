@@ -2,6 +2,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: acm-custom-registry
+  namespace: open-cluster-management
 spec:
   ports:
     - name: grpc
@@ -10,3 +11,18 @@ spec:
       targetPort: 50051
   selector:
     app: acm-custom-registry
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mce-custom-registry
+  namespace: multicluster-engine
+spec:
+  ports:
+    - name: grpc
+      protocol: TCP
+      port: 50051
+      targetPort: 50051
+  selector:
+    app: mce-custom-registry
