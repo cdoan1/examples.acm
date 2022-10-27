@@ -1,0 +1,23 @@
+apiVersion: agent-install.openshift.io/v1beta1
+kind: InfraEnv
+metadata:
+  labels:
+    agentclusterinstalls.extensions.hive.openshift.io/location: raleigh
+    networkType: dhcp
+  name: dell-r730-069
+  namespace: dell-r730-069
+spec:
+  clusterRef:
+    name: dell-r730-069
+    namespace: dell-r730-069
+  agentLabels:
+    cluster-name: dell-r730-069
+    agentclusterinstalls.extensions.hive.openshift.io/location: raleigh
+  cpuArchitecture: x86_64
+  nmStateConfigLabelSelector:
+    matchLabels:
+      infraenvs.agent-install.openshift.io: dell-r730-069
+  pullSecretRef:
+    name: pullsecret-dell-r730-069
+    namespace: dell-r730-069
+  sshAuthorizedKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDYZGp2p18fxcuYMULI7PN9/NcX1FQWIGT525eT0nZ/1KJogMGns5BvlUiGXfKakrNnp1JQa03aYWYRRY2pNezLdyVZFTTvaId1QzL/LlkQwAlDNT8jiMjnhx/IqbDFy6mfP09OooBjQr/Ad9DztHOxZOsquKcEn6P4f7vVCdejYUYgrF41DD3cLB6PMWSo/oTAjgS6bWxLc366YG2qXJDsNfRWu+n4J4lZRLQOoCCv/xSxvYdl/vkGcTB6uxZ/OUaX+gyW7v2UiD21UuElEVGsBwJYCVRykxRY94ppAHWdryOwWTvBCPnbJbaDsc3WsrQds8DxhRAZiwtq5A74hjdrkMLUgd1Srdk2TXLY2x4LOcw8PX2d7zjYPkPZFipsalVk6ZVICQR0vHZmrAUc/WK1apYAOAtkEyHGOeflSuH/wNDLmFhZP4OS3t8IrrFU7h3sHvtQDoM6Ch3enrQOKhIc4kL2R3TMu7BmkQqOcay5xuj7PNSOcFH5q2fuRL73Qb0=

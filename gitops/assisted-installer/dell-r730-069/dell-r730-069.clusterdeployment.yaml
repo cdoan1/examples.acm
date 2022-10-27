@@ -1,0 +1,27 @@
+apiVersion: hive.openshift.io/v1
+kind: ClusterDeployment
+metadata:
+  annotations:
+    agentclusterinstalls.extensions.hive.openshift.io/location: raleigh
+  labels:
+    cluster.open-cluster-management.io/clusterset: default
+    hive.openshift.io/cluster-platform: agent-baremetal
+  name: dell-r730-069
+  namespace: dell-r730-069
+spec:
+  baseDomain: stolostron.io
+  clusterInstallRef:
+    group: extensions.hive.openshift.io
+    kind: AgentClusterInstall
+    name: dell-r730-069
+    version: v1beta1
+  clusterName: dell-r730-069
+  controlPlaneConfig:
+    servingCertificates: {}
+  platform:
+    agentBareMetal:
+      agentSelector:
+        matchLabels:
+          cluster-name: dell-r730-069
+  pullSecretRef:
+    name: pullsecret-cluster-dell-r730-069

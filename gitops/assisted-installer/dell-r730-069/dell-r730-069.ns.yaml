@@ -1,0 +1,7 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dell-r730-069
+  labels:
+    name: dell-r730-069

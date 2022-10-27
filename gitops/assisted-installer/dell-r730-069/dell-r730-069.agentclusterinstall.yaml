@@ -1,0 +1,21 @@
+apiVersion: extensions.hive.openshift.io/v1beta1
+kind: AgentClusterInstall
+metadata:
+  name: dell-r730-069
+  namespace: dell-r730-069
+spec:
+  clusterDeploymentRef:
+    name: dell-r730-069
+  imageSetRef:
+    name: img4.10.37-x86-64-appsub
+  networking:
+    clusterNetwork:
+    - cidr: 10.128.0.0/14
+      hostPrefix: 23
+    machineNetwork:
+    - cidr: 10.1.8.0/22
+    serviceNetwork:
+    - 172.30.0.0/16
+  provisionRequirements:
+    controlPlaneAgents: 1
+  sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDYZGp2p18fxcuYMULI7PN9/NcX1FQWIGT525eT0nZ/1KJogMGns5BvlUiGXfKakrNnp1JQa03aYWYRRY2pNezLdyVZFTTvaId1QzL/LlkQwAlDNT8jiMjnhx/IqbDFy6mfP09OooBjQr/Ad9DztHOxZOsquKcEn6P4f7vVCdejYUYgrF41DD3cLB6PMWSo/oTAjgS6bWxLc366YG2qXJDsNfRWu+n4J4lZRLQOoCCv/xSxvYdl/vkGcTB6uxZ/OUaX+gyW7v2UiD21UuElEVGsBwJYCVRykxRY94ppAHWdryOwWTvBCPnbJbaDsc3WsrQds8DxhRAZiwtq5A74hjdrkMLUgd1Srdk2TXLY2x4LOcw8PX2d7zjYPkPZFipsalVk6ZVICQR0vHZmrAUc/WK1apYAOAtkEyHGOeflSuH/wNDLmFhZP4OS3t8IrrFU7h3sHvtQDoM6Ch3enrQOKhIc4kL2R3TMu7BmkQqOcay5xuj7PNSOcFH5q2fuRL73Qb0=
