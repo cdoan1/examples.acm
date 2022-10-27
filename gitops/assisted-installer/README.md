@@ -11,7 +11,7 @@ Since this example does not define any baremetal host manifests, we won't automa
 1. Define the `.env.secret` file with the pull secret in the dell-r730-069 folder. We'll use kustomize to generate the secret. Alternatively, you can store the pull secret in `Vault` and leverage external secrets.
 
 ```bash
-cat > .env.test.secret <<EOF
+cat > .env.secret <<EOF
 .dockerconfigjson=$(oc get secret pull-secret -n openshift-config -ojsonpath='{.data.\.dockerconfigjson}' | base64 --decode | jq -c .)
 EOF
 ```
