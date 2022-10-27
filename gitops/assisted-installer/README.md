@@ -27,3 +27,18 @@ oc apply -k .
 
 4. Manually download and boot the discrovery .ISO file.
 5. Accept the host, and the OCP provision will start.
+
+## Deploy an baremetal OCP cluster behind a VPN
+
+It is possible to use ACM/MCE on AWS and provision a baremtal cluster on prem behind your corporate vpn using the procedure described above.
+After the cluster is provisioned, we will need perform a direct import of the new baremtal cluster becasue the vpn blocks the default autoimport step after cluster provisioning.
+
+For small number of clusters, we can use the script here: `./hack/lab-cluster-import/direct-import.sh`
+
+`./direct-import.sh [managedcluster name] [path to hub kubeconfig] [path to spoke kubeconfig]`
+
+Example:
+
+```bash
+./hack/lab-cluster-import/direct-import.sh dell-r730-069 /Users/cdoan/Downloads/randy /Users/cdoan/Downloads/dell-r730-069-kubeconfig.yaml
+```
