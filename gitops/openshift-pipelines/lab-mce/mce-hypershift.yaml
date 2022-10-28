@@ -4,7 +4,6 @@ kind: Pipeline
 metadata:
   name: mce-hypershift
   namespace: open-cluster-management-pipelines-mce
-  description: "1. Enable hypershoft 2. Create a hostedcluster."
 spec:
   params:
   - name: kubeconfig
