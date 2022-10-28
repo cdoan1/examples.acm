@@ -10,4 +10,5 @@ resources:
 - ns.yaml
 - mce-hypershift.yaml
 - task_mce_hypershift_create_hostedcluster.yaml
+- task_mce_install_acm.yaml
 - shared-workspace-pvc.yaml
