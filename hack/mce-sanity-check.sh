@@ -7,9 +7,11 @@ TOP=$(pwd)
 echo "Current kube context"
 oc cluster-info
 
-if [[ "$(params.kubeconfig)" != "" ]]; then
+export K=$(params.kubeconfig)
+
+if [[ "$K" != "" ]]; then
     echo "Switching kubeconfig context"
-    echo $(params.kubeconfig) | base64 --decode > $TOP/remote.kubeconfig
+    echo $K | base64 --decode > $TOP/remote.kubeconfig
     export KUBECONFIG=$TOP/remote.kubeconfig
     oc cluster-info
 fi
