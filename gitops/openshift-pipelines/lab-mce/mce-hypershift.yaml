@@ -33,6 +33,17 @@ spec:
     workspaces:
     - name: output
       workspace: shared-workspace
+  - name: deploy-acm
+    runAfter:
+    - fetch-repo
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-install-acm
+    workspaces:
+    - name: source
+      workspace: shared-workspace
   - name: enable-hypershift
     runAfter:
     - fetch-repo
