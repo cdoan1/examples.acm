@@ -9,4 +9,5 @@ generatorOptions:
 resources:
 - ns.yaml
 - mce-hypershift.yaml
+- task_mce_hypershift_create_hostedcluster.yaml
 - shared-workspace-pvc.yaml
