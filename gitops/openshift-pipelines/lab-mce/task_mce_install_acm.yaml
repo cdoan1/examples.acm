@@ -43,7 +43,8 @@ spec:
       mv temp.yaml $KUSTOM
 
       oc apply -k ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d
-      sleep 20
+
+      sleep 60
       oc wait --for condition=Ready pods -n open-cluster-management -l name=multiclusterhub-operator --timeout=120s
       
       # todo(cdoan): hack create the mch pull secret
