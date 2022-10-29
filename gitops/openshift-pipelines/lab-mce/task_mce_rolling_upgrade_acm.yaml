@@ -51,7 +51,7 @@ spec:
       kind: CatalogSource
       metadata:
         name: acm-custom-registry
-        namespace: $NS
+        namespace: open-cluster-management
       spec:
         displayName: Advanced Cluster Management
         image: quay.io:443/acm-d/acm-custom-registry:$(params.upgrade-snapshot)
@@ -69,7 +69,7 @@ spec:
       kind: CatalogSource
       metadata:
         name: multiclusterengine-catalog
-        namespace: $NS2
+        namespace: multicluster-engine
       spec:
         displayName: MultiCluster Engine
         image: quay.io:443/acm-d/mce-custom-registry:$(params.upgrade-snapshot)
