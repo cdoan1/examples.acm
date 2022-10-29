@@ -26,7 +26,7 @@ spec:
   - args:
     - |-
       set -e
-
+      set -x
       if [ -f $(pwd)/remote.kubeconfig ]; then
         export KUBECONFIG=$(pwd)/remote.kubeconfig
       else
@@ -43,8 +43,10 @@ spec:
       mv temp.yaml $KUSTOM
 
       oc apply -k ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d
-      oc wait --for condition=Ready pods -n open-cluster-management -l name=multiclusterhub-operator --timeout=90s
 
+      oc wait --for condition=Ready pods -n open-cluster-management -l name=multiclusterhub-operator --timeout=90s
+      sleep 30
+      
       # todo(cdoan): hack create the mch pull secret
       oc get secret pull-secret -n openshift-config -o yaml \
         | sed "s/namespace: openshift-config/namespace: open-cluster-management/g" \
@@ -56,6 +58,7 @@ spec:
       
       oc apply -k ./gitops/kustomization/rhacm-instance/overlays/downstream-release-2.7-catalogsource
       
+      set +x
       set +e
       exit 0
     command:
