@@ -84,7 +84,7 @@ spec:
             interval: 10m
       EOF
 
-      sleep 2
+      sleep 20
 
       oc wait --for="condition=Ready" pod -l app=acm-custom-registry -n open-cluster-management
 
@@ -97,7 +97,7 @@ spec:
       oc -n open-cluster-management delete subscription.operator advanced-cluster-management || exit 1
       oc -n multicluster-engine delete subscription.operator multicluster-engine || exit 1
       
-      sleep 2
+      sleep 20
 
       oc create -f - <<EOF
       apiVersion: operators.coreos.com/v1alpha1
