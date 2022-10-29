@@ -13,6 +13,7 @@ resources:
 - mce-hypershift-uninstall.yaml
 - task_mce_enable_kubeconfig.yaml
 - task_mce_install_acm.yaml
+- task_mce_wait_ready.yaml
 - task_mce_check_status.yaml
 - task_mce_hypershift_create_hostedcluster.yaml
 - task_mce_uninstall_acm.yaml

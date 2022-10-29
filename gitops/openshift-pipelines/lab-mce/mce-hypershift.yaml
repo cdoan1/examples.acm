@@ -67,9 +67,20 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
-  - name: check-status
+  - name: wait-ready
     runAfter:
     - deploy-acm
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-wait-ready
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: check-status
+    runAfter:
+    - wait-ready
     params:
     - name: kubeconfig
       value: $(params.kubeconfig)
