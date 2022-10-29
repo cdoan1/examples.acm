@@ -2,7 +2,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: mce-install-acm
+  name: mce-uninstall-acm
   namespace: open-cluster-management-pipelines-mce
 spec:
   params:
@@ -30,6 +30,7 @@ spec:
       if [ -f $(pwd)/remote.kubeconfig ]; then
         export KUBECONFIG=$(pwd)/remote.kubeconfig
       else
+        echo "remote kubeconfig not found"
         exit 1
       fi
       
@@ -42,19 +43,8 @@ spec:
       cat $KUSTOM | sed -r "s/    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54/    newTag: $S/g" > temp.yaml
       mv temp.yaml $KUSTOM
 
-      oc apply -k ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d
-      oc wait --for condition=Ready pods -n open-cluster-management -l name=multiclusterhub-operator --timeout=90s
-
-      # todo(cdoan): hack create the mch pull secret
-      oc get secret pull-secret -n openshift-config -o yaml \
-        | sed "s/namespace: openshift-config/namespace: open-cluster-management/g" \
-        | sed "s/name: pull-secret/name: multiclusterhub-operator-pull-secret/g" \
-        | sed "/  resourceVersion:/d" \
-        | sed "/  uid:/d" \
-        | sed "/  creationTimestamp:/d" \
-        | oc apply -f -
-      
-      oc apply -k ./gitops/kustomization/rhacm-instance/overlays/downstream-release-2.7-catalogsource
+      echo "oc delete mce multiclusterengine --all -n multicluster-engine"
+      echo "oc delete mch multiclusterhub --all -n open-cluster-management"
       
       set +e
       exit 0
