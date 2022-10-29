@@ -86,7 +86,7 @@ spec:
 
       sleep 10
 
-      oc wait --for="condition=Ready" pod -l app=acm-custom-registry -n open-cluster-management --timeout=60s || true
+      oc wait --for="condition=Ready" pod -l olm.catalogSource=acm-custom-registry -n open-cluster-management --timeout=60s || true
 
       oc -n open-cluster-management delete csv advanced-cluster-management.v2.7.0 || exit 1
       oc -n multicluster-engine delete csv multicluster-engine.v2.2.0 || exit 1
