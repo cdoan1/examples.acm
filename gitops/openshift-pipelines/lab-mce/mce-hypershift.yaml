@@ -21,7 +21,7 @@ spec:
   - name: start-snapshot
     type: string
     description: "snapshot version to initially install."
-    default: ""
+    default: "2.7.0-DOWNSTREAM-2022-10-07-00-46-31"
   - name: upgrade-snapshot
     type: string
     description: "snapshot version to upgrade too."

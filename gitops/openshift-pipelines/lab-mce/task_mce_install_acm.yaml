@@ -35,9 +35,20 @@ spec:
       
       oc cluster-info
 
-      sed "s/    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54/    newTag: "$(params.start-snapshot)"/g" ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d/kustomization.yaml
-      cat ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d/kustomization.yaml
+      KUSTOM=./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d/kustomization.yaml
 
+      set -x
+
+      S=$(params.start-snapshot)
+      echo "$S"
+      
+      cat $KUSTOM | sed -r "s/    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54/    newTag: $S/g" > new-k.yaml
+      cp new-k.yaml $KUSTOM
+      cat $KUSTOM
+      cat new-k.yaml
+      ls -al
+      
+      set +x
       exit 0
 
       oc apply -k ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d
