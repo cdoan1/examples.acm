@@ -43,8 +43,8 @@ spec:
       cat $KUSTOM | sed -r "s/    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54/    newTag: $S/g" > temp.yaml
       mv temp.yaml $KUSTOM
 
-      echo "oc delete mce multiclusterengine --all -n multicluster-engine"
-      echo "oc delete mch multiclusterhub --all -n open-cluster-management"
+      oc delete mce multiclusterengine --all -n multicluster-engine
+      oc delete mch multiclusterhub --all -n open-cluster-management
       
       set +e
       exit 0
