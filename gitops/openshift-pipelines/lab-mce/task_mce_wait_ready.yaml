@@ -36,12 +36,16 @@ spec:
       
       # oc wait --for="condition=InstallSucceeded" csv -n multicluster-engine multicluster-engine.v2.2.0
 
-      ace_current_csv=$(oc get sub -n open-cluster-management -l operators.coreos.com/advanced-cluster-management.open-cluster-management= -ojsonpath='{.items[].status.currentCSV}')
       mce_current_csv=$(oc get sub -n multicluster-engine -ojsonpath='{.items[].status.currentCSV}')
       _mce_csv_condition=$(oc get csv -n multicluster-engine $mce_current_csv -ojsonpath='{.status.conditions[-1].phase}')
-      _acm_csv_condition=$(oc get csv -n open-cluster-management $acm_current_csv -ojsonpath='{.status.conditions[-1].phase}')
+
+      ace_current_csv=$(oc get sub -n open-cluster-management -l operators.coreos.com/advanced-cluster-management.open-cluster-management= -ojsonpath='{.items[].status.currentCSV}')
+      _acm_csv_condition=$(oc get csv -n open-cluster-management $ace_current_csv -ojsonpath='{.status.conditions[-1].phase}')
+
+      oc get csv -n open-cluster-management -ojsonpath='{.status.conditions[-1].phase}' advanced-cluster-management.v2.7.0
 
       echo "Ensure that csv are succeeded:"
+
       echo " mce: $_mce_csv_condition"
       echo " acm: $_acm_csv_condition"
       
