@@ -43,10 +43,21 @@ spec:
       cat $KUSTOM | sed -r "s/    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54/    newTag: $S/g" > temp.yaml
       mv temp.yaml $KUSTOM
 
-      set -x
-      oc delete mch multiclusterhub --all -n open-cluster-management
-      oc delete mce multiclusterengine --all -n multicluster-engine
-      set +x
+      NS=open-cluster-management
+
+      echo "$ oc delete mch --all -n open-cluster-management"
+      oc delete mch --all -n open-cluster-management
+      
+      echo "only the acm operator pods should be running now."
+      oc get pods -n $NS
+
+      _acm_currentcsv=$(oc get sub -n $NS -ojsonpath='{.items[].status.currentCSV}')
+      echo "$ oc delete csv $_acm_currentcsv -n $NS"
+      oc delete csv $_acm_currentcsv -n $NS
+
+      _acm_sub=$(oc get sub -n $NS -l operators.coreos.com/advanced-cluster-management.open-cluster-management= -o name)
+      echo "$ oc delete $_acm_sub -n $NS"
+      oc delete $_acm_sub -n $NS
 
       set +e
       exit 0
