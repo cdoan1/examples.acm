@@ -89,7 +89,6 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
-
   - name: rolling-upgrade
     runAfter:
     - check-status
@@ -114,7 +113,6 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
-
   - name: enable-hypershift
     runAfter:
     - enable-kubeconfig
