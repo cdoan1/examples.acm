@@ -1,4 +1,5 @@
 ---
+apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
   name: acm-custom-registry
