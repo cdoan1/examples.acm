@@ -38,7 +38,7 @@ spec:
       mce_current_csv=$(oc get sub -n open-cluster-management -l operators.coreos.com/advanced-cluster-management.open-cluster-management= -ojsonpath='{.items[].status.currentCSV}')
       mce_current_csv=$(oc get sub -n multicluster-engine -ojsonpath='{.items[].status.currentCSV}')
       _mce_csv_condition=$(oc get csv -n multicluster-engine $mce_current_csv -ojsonpath='{.status.conditions[-1]}')
-      _acm_csv_condition=$(oc get csv -n open-cluster-management $mce_current_csv -ojsonpath='{.status.conditions[-1]}')
+      _acm_csv_condition=$(oc get csv -n open-cluster-management $acm_current_csv -ojsonpath='{.status.conditions[-1]}')
 
       echo "Ensure that csv are succeeded: $_mce_csv_condition $_acm_csv_condition"
       
