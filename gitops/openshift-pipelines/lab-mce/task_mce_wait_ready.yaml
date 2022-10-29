@@ -30,8 +30,8 @@ spec:
       NS2=multicluster-engine
 
       set -x
-      oc wait --for="condition=Available" mce multiclusterengine -n multicluster-engine --timeout=600s
       oc wait --for="condition=Complete" mch multiclusterhub -n open-cluster-management --timeout=600s
+      oc wait --for="condition=Available" mce multiclusterengine -n multicluster-engine --timeout=600s
       
       mce_current_csv=$(oc get sub -n multicluster-engine -ojsonpath='{.items[].status.currentCSV}')
       _mce_csv_condition=$(oc get csv -n multicluster-engine $mce_current_csv -ojsonpath='{.status.conditions[-1].phase}')
