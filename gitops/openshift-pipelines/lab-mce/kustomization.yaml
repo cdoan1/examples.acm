@@ -8,12 +8,12 @@ generatorOptions:
 
 resources:
 - ns.yaml
+- shared-workspace-pvc.yaml
 - mce-hypershift.yaml
 - mce-hypershift-uninstall.yaml
 - task_mce_enable_kubeconfig.yaml
 - task_mce_install_acm.yaml
 - task_mce_check_status.yaml
 - task_mce_hypershift_create_hostedcluster.yaml
-- shared-workspace-pvc.yaml
 - task_mce_uninstall_acm.yaml
 - task_mce_uninstall_acm_post_cleanup.yaml

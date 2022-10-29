@@ -45,6 +45,10 @@ spec:
 
       NS=open-cluster-management
 
+      if ! oc get mch -n $NS | grep "multiclusterhub"; then
+        echo "mch already deleted." && exit 0
+      fi
+
       echo "$ oc delete mch --all -n open-cluster-management"
       oc delete mch --all -n open-cluster-management
       
@@ -58,7 +62,7 @@ spec:
       _acm_sub=$(oc get sub -n $NS -l operators.coreos.com/advanced-cluster-management.open-cluster-management= -o name)
       echo "$ oc delete $_acm_sub -n $NS"
       oc delete $_acm_sub -n $NS
-
+      
       set +e
       exit 0
     command:
