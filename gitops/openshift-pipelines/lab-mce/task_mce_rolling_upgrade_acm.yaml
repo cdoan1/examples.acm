@@ -91,7 +91,10 @@ spec:
       oc -n open-cluster-management delete csv advanced-cluster-management.v2.7.0 || exit 1
       oc -n multicluster-engine delete csv multicluster-engine.v2.2.0 || exit 1
 
-      oc -n open-cluster-management delete subscription.operator acm-operator-subscription || exit 1
+      # new: advanced-cluster-management
+      # old: acm-operator-subscription
+
+      oc -n open-cluster-management delete subscription.operator advanced-cluster-management || exit 1
       oc -n multicluster-engine delete subscription.operator multicluster-engine || exit 1
       
       sleep 2
@@ -102,7 +105,7 @@ spec:
       metadata:
         labels:
           operators.coreos.com/advanced-cluster-management.open-cluster-management: ""
-        name: acm-operator-subscription
+        name: advanced-cluster-management
         namespace: open-cluster-management
       spec:
         channel: release-2.7
