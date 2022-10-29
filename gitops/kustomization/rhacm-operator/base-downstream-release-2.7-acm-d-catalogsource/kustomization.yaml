@@ -15,8 +15,6 @@ images:
 resources:
   - open-cluster-management-ns.yaml
   - open-cluster-management-operatorgroup.yaml
-  - custom-registry-deployment.yaml
-  - custom-registry-service.yaml
   - catalog-source.yaml
   - advanced-cluster-management-sub.yaml
   - rhacm-repo.yaml
