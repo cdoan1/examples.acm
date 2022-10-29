@@ -18,7 +18,7 @@ spec:
       export K=$(params.kubeconfig)
       if [ -z $K ]; then
         echo "kubeconfig is empty, check if this is a managed cluster, and we have the kubeconfig."
-        if [ "$(params.managed-cluster)" != "" ]]; then
+        if [[ "$(params.managed-cluster)" != "" ]]; then
           echo "found managed cluster $(params.managed-cluster)"
           if oc get secret -n cdoan-hosting-cluster -l hive.openshift.io/secret-type=kubeconfig -o name; then
             _SECRET=$(oc get secret -n cdoan-hosting-cluster -l hive.openshift.io/secret-type=kubeconfig -o name)
