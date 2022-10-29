@@ -53,45 +53,46 @@ spec:
 
         # mch will hang on delete if there is no mce csv to delete
         oc delete -f - <<EOF
-        apiVersion: operators.coreos.com/v1alpha1
-        kind: Subscription
-        metadata:
-          labels:
-            installer.name: multiclusterhub
-            installer.namespace: open-cluster-management
-            multiclusterhubs.operator.open-cluster-management.io/managed-by: "true"
-            operators.coreos.com/multicluster-engine.multicluster-engine: ""
-          name: multicluster-engine
-          namespace: multicluster-engine
-        spec:
-          channel: stable-2.2
-          config: {}
-          installPlanApproval: Automatic
-          name: multicluster-engine
-          source: mce-custom-registry
-          sourceNamespace: multicluster-engine
-        EOF
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        labels:
+          installer.name: multiclusterhub
+          installer.namespace: open-cluster-management
+          multiclusterhubs.operator.open-cluster-management.io/managed-by: "true"
+          operators.coreos.com/multicluster-engine.multicluster-engine: ""
+        name: multicluster-engine
+        namespace: multicluster-engine
+      spec:
+        channel: stable-2.2
+        config: {}
+        installPlanApproval: Automatic
+        name: multicluster-engine
+        source: mce-custom-registry
+        sourceNamespace: multicluster-engine
+      EOF
+
         sleep 2
 
         oc delete -f - <<EOF
-        apiVersion: operators.coreos.com/v1alpha1
-        kind: Subscription
-        metadata:
-          labels:
-            installer.name: multiclusterhub
-            installer.namespace: open-cluster-management
-            multiclusterhubs.operator.open-cluster-management.io/managed-by: "true"
-            operators.coreos.com/multicluster-engine.multicluster-engine: ""
-          name: multicluster-engine
-          namespace: multicluster-engine
-        spec:
-          channel: stable-2.2
-          config: {}
-          installPlanApproval: Automatic
-          name: multicluster-engine
-          source: mce-custom-registry
-          sourceNamespace: multicluster-engine
-        EOF
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        labels:
+          installer.name: multiclusterhub
+          installer.namespace: open-cluster-management
+          multiclusterhubs.operator.open-cluster-management.io/managed-by: "true"
+          operators.coreos.com/multicluster-engine.multicluster-engine: ""
+        name: multicluster-engine
+        namespace: multicluster-engine
+      spec:
+        channel: stable-2.2
+        config: {}
+        installPlanApproval: Automatic
+        name: multicluster-engine
+        source: mce-custom-registry
+        sourceNamespace: multicluster-engine
+      EOF
 
         oc delete mch --all -n open-cluster-management
       }
