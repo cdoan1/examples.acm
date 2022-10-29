@@ -18,6 +18,14 @@ spec:
     type: string
     description: "ocp release image version to install the hostedcluster."
     default: ""
+  - name: start-snapshot
+    type: string
+    description: "snapshot version to initially install."
+    default: ""
+  - name: upgrade-snapshot
+    type: string
+    description: "snapshot version to upgrade too."
+    default: ""
   tasks:
   - name: fetch-repo
     params:
@@ -33,14 +41,40 @@ spec:
     workspaces:
     - name: output
       workspace: shared-workspace
-  - name: deploy-acm
+  - name: enable-kubeconfig
     runAfter:
     - fetch-repo
     params:
     - name: kubeconfig
       value: $(params.kubeconfig)
     taskRef:
+      name: mce-enable-kubeconfig
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: deploy-acm
+    runAfter:
+    - enable-kubeconfig
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    - name: start-snapshot
+      value: $(params.start-snapshot)
+    - name: upgrade-snapshot
+      value: $(params.upgrade-snapshot)
+    taskRef:
       name: mce-install-acm
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: check-status
+    runAfter:
+    - deploy-acm
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-check-status
     workspaces:
     - name: source
       workspace: shared-workspace
