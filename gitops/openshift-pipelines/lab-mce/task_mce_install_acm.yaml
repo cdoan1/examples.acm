@@ -36,26 +36,15 @@ spec:
       oc cluster-info
 
       KUSTOM=./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d/kustomization.yaml
-
-      set -x
-
       S=$(params.start-snapshot)
-      echo "$S"
-      echo "$(params.start-snapshot)"
-      
-      cat $KUSTOM | sed -r "s/    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54/    newTag: $S/g" > new-k.yaml
-      cp new-k.yaml $KUSTOM
-      cat $KUSTOM
-      cat new-k.yaml
-      ls -al
-      
-      set +x
-      exit 0
+      echo "Updating start-snapshot: $S"
+      cat $KUSTOM | sed -r "s/    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54/    newTag: $S/g" > temp.yaml
+      mv temp.yaml $KUSTOM
 
       oc apply -k ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d
       oc wait --for condition=Ready pods -n open-cluster-management -l name=multiclusterhub-operator --timeout=90s
 
-      # todo(cdoan): hack
+      # todo(cdoan): hack create the mch pull secret
       oc get secret pull-secret -n openshift-config -o yaml \
         | sed "s/namespace: openshift-config/namespace: open-cluster-management/g" \
         | sed "s/name: pull-secret/name: multiclusterhub-operator-pull-secret/g" \
