@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+images:
+  - name: acm-custom-registry
+    newName: quay.io:443/acm-d/acm-custom-registry
+    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54
+  - name: mce-custom-registry
+    newName: quay.io:443/acm-d/mce-custom-registry
+    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54
+
+resources:
+  - open-cluster-management-ns.yaml
+  - open-cluster-management-operatorgroup.yaml
+  - custom-registry-deployment.yaml
+  - custom-registry-service.yaml
+  - catalog-source.yaml
+  - advanced-cluster-management-sub.yaml
+  - rhacm-repo.yaml
