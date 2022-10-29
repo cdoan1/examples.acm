@@ -49,7 +49,7 @@ spec:
       if [[ $(oc get pods -n $NS -o name | wc -l) -gt 0 ]]; then
         oc get deployment -n $NS -o name | xargs -I % oc delete % -n $NS
       fi
-      set +
+      set +x
       
       set +e
       exit 0
