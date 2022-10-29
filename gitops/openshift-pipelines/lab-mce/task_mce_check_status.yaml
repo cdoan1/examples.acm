@@ -63,6 +63,12 @@ spec:
       oc get mch -o yaml -n open-cluster-management
       oc get mce -o yaml -n multicluster-engine 
 
+      oc get pods -n open-cluster-management-agent -o yaml | grep "image:" | sort -u | grep -v f:image | sed s'#    -#     #' | sort -u
+      for i in open-cluster-management open-cluster-management-hub multicluster-engine
+      do
+        oc get pods -n $i -o yaml | grep "image:" | sort -u | grep -v f:image | sed s'#    -#     #' | sort -u
+      done
+
       exit 0
     command:
     - /bin/bash

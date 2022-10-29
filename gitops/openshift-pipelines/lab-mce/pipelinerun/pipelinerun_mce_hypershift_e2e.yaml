@@ -18,7 +18,8 @@ spec:
   - name: start-snapshot
     value: 2.7.0-DOWNSTREAM-2022-10-07-00-46-31
   - name: upgrade-snapshot
-    value: 2.7.0-DOWNSTREAM-2022-10-28-18-36-56
+    value: 2.7.0-DOWNSTREAM-2022-10-24-01-24-39
+    # value: 2.7.0-DOWNSTREAM-2022-10-28-18-36-56 - successful
     # value: 2.7.0-DOWNSTREAM-2022-10-20-05-23-04 - successful
   pipelineRef:
     name: mce-hypershift-e2e
