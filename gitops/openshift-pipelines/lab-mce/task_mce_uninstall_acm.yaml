@@ -47,10 +47,12 @@ spec:
       NS=open-cluster-management
 
       function retry_loop() {
+        set -x
         oc apply -k ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d
-        oc wait --for condition=Ready pods -n open-cluster-management -l name=multiclusterhub-operator --timeout=90s
         sleep 20
-        oc delete mch --all -n open-cluster-management  
+        oc wait --for condition=Ready pods -n open-cluster-management -l name=multiclusterhub-operator --timeout=90s
+        oc delete mch --all -n open-cluster-management
+        set +x
       }
 
       if ! oc get mch -n $NS | grep "multiclusterhub"; then
