@@ -112,7 +112,7 @@ spec:
         installPlanApproval: Automatic
         name: advanced-cluster-management
         source: acm-custom-registry
-        sourceNamespace: openshift-marketplace
+        sourceNamespace: open-cluster-management
         startingCSV: advanced-cluster-management.v2.7.0
       EOF
       if [ $? -ne 0 ]; then
@@ -132,8 +132,8 @@ spec:
         channel: stable-2.2
         installPlanApproval: Automatic
         name: multicluster-engine
-        source: multiclusterengine-catalog
-        sourceNamespace: openshift-marketplace
+        source: mce-custom-registry
+        sourceNamespace: multicluster-engine
       EOF
       if [ $? -ne 0 ]; then
         echo "failed to apply subscription mce"
