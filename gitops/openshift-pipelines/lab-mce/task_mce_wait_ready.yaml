@@ -29,25 +29,24 @@ spec:
       NS=open-cluster-management
       NS2=multicluster-engine
 
-      
-      echo "Ensure that the operand are available or Complete"
+      set -x
       oc wait --for="condition=Available" mce multiclusterengine -n multicluster-engine --timeout=600s
       oc wait --for="condition=Complete" mch multiclusterhub -n open-cluster-management --timeout=600s
       
-      # oc wait --for="condition=InstallSucceeded" csv -n multicluster-engine multicluster-engine.v2.2.0
-
       mce_current_csv=$(oc get sub -n multicluster-engine -ojsonpath='{.items[].status.currentCSV}')
       _mce_csv_condition=$(oc get csv -n multicluster-engine $mce_current_csv -ojsonpath='{.status.conditions[-1].phase}')
 
       ace_current_csv=$(oc get sub -n open-cluster-management -l operators.coreos.com/advanced-cluster-management.open-cluster-management= -ojsonpath='{.items[].status.currentCSV}')
       _acm_csv_condition=$(oc get csv -n open-cluster-management $ace_current_csv -ojsonpath='{.status.conditions[-1].phase}')
+      set +x
 
-      oc get csv -n open-cluster-management -ojsonpath='{.status.conditions[-1].phase}' advanced-cluster-management.v2.7.0
+      echo " mce csv: $_mce_csv_condition"
+      echo " acm csv: $_acm_csv_condition"
 
-      echo "Ensure that csv are succeeded:"
-
-      echo " mce: $_mce_csv_condition"
-      echo " acm: $_acm_csv_condition"
+      if [[ $_mce_csv_condition != "Succeeded" ]] || [[ $_acm_csv_condition != "Succeeded" ]]; then
+        echo "operator csv failed to complete."
+        exit 1
+      fi
       
       exit 0
     command:
