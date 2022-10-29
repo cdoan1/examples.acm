@@ -103,6 +103,17 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
+  - name: rolling-upgrade-wait-ready
+    runAfter:
+    - deploy-acm
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-wait-ready
+    workspaces:
+    - name: source
+      workspace: shared-workspace
 
   - name: enable-hypershift
     runAfter:
