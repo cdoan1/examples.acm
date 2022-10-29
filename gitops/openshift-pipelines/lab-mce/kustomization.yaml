@@ -16,3 +16,4 @@ resources:
 - task_mce_hypershift_create_hostedcluster.yaml
 - shared-workspace-pvc.yaml
 - task_mce_uninstall_acm.yaml
+- task_mce_uninstall_acm_post_cleanup.yaml

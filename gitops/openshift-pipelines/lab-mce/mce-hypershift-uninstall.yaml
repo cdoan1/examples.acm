@@ -67,6 +67,21 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
+  - name: post-cleanup
+    runAfter:
+    - uninstall-acm
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    - name: start-snapshot
+      value: $(params.start-snapshot)
+    - name: upgrade-snapshot
+      value: $(params.upgrade-snapshot)
+    taskRef:
+      name: mce-uninstall-acm-post-cleanup
+    workspaces:
+    - name: source
+      workspace: shared-workspace
 
   workspaces:
   - name: shared-workspace
