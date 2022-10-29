@@ -38,7 +38,7 @@ spec:
       # hack to set/update the snapshot version
       KUSTOM=./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d/kustomization.yaml
       S=$(params.upgrade-snapshot)
-      echo "Updating start-snapshot: $S"
+      echo "Updating upgrade-snapshot: $S"
       cat $KUSTOM | sed -r "s/    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54/    newTag: $S/g" > temp.yaml
       mv temp.yaml $KUSTOM
 
@@ -54,7 +54,7 @@ spec:
         namespace: $NS
       spec:
         displayName: Advanced Cluster Management
-        image: quay.io:443/acm-d/acm-custom-registry:$(params.snapshot)
+        image: quay.io:443/acm-d/acm-custom-registry:$(params.upgrade-snapshot)
         publisher: Red Hat
         secrets:
         - multiclusterhub-operator-pull-secret
@@ -72,7 +72,7 @@ spec:
         namespace: $NS2
       spec:
         displayName: MultiCluster Engine
-        image: quay.io:443/acm-d/mce-custom-registry:$(params.snapshot)
+        image: quay.io:443/acm-d/mce-custom-registry:$(params.upgrade-snapshot)
         publisher: Red Hat
         sourceType: grpc
         updateStrategy:
