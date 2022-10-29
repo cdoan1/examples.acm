@@ -41,6 +41,7 @@ spec:
 
       S=$(params.start-snapshot)
       echo "$S"
+      echo "$(params.start-snapshot)"
       
       cat $KUSTOM | sed -r "s/    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54/    newTag: $S/g" > new-k.yaml
       cp new-k.yaml $KUSTOM
