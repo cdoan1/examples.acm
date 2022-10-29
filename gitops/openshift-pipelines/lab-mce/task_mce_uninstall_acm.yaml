@@ -50,9 +50,52 @@ spec:
         oc apply -k ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d
         sleep 20
         oc wait --for condition=Ready pods -n open-cluster-management -l name=multiclusterhub-operator --timeout=90s
+
+        # mch will hang on delete if there is no mce csv to delete
+        oc delete -f - <<EOF
+        apiVersion: operators.coreos.com/v1alpha1
+        kind: Subscription
+        metadata:
+          labels:
+            installer.name: multiclusterhub
+            installer.namespace: open-cluster-management
+            multiclusterhubs.operator.open-cluster-management.io/managed-by: "true"
+            operators.coreos.com/multicluster-engine.multicluster-engine: ""
+          name: multicluster-engine
+          namespace: multicluster-engine
+        spec:
+          channel: stable-2.2
+          config: {}
+          installPlanApproval: Automatic
+          name: multicluster-engine
+          source: mce-custom-registry
+          sourceNamespace: multicluster-engine
+        EOF
+        sleep 2
+
+        oc delete -f - <<EOF
+        apiVersion: operators.coreos.com/v1alpha1
+        kind: Subscription
+        metadata:
+          labels:
+            installer.name: multiclusterhub
+            installer.namespace: open-cluster-management
+            multiclusterhubs.operator.open-cluster-management.io/managed-by: "true"
+            operators.coreos.com/multicluster-engine.multicluster-engine: ""
+          name: multicluster-engine
+          namespace: multicluster-engine
+        spec:
+          channel: stable-2.2
+          config: {}
+          installPlanApproval: Automatic
+          name: multicluster-engine
+          source: mce-custom-registry
+          sourceNamespace: multicluster-engine
+        EOF
+
         oc delete mch --all -n open-cluster-management
       }
-
+      
       if ! oc get mch -n $NS | grep "multiclusterhub"; then
         echo "mch already deleted." && exit 0
       fi
