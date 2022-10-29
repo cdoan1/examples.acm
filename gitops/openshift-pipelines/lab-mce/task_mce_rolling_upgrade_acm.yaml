@@ -1,0 +1,147 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: mce-rolling-upgrade-acm
+  namespace: open-cluster-management-pipelines-mce
+spec:
+  params:
+  - name: kubeconfig
+    default: ""
+    description: "base64 encoded kubeconfig of the cluster we want to run this task on. Default to empty string, use the current cluster."
+    type: string
+  - name: managed-cluster
+    default: "cdoan-hosting-cluster"
+    description: "name of the managed cluster to run tasks on."
+    type: string
+  - name: start-snapshot
+    default: "2.7.0-DOWNSTREAM-2022-10-07-00-46-31"
+    description: "sprint 18"
+    type: string
+  - name: upgrade-snapshot
+    default: "2.7.0-DOWNSTREAM-2022-10-20-05-23-04"
+    description: "sprint 19"
+    type: string
+  steps:
+  - args:
+    - |-
+      set -e
+      set -x
+      if [ -f $(pwd)/remote.kubeconfig ]; then
+        export KUBECONFIG=$(pwd)/remote.kubeconfig
+      else
+        exit 1
+      fi
+      
+      oc cluster-info
+
+      # hack to set/update the snapshot version
+      KUSTOM=./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d/kustomization.yaml
+      S=$(params.upgrade-snapshot)
+      echo "Updating start-snapshot: $S"
+      cat $KUSTOM | sed -r "s/    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54/    newTag: $S/g" > temp.yaml
+      mv temp.yaml $KUSTOM
+
+      NS=open-cluster-management
+      NS2=multicluster-engine
+
+      echo "Deploying a new ACM Catalog Source."
+      oc apply -f - <<EOF
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      metadata:
+        name: acm-custom-registry
+        namespace: $NS
+      spec:
+        displayName: Advanced Cluster Management
+        image: quay.io:443/acm-d/acm-custom-registry:$(params.snapshot)
+        publisher: Red Hat
+        secrets:
+        - multiclusterhub-operator-pull-secret
+        sourceType: grpc
+        updateStrategy:
+          registryPoll:
+            interval: 10m
+      EOF
+
+      oc apply -f - <<EOF
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      metadata:
+        name: multiclusterengine-catalog
+        namespace: $NS2
+      spec:
+        displayName: MultiCluster Engine
+        image: quay.io:443/acm-d/mce-custom-registry:$(params.snapshot)
+        publisher: Red Hat
+        sourceType: grpc
+        updateStrategy:
+          registryPoll:
+            interval: 10m
+      EOF
+
+      sleep 2
+
+      oc wait --for="condition=Ready" pod -l app=acm-custom-registry -n open-cluster-management
+
+      oc -n open-cluster-management delete csv advanced-cluster-management.v2.7.0 || exit 1
+      oc -n multicluster-engine delete csv multicluster-engine.v2.2.0 || exit 1
+
+      oc -n open-cluster-management delete subscription.operator acm-operator-subscription || exit 1
+      oc -n multicluster-engine delete subscription.operator multicluster-engine || exit 1
+      
+      sleep 2
+
+      oc create -f - <<EOF
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        labels:
+          operators.coreos.com/advanced-cluster-management.open-cluster-management: ""
+        name: acm-operator-subscription
+        namespace: open-cluster-management
+      spec:
+        channel: release-2.7
+        installPlanApproval: Automatic
+        name: advanced-cluster-management
+        source: acm-custom-registry
+        sourceNamespace: openshift-marketplace
+        startingCSV: advanced-cluster-management.v2.7.0
+      EOF
+      if [ $? -ne 0 ]; then
+        echo "failed to apply subscription acm"
+        exit 1
+      fi
+
+      oc create -f - <<EOF
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        labels:
+          operators.coreos.com/multicluster-engine.multicluster-engine: ""
+        name: multicluster-engine
+        namespace: multicluster-engine
+      spec:
+        channel: stable-2.2
+        installPlanApproval: Automatic
+        name: multicluster-engine
+        source: multiclusterengine-catalog
+        sourceNamespace: openshift-marketplace
+      EOF
+      if [ $? -ne 0 ]; then
+        echo "failed to apply subscription mce"
+        exit 1
+      fi
+
+      set +x
+      set +e
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/acm-sre/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source

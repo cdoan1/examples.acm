@@ -89,6 +89,21 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
+
+  - name: rolling-upgrade
+    runAfter:
+    - check-status
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    - name: upgrade-snapshot
+      value: $(params.upgrade-snapshot)
+    taskRef:
+      name: mce-rolling-upgrade-acm
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
   - name: enable-hypershift
     runAfter:
     - enable-kubeconfig
