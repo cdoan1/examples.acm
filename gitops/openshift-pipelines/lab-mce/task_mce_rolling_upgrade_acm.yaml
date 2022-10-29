@@ -140,6 +140,9 @@ spec:
         exit 1
       fi
 
+      echo "hard wait 120s, before continuing"
+      sleep 120s
+
       set +x
       set +e
       exit 0
