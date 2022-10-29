@@ -91,7 +91,7 @@ spec:
       workspace: shared-workspace
   - name: enable-hypershift
     runAfter:
-    - fetch-repo
+    - enable-kubeconfig
     params:
     - name: kubeconfig
       value: $(params.kubeconfig)
