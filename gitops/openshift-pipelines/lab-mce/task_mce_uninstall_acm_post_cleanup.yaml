@@ -52,6 +52,9 @@ spec:
       oc get catalogsource -n $NS -o name | xargs -I % oc delete % -n $NS
       set +x
       
+      echo "wait 60s"
+      sleep 60
+      
       set +e
       exit 0
     command:
