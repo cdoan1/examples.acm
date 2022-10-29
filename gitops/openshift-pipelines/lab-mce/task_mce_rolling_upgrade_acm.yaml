@@ -72,7 +72,7 @@ spec:
       apiVersion: operators.coreos.com/v1alpha1
       kind: CatalogSource
       metadata:
-        name: multiclusterengine-catalog
+        name: mce-custom-registry
         namespace: multicluster-engine
       spec:
         displayName: MultiCluster Engine
