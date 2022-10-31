@@ -38,7 +38,7 @@ spec:
       OIDC_BUCKET_NAME=playbacknext-hypershift
       OIDC_BUCKET_REGION=us-west-1
       BASE_DOMAIN=demo.red-chesterfield.com
-      RELEASE=quay.io/openshift-release-dev/ocp-release:4.11.11-x86_64
+      # RELEASE=quay.io/openshift-release-dev/ocp-release:4.11.11-x86_64
 
       CLUSTER_NAME=$(params.managed-cluster)-hostedcluster
       INFRA_ID=$CLUSTER_NAME
@@ -97,12 +97,13 @@ spec:
         --aws-creds $AWS_CREDS \
         --pull-secret $PULL_SECRET \
         --region $REGION \
-        --release-image $RELEASE \
         --generate-ssh \
         --node-pool-replicas 3 \
         --namespace local-cluster \
         --render > hosted-cluster.yaml
 
+      # --release-image $RELEASE \
+      
       echo "🖐️ creating hostedcluster aws $CLUSTER_NAME"
       oc apply -f hosted-cluster.yaml
       oc annotate hostedcluster $CLUSTER_NAME "cluster.open-cluster-management.io/hypershiftdeployment=default/local-cluster" -n local-cluster --overwrite
