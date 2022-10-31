@@ -20,6 +20,11 @@ spec:
       set -e
       set -x
 
+      TOP=$(pwd)
+      PULL_SECRET=$TOP/pull-secret-hypershift.json
+      export NS=open-cluster-management-pipelines-rhacm
+      oc get secret multiclusterhub-operator-pull-secret-basic -n $NS -ojsonpath='{.data.\.dockerconfigjson}' | base64 --decode > $PULL_SECRET
+
       if [ -f $(pwd)/remote.kubeconfig ]; then
         export KUBECONFIG=$(pwd)/remote.kubeconfig
       else
@@ -27,14 +32,8 @@ spec:
         exit 1
       fi
 
-      TOP=$(pwd)
-      PULL_SECRET=$TOP/pull-secret-hypershift.json
-
       oc cluster-info
       
-      export NS=open-cluster-management-pipelines-rhacm
-      oc get secret multiclusterhub-operator-pull-secret-basic -n $NS -ojsonpath='{.data.\.dockerconfigjson}' | base64 --decode > $PULL_SECRET
-
       OIDC_BUCKET_NAME=playbacknext-hypershift
       OIDC_BUCKET_REGION=us-west-1
       BASE_DOMAIN=demo.red-chesterfield.com
@@ -103,7 +102,7 @@ spec:
         --render > hosted-cluster.yaml
 
       # --release-image $RELEASE \
-      
+
       echo "🖐️ creating hostedcluster aws $CLUSTER_NAME"
       oc apply -f hosted-cluster.yaml
       oc annotate hostedcluster $CLUSTER_NAME "cluster.open-cluster-management.io/hypershiftdeployment=default/local-cluster" -n local-cluster --overwrite
