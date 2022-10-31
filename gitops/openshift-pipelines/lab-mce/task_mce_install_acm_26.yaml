@@ -21,7 +21,7 @@ spec:
     type: string
   - name: upgrade-snapshot
     default: ""
-    description: ""
+    description: "none"
     type: string
   steps:
   - args:
