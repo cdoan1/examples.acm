@@ -39,7 +39,7 @@ spec:
       OIDC_BUCKET_REGION=us-west-1
       BASE_DOMAIN=demo.red-chesterfield.com
 
-      CLUSTER_NAME=$(params.managed-cluster)-hostedcluster
+      # CLUSTER_NAME=$(params.managed-cluster)-hostedcluster
       REGION=us-west-1
 
       aws s3api create-bucket --acl public-read --bucket $OIDC_BUCKET_NAME \
