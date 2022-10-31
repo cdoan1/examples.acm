@@ -161,7 +161,7 @@ spec:
 
   - name: enable-hypershift
     runAfter:
-    - enable-kubeconfig
+    - rolling-upgrade-check-status
     params:
     - name: kubeconfig
       value: $(params.kubeconfig)

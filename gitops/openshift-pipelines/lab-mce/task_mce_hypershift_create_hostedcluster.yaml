@@ -10,14 +10,181 @@ spec:
     default: ""
     description: "base64 encoded kubeconfig of the cluster we want to run this task on. Default to empty string, use the current cluster."
     type: string
+  - name: managed-cluster
+    default: "cdoan-hosting-cluster"
+    description: "name of this managed cluster, will use this value to construct the hostedcluster name."
+    type: string
   steps:
   - args:
     - |-
       set -e
+      set -x
 
-      export K=$(params.kubeconfig)
-      ./hack/mce-sanity-check.sh
+      if [ -f $(pwd)/remote.kubeconfig ]; then
+        export KUBECONFIG=$(pwd)/remote.kubeconfig
+      else
+        echo "Expected to find remote.kubeconfig. Existing."
+        exit 1
+      fi
 
+      TOP=$(pwd)
+      PULL_SECRET=$TOP/pull-secret-hypershift.json
+
+      oc cluster-info
+      
+      export NS=open-cluster-management-pipelines-rhacm
+      oc get secret multiclusterhub-operator-pull-secret-basic -n $NS -ojsonpath='{.data.\.dockerconfigjson}' | base64 --decode > $PULL_SECRET
+
+      OIDC_BUCKET_NAME=playbacknext-hypershift
+      OIDC_BUCKET_REGION=us-west-1
+      BASE_DOMAIN=demo.red-chesterfield.com
+      RELEASE=quay.io/openshift-release-dev/ocp-release:4.11.11-x86_64
+
+      CLUSTER_NAME=$(params.managed-cluster)-hostedcluster
+      INFRA_ID=$CLUSTER_NAME
+      REGION=us-west-1
+
+      if [ ! -f $AWS_CREDS ]; then
+        echo "Requires AWS credentials file."
+        exit 1
+      fi
+
+      AWS_CREDS=credentials
+      OUTPUT_INFRA_FILE=$TOP/hypershift_test_infra.json
+      OUTPUT_IAM_FILE=$TOP/hypershift_test_iam.json
+
+      git clone https://github.com/openshift/hypershift.git
+      cd hypershift
+      git checkout -b release-11
+      make build
+      install -m 0755 bin/hypershift /usr/local/bin/hypershift
+      hypershift version
+      cd $TOP
+
+      echo "🖐️ creating infra aws $CLUSTER_NAME"
+      hypershift create infra aws --name $CLUSTER_NAME \
+        --aws-creds $AWS_CREDS \
+        --base-domain $BASE_DOMAIN \
+        --infra-id $CLUSTER_NAME \
+        --region $REGION \
+        --output-file $OUTPUT_INFRA_FILE
+
+      PUBLIC_ZONE_ID=$(cat $OUTPUT_INFRA_FILE | jq '.publicZoneID' | tr -d '"')
+      PRIVATE_ZONE_ID=$(cat $OUTPUT_INFRA_FILE | jq '.privateZoneID' | tr -d '"')
+      LOCAL_ZONE_ID=$(cat $OUTPUT_INFRA_FILE | jq '.localZoneID' | tr -d '"')
+
+      echo "public zone id: $PUBLIC_ZONE_ID"
+      echo "private zone id: $PRIVATE_ZONE_ID"
+      echo "local zone id: $LOCAL_ZONE_ID"
+      
+      echo "🖐️ creating iam aws $CLUSTER_NAME"
+      hypershift create iam aws --infra-id $CLUSTER_NAME \
+        --aws-creds $AWS_CREDS \
+        --oidc-storage-provider-s3-bucket-name $OIDC_BUCKET_NAME \
+        --oidc-storage-provider-s3-region $OIDC_BUCKET_REGION \
+        --region $REGION \
+        --public-zone-id $PUBLIC_ZONE_ID \
+        --private-zone-id $PRIVATE_ZONE_ID \
+        --local-zone-id $LOCAL_ZONE_ID \
+        --output-file $OUTPUT_IAM_FILE
+
+      echo "🖐️ generate hostedcluster $CLUSTER_NAME manifest ..."
+      hypershift create cluster aws \
+        --name $CLUSTER_NAME \
+        --infra-id $CLUSTER_NAME \
+        --infra-json $OUTPUT_INFRA_FILE \
+        --iam-json $OUTPUT_IAM_FILE \
+        --aws-creds $AWS_CREDS \
+        --pull-secret $PULL_SECRET \
+        --region $REGION \
+        --release-image $RELEASE \
+        --generate-ssh \
+        --node-pool-replicas 3 \
+        --namespace local-cluster \
+        --render > hosted-cluster.yaml
+
+      echo "🖐️ creating hostedcluster aws $CLUSTER_NAME"
+      oc apply -f hosted-cluster.yaml
+      oc annotate hostedcluster $CLUSTER_NAME "cluster.open-cluster-management.io/hypershiftdeployment=default/local-cluster" -n local-cluster --overwrite
+
+      echo "🖐️ verify whoami ..." && oc whoami
+
+      echo "🖐️ create managedcluster CR ..."
+      cat <<EOF | oc apply -f -
+      apiVersion: cluster.open-cluster-management.io/v1
+      kind: ManagedCluster
+      metadata:
+        annotations:
+          import.open-cluster-management.io/klusterlet-deploy-mode: Hosted
+          import.open-cluster-management.io/hosting-cluster-name: local-cluster
+          import.open-cluster-management.io/klusterlet-namespace: klusterlet-$INFRA_ID
+          open-cluster-management/created-via: other
+        labels:
+          cloud: auto-detect
+          cluster.open-cluster-management.io/clusterset: default
+          name: $INFRA_ID
+          vendor: OpenShift
+        name: $INFRA_ID
+      spec:
+        hubAcceptsClient: true
+        leaseDurationSeconds: 60
+      EOF
+
+      echo "🖐️ wait 10m for hostedcluster to be available ..."
+      oc wait --for="condition=Available" hostedcluster $CLUSTER_NAME -n local-cluster --timeout=600s
+      oc wait --for="condition=ReconciliationSucceeded" hostedcluster $CLUSTER_NAME -n local-cluster --timeout=600s
+
+      oc apply -f - <<EOF
+      ---
+      apiVersion: addon.open-cluster-management.io/v1alpha1
+      kind: ManagedClusterAddOn
+      metadata:
+        name: config-policy-controller
+        namespace: $CLUSTER_NAME
+      spec:
+        installNamespace: open-cluster-management-agent-addon
+      ---
+      apiVersion: addon.open-cluster-management.io/v1alpha1
+      kind: ManagedClusterAddOn
+      metadata:
+        name: governance-policy-framework
+        namespace: $CLUSTER_NAME
+      spec:
+        installNamespace: open-cluster-management-agent-addon
+      EOF
+
+      echo "🖐️ wait 10m for hostedcluster ReconciliationSucceeded to be true ..."
+      oc wait --for="condition=ReconciliationSucceeded" hostedcluster $INFRA_ID -n local-cluster --timeout=600s || true
+      echo "🖐️ wait 10m for managedcluster to be available ..."
+      oc wait --for="condition=ManagedClusterConditionAvailable" managedcluster $INFRA_ID --timeout=600s || true
+
+      oc get hostedclusters -A
+      oc get managedclusters -A
+      oc get managedclusteraddon -A
+      
+      oc get mch multiclusterhub -n $NS -ojsonpath='{.status.currentVersion}'
+      
+      oc get mce multiclusterengine -n multicluster-engine -ojsonpath='{.status.currentVersion}'
+      
+      oc get pods -n local-cluster-$CLUSTER_NAME
+      
+      oc get pods -n klusterlet-$CLUSTER_NAME
+      oc get pods -n klusterlet-$CLUSTER_NAME -o yaml | grep "image:" | sort -u | grep -v f:image | sed s'#    -#     #' | sort -u | sed 's/^[ \t]*//'
+      
+      if oc get secret -n local-cluster $CLUSTER_NAME-admin-kubeconfig; then
+        oc get secret -n local-cluster $CLUSTER_NAME-admin-kubeconfig -ojsonpath='{.data.kubeconfig}' | base64 --decode > hostedcluster.kubeconfig
+        if [ -f hostedcluster.kubeconfig ]; then
+          export KUBECONFIG=hostedcluster.kubeconfig
+          oc cluster-info
+          oc get co
+          oc get pods -n open-cluster-management-agent-addon
+          oc get pods -n open-cluster-management-agent-addon -o yaml | grep "image:" | sort -u | grep -v f:image | sed s'#    -#     #' | sort -u | sed 's/^[ \t]*//'
+        fi
+      fi
+
+      echo "Done with hostedcluster task ..."
+
+      set +x
       set +e
       exit 0
     command:

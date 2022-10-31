@@ -116,7 +116,7 @@ spec:
       workspace: shared-workspace
   - name: enable-hypershift
     runAfter:
-    - enable-kubeconfig
+    - rolling-upgrade-wait-ready
     params:
     - name: kubeconfig
       value: $(params.kubeconfig)
