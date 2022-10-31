@@ -17,6 +17,7 @@ spec:
   steps:
   - args:
     - |-
+      set -x
 
       if [ -f $(pwd)/remote.kubeconfig ]; then
         export KUBECONFIG=$(pwd)/remote.kubeconfig
@@ -29,7 +30,6 @@ spec:
       NS=open-cluster-management
       NS2=multicluster-engine
 
-      set -x
       oc wait --for="condition=Complete" mch multiclusterhub -n open-cluster-management --timeout=600s
       oc wait --for="condition=Available" mce multiclusterengine -n multicluster-engine --timeout=600s
       
@@ -38,7 +38,6 @@ spec:
 
       ace_current_csv=$(oc get sub -n open-cluster-management -l operators.coreos.com/advanced-cluster-management.open-cluster-management= -ojsonpath='{.items[].status.currentCSV}')
       _acm_csv_condition=$(oc get csv -n open-cluster-management $ace_current_csv -ojsonpath='{.status.conditions[-1].phase}')
-      set +x
 
       echo " mce csv: $_mce_csv_condition"
       echo " acm csv: $_acm_csv_condition"
@@ -49,6 +48,7 @@ spec:
       fi
       
       echo "done with waiting."
+      set +x
       exit 0
     command:
     - /bin/bash
