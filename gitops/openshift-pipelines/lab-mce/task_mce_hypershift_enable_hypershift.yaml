@@ -19,6 +19,10 @@ spec:
     - |-
       set -e
 
+      oc extract secret/aws-credentials
+      mkdir ~/.aws
+      cp credentials ~/.aws
+
       if [ -f $(pwd)/remote.kubeconfig ]; then
         export KUBECONFIG=$(pwd)/remote.kubeconfig
       else
