@@ -48,6 +48,7 @@ spec:
         exit 1
       fi
       
+      echo "done with waiting."
       exit 0
     command:
     - /bin/bash

@@ -30,12 +30,12 @@ spec:
       NS2=multicluster-engine
 
       function check() {
-          if [[ "$1" == "Available" ]] || [[ "$1" == "Succeeded" ]] || [[ "$1" == "Running" ]]; then
-              icon="✅"
-          else
-              icon="❌ (Expected: Available | Succeeded | Running)"
-          fi
-          echo "$1 $icon"
+        if [[ "$1" == "Available" ]] || [[ "$1" == "Succeeded" ]] || [[ "$1" == "Running" ]]; then
+          icon="✅"
+        else
+          icon="❌ (Expected: Available | Succeeded | Running)"
+        fi
+        echo "$1 $icon"
       }
 
       acm_current_csv=$(oc get sub -n open-cluster-management -l operators.coreos.com/advanced-cluster-management.open-cluster-management= -ojsonpath='{.items[].status.currentCSV}')
