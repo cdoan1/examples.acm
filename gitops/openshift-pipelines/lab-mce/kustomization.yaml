@@ -14,6 +14,7 @@ resources:
 - mce_hypershift_e2e.yaml
 - task_mce_enable_kubeconfig.yaml
 - task_mce_install_acm.yaml
+- task_mce_install_acm_26.yaml
 - task_mce_wait_ready.yaml
 - task_mce_check_status.yaml
 - task_mce_rolling_upgrade_acm.yaml
