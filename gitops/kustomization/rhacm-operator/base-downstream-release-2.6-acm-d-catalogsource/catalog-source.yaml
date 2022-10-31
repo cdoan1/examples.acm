@@ -1,0 +1,31 @@
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: acm-custom-registry
+  namespace: open-cluster-management
+spec:
+  displayName: Advanced Cluster Management
+  image: quay.io:443/acm-d/acm-custom-registry:v2.6.1-RC1
+  publisher: Red Hat
+  secrets:
+  - multiclusterhub-operator-pull-secret
+  sourceType: grpc
+  updateStrategy:
+    registryPoll:
+      interval: 10m
+
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: mce-custom-registry
+  namespace: multicluster-engine
+spec:
+  displayName: MultiCluster Engine
+  image: quay.io:443/acm-d/mce-custom-registry:v2.6.1-RC1
+  publisher: Red Hat
+  sourceType: grpc
+  updateStrategy:
+    registryPoll:
+      interval: 10m
