@@ -14,3 +14,20 @@
 oc apply -k ./gitops/kustomization/rhacm-operator/base-release-2.4
 oc apply -k ./gitops/kustomization/rhacm-instance/base
 ```
+
+# ACM OCM Addon Testing
+
+On a new OCP cluster, we should be able to deploy the operator and operand and expect to see 2.6.2 installed.
+
+```bash
+oc apply -k gitops/kustomization/rhacm-operator/base-downstream-release-2.6.2-acm-ocm-addon-2.7.1
+oc apply -k gitops/kustomization/rhacm-instance/overlays/addon-release-2.6.2-acm-ocm-addon-2.7.1
+```
+
+On an existing cluster with OCP and ACM 2.6.1 installed, we expect to see ACM upgraded to 2.6.2.
+
+```bash
+oc apply -k gitops/kustomization/rhacm-operator/base-downstream-release-2.6-acm-d-catalogsource
+oc apply -k gitops/kustomization/rhacm-operator/base-downstream-release-2.6.2-acm-ocm-addon-2.7.1
+oc apply -k gitops/kustomization/rhacm-instance/overlays/addon-release-2.6.2-acm-ocm-addon-2.7.1
+```

@@ -22,3 +22,5 @@ resources:
 - task_mce_hypershift_create_hostedcluster.yaml
 - task_mce_uninstall_acm.yaml
 - task_mce_uninstall_acm_post_cleanup.yaml
+- mce_hypershift_clusterpool_flow.yaml
+- task_checkoutCluster.yaml
