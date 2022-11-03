@@ -41,6 +41,7 @@ spec:
 
       # the presents of a previous klusterlet can block a succcessful local-cluster rollout
       oc delete klusterlet klusterlet-chc-hostedcluster -n local-cluster
+      
       oc delete managedclusteraddon hypershift-addon -n local-cluster
 
 
