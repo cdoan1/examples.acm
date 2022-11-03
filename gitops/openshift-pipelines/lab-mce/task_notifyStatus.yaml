@@ -37,7 +37,6 @@ spec:
     - |-
       #!/bin/bash
       set -e
-      set -x
       
       if oc get secret slack-token; then
         SLACK_TOKEN=$(oc get secret slack-token -ojsonpath='{.data.slack-token}' | base64 --decode)
@@ -46,12 +45,23 @@ spec:
         exit 0
       fi
       
+
+      # Workaround pipeline task bug when task fails      
+      hubHdStatus="Failed"
+      if [[ "$(inputs.params.hubHd)" == *"Completed"* ]]; then
+        hubHdStatus="Succeeded"
+      fi
+      overallStatus="$(inputs.params.runStatus)"
+      if [[ $hubHdStatus == "Failed" ]] || [[ $spokeHdStatus == "Failed" ]]; then
+        overallStatus="Failed"
+      fi
+
       if [[ "$(inputs.params.sendNotification)" == "true" ]]; then
         echo "Send notification to app-lifecycle-backend-dev slack channel"
         cat > payload.txt <<EOF
-        { 
-          "text": "ACM build $(inputs.params.snapshot)"
-        }
+      { 
+        "text": "ACM build $(inputs.params.snapshot)\n\tOverall status: $overallStatus\n\tACM install:$(inputs.params.mchStatus)\n\t"
+      }
       EOF
 
         curl -X POST -H 'Content-type: application/json' \
