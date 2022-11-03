@@ -69,7 +69,7 @@ spec:
       value: $(params.clusterPoolName)
     - name: clusterClaimLifetime
       value: $(params.clusterClaimLifetime)
-    - name: keepclusterClaim
+    - name: keepClusterClaim
       value: $(params.keepClusterClaim)
     taskRef:
       name: deploy-acm-hyper-checkout-cluster
