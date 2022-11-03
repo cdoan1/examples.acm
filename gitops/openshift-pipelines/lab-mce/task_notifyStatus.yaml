@@ -45,7 +45,6 @@ spec:
         exit 0
       fi
       
-
       # Workaround pipeline task bug when task fails      
       hubHdStatus="Failed"
       if [[ "$(inputs.params.hubHd)" == *"Completed"* ]]; then
@@ -56,24 +55,22 @@ spec:
         overallStatus="Failed"
       fi
 
-      if [[ "$(inputs.params.sendNotification)" == "true" ]]; then
-        echo "Send notification to app-lifecycle-backend-dev slack channel"
-        cat > payload.txt <<EOF
+      if [[ "$(inputs.params.sendNotification)" != "true" ]]; then
+        exit 0
+      fi
+
+      echo "Send notification to app-lifecycle-backend-dev slack channel"
+      cat > payload.txt <<EOF
       { 
         "text": "ACM build $(inputs.params.snapshot)\nOverall status: $overallStatus\nACM install:$(inputs.params.mchStatus)\n"
       }
       EOF
 
-        curl -X POST -H 'Content-type: application/json' \
-          --data-binary "@payload.txt" \
-          https://hooks.slack.com/services/$SLACK_TOKEN
-
-      else
-        echo "Skip notification to slack channel"
-      fi
+      curl -X POST -H 'Content-type: application/json' \
+        --data-binary "@payload.txt" \
+        https://hooks.slack.com/services/$SLACK_TOKEN
 
       exit 0
-
     command:
     - /bin/bash
     - -c
