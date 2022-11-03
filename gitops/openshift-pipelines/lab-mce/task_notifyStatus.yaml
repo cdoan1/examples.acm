@@ -39,21 +39,20 @@ spec:
       set -e
       set -x
       
-      SLACK_TOKEN=$(oc get secret slack-token -ojsonpath='{.data.slack-token}' | base64 --decode)
-      if [[ "$SLACK_TOKEN" == "" ]]; then
+      if oc get secret slack-token; then
+        SLACK_TOKEN=$(oc get secret slack-token -ojsonpath='{.data.slack-token}' | base64 --decode)
+      else
         echo "slack token is undefined, skipping."
         exit 0
       fi
       
       if [[ "$(inputs.params.sendNotification)" == "true" ]]; then
-
         echo "Send notification to app-lifecycle-backend-dev slack channel"
-
         cat > payload.txt <<EOF
         { 
           "text": "ACM build $(inputs.params.snapshot)"
         }
-        EOF
+      EOF
 
         curl -X POST -H 'Content-type: application/json' \
           --data-binary "@payload.txt" \

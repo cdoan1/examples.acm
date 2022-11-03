@@ -73,7 +73,7 @@ spec:
       KUBECONFIG_SECRET=$(oc get cd ${NAMESPACE} -n ${NAMESPACE} -o yaml | yq eval '.spec.clusterMetadata.adminKubeconfigSecretRef.name' -)
 
       _USERNAME=$(oc get secret ${CD_INFO} -n ${NAMESPACE} -o jsonpath='{.data.username}' | base64 -d )
-      _PASSWORD=$(oc get secret ${CD_INFO} -n ${NAMESPACE} -o jsonpath='{.data.password}' | base64 -d  )
+      _PASSWORD=$(oc get secret ${CD_INFO} -n ${NAMESPACE} -o jsonpath='{.data.password}' | base64 -d )
       _API_URL=$(oc get cd ${NAMESPACE} -n ${NAMESPACE} -o jsonpath='{.status.apiURL}' )
       
       oc get secret -n ${NAMESPACE} ${KUBECONFIG_SECRET} -o yaml | yq eval '.data.kubeconfig' - | base64 -d > $(inputs.params.clusterClaimName)-kubeconfig.yaml
