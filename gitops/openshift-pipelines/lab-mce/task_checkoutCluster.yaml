@@ -19,15 +19,19 @@ spec:
     default: "8h"
     description: The length of the lifetime of the clusterclaim
     type: string
+  - name: keepClusterClaim
+    default: "false"
+    description: Keep cluster claim
+    type: string
   results:
   - name: username
     description: Username for the claimed cluster.
   - name: password
-    description: Password for the claimed cluster.  
+    description: Password for the claimed cluster.
   - name: api
     description: API URL of the claimed cluster.
   - name: ocLogin
-    description: OC Login command to login to the cluster    
+    description: OC Login command to login to the cluster
   - name: imagePullSecret
     description: The imagePullSecret on the hub cluster.
   steps:
@@ -37,10 +41,12 @@ spec:
       set -e
       set -x
       
-      # Delete cluster claim if it exists
-      echo "Deleting hub clusterclaim: $(inputs.params.clusterClaimName)"
-      oc delete clusterclaim.hive $(inputs.params.clusterClaimName) || true
-
+      if [[ "$keepClusterClaim" != "true" ]]; then
+        # Delete cluster claim if it exists
+        echo "Deleting hub clusterclaim: $(inputs.params.clusterClaimName)"
+        oc delete clusterclaim.hive $(inputs.params.clusterClaimName) || true
+      fi
+      
       _TEMPLATE="apiVersion: hive.openshift.io/v1
       kind: ClusterClaim
       metadata:

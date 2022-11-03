@@ -109,4 +109,4 @@ spec:
       name: notify-status-ds
     workspaces:
     - name: source
-      workspace: shared-workspace     
+      workspace: shared-workspace
