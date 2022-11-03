@@ -54,6 +54,13 @@ spec:
         --from-literal=region=$OIDC_BUCKET_REGION \
         -n local-cluster || true
 
+      # Only in 2.7.0 !!
+      oc create secret generic hypershift-operator-external-dns-credentials \
+        --from-literal=provider=aws \
+        --from-literal=domain-filter=stolostron.io \
+        --from-literal=txt-owner-id=cdoan \
+        -n local-cluster || true
+
       oc apply -f - <<EOF
       apiVersion: addon.open-cluster-management.io/v1alpha1
       kind: ManagedClusterAddOn

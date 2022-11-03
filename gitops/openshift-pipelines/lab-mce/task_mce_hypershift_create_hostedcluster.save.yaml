@@ -2,7 +2,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: mce-hypershift-create-hostedcluster-external-dns
+  name: mce-hypershift-create-hostedcluster
   namespace: open-cluster-management-pipelines-mce
 spec:
   params:
