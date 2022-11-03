@@ -41,7 +41,7 @@ spec:
       set -e
       set -x
       
-      if [[ "$keepClusterClaim" != "true" ]]; then
+      if [[ "$(params.keepClusterClaim)" != "true" ]]; then
         # Delete cluster claim if it exists
         echo "Deleting hub clusterclaim: $(inputs.params.clusterClaimName)"
         oc delete clusterclaim.hive $(inputs.params.clusterClaimName) || true
