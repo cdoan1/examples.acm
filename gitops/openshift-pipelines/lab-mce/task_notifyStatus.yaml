@@ -60,7 +60,7 @@ spec:
         echo "Send notification to app-lifecycle-backend-dev slack channel"
         cat > payload.txt <<EOF
       { 
-        "text": "ACM build $(inputs.params.snapshot)\n\tOverall status: $overallStatus\n\tACM install:$(inputs.params.mchStatus)\n\t"
+        "text": "ACM build $(inputs.params.snapshot)\nOverall status: $overallStatus\nACM install:$(inputs.params.mchStatus)\n"
       }
       EOF
 
