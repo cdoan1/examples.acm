@@ -70,8 +70,43 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
-
-
+  - name: login-to-hub-cluster
+    params:
+    - name: username
+      value: "$(tasks.checkout-hub-cluster.results.username)"
+    - name: password
+      value: "$(tasks.checkout-hub-cluster.results.password)"
+    - name: api
+      value: "$(tasks.checkout-hub-cluster.results.api)"
+    runAfter:
+    - checkout-hub-cluster
+    taskRef:
+      kind: Task
+      name: deploy-acm-hyper-login-to-cluster
+    workspaces:
+    - name: source
+      workspace: shared-workspace
   workspaces:
   - name: shared-workspace
 
+  finally:
+  - name: notify-status-ds
+    params:
+    - name: sendNotification
+      value: "$(params.sendNotification)"
+    - name: snapshot
+      value: "$(params.snapshot)"
+    - name: runStatus
+      value: "$(tasks.status)"
+    - name: hubOcLogin
+      value: "$(tasks.checkout-hub-cluster.results.ocLogin)"
+    # - name: mchStatus
+    #   value: "$(tasks.ensure-mch.status)"
+    # - name: hubHd
+    #   value: "$(tasks.ensure-hypershiftdeployment-hub.results.hdStatus)"
+    taskRef:
+      kind: Task
+      name: notify-status-ds
+    workspaces:
+    - name: source
+      workspace: shared-workspace     

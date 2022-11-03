@@ -24,3 +24,5 @@ resources:
 - task_mce_uninstall_acm_post_cleanup.yaml
 - mce_hypershift_clusterpool_flow.yaml
 - task_checkoutCluster.yaml
+- task_loginToCluster.yaml
+- task_notifyStatus.yaml
