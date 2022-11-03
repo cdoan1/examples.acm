@@ -129,6 +129,45 @@ spec:
     - name: source
       workspace: shared-workspace
 
+  - name: deploy-acm
+    runAfter:
+    - post-cleanup
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    - name: start-snapshot
+      value: $(params.start-snapshot)
+    - name: upgrade-snapshot
+      value: $(params.upgrade-snapshot)
+    taskRef:
+      name: mce-install-acm-26
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: wait-ready
+    runAfter:
+    - deploy-acm
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-wait-ready
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: check-status
+    runAfter:
+    - wait-ready
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-check-status
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
+
   workspaces:
   - name: shared-workspace
 
