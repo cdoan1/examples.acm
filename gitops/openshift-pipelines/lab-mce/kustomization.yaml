@@ -20,7 +20,6 @@ resources:
 - task_mce_rolling_upgrade_acm.yaml
 - task_mce_hypershift_enable_hypershift.yaml
 - task_mce_hypershift_create_hostedcluster.yaml
-- task_mce_hypershift_create_hostedcluster_external_dns.yaml
 - task_mce_uninstall_acm.yaml
 - task_mce_uninstall_acm_post_cleanup.yaml
 - mce_hypershift_clusterpool_flow.yaml
