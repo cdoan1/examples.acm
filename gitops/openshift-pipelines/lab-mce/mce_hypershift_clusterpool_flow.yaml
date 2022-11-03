@@ -100,7 +100,7 @@ spec:
 
   - name: uninstall-acm
     runAfter:
-    - enable-kubeconfig
+    - login-to-hub-cluster
     params:
     - name: kubeconfig
       value: $(params.kubeconfig)
