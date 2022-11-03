@@ -18,11 +18,11 @@ spec:
   - name: clusterClaimLifetime
     type: string
     description: The length of the lifetime of the clusterclaim. Default 8h
-    default: "8h"
+    default: "4h"
   - name: keepClusterClaim
     type: string
-    description: Do not delete the cluster
-    default: "false"
+    description: Reuse existing clusterclaim if it exists.
+    default: "true"
   - name: namespace
     type: string
     description: The namespace to deploy ACM onto the target cluster
