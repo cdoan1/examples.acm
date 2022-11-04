@@ -62,32 +62,36 @@ spec:
       hypershift.12 version
       cd $TOP
 
-      echo "🖐️ creating infra aws $CLUSTER_NAME"
-      hypershift.12 create infra aws --name $CLUSTER_NAME \
-        --aws-creds $AWS_CREDS \
-        --base-domain $HOSTED_CLUSTER_BASE_DOMAIN \
-        --infra-id $CLUSTER_NAME \
-        --region $REGION \
-        --output-file $OUTPUT_INFRA_FILE
+      # echo "🖐️ creating infra aws $CLUSTER_NAME"
+      # hypershift.12 create infra aws --name $CLUSTER_NAME \
+      #   --aws-creds $AWS_CREDS \
+      #   --base-domain $HOSTED_CLUSTER_BASE_DOMAIN \
+      #   --infra-id $CLUSTER_NAME \
+      #   --region $REGION \
+      #   --output-file $OUTPUT_INFRA_FILE
 
-      PUBLIC_ZONE_ID=$(cat $OUTPUT_INFRA_FILE | jq '.publicZoneID' | tr -d '"')
-      PRIVATE_ZONE_ID=$(cat $OUTPUT_INFRA_FILE | jq '.privateZoneID' | tr -d '"')
-      LOCAL_ZONE_ID=$(cat $OUTPUT_INFRA_FILE | jq '.localZoneID' | tr -d '"')
+      # PUBLIC_ZONE_ID=$(cat $OUTPUT_INFRA_FILE | jq '.publicZoneID' | tr -d '"')
+      # PRIVATE_ZONE_ID=$(cat $OUTPUT_INFRA_FILE | jq '.privateZoneID' | tr -d '"')
+      # LOCAL_ZONE_ID=$(cat $OUTPUT_INFRA_FILE | jq '.localZoneID' | tr -d '"')
 
-      echo "public zone id: $PUBLIC_ZONE_ID"
-      echo "private zone id: $PRIVATE_ZONE_ID"
-      echo "local zone id: $LOCAL_ZONE_ID"
+      # echo "public zone id: $PUBLIC_ZONE_ID"
+      # echo "private zone id: $PRIVATE_ZONE_ID"
+      # echo "local zone id: $LOCAL_ZONE_ID"
       
-      echo "🖐️ creating iam aws $CLUSTER_NAME"
-      hypershift.12 create iam aws --infra-id $CLUSTER_NAME \
-        --aws-creds $AWS_CREDS \
-        --oidc-storage-provider-s3-bucket-name $OIDC_BUCKET_NAME \
-        --oidc-storage-provider-s3-region $OIDC_BUCKET_REGION \
-        --region $REGION \
-        --public-zone-id $PUBLIC_ZONE_ID \
-        --private-zone-id $PRIVATE_ZONE_ID \
-        --local-zone-id $LOCAL_ZONE_ID \
-        --output-file $OUTPUT_IAM_FILE
+      # echo "🖐️ creating iam aws $CLUSTER_NAME"
+      # hypershift.12 create iam aws --infra-id $CLUSTER_NAME \
+      #   --aws-creds $AWS_CREDS \
+      #   --oidc-storage-provider-s3-bucket-name $OIDC_BUCKET_NAME \
+      #   --oidc-storage-provider-s3-region $OIDC_BUCKET_REGION \
+      #   --region $REGION \
+      #   --public-zone-id $PUBLIC_ZONE_ID \
+      #   --private-zone-id $PRIVATE_ZONE_ID \
+      #   --local-zone-id $LOCAL_ZONE_ID \
+      #   --output-file $OUTPUT_IAM_FILE
+
+
+      # hypershift create cluster aws --name=example --endpoint-access=PublicAndPrivate --external-dns-domain=service.hypershift.example.org ...
+
 
       echo "🖐️ generate hostedcluster $CLUSTER_NAME manifest ..."
       hypershift.12 create cluster aws \
@@ -102,6 +106,7 @@ spec:
         --node-pool-replicas 3 \
         --namespace local-cluster \
         --endpoint-access=Public \
+        --base-domain stolostron.io \
         --external-dns-domain=cdoan.stolostron.io \
         --render > $CLUSTER_NAME-hosted-cluster.yaml
 
