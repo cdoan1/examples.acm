@@ -84,11 +84,12 @@ spec:
         --base-domain stolostron.io \
         --node-pool-replicas 3 \
         --pull-secret $PULL_SECRET \
-        --release-image quay.io/openshift-release-dev/ocp-release:4.12.0-ec.3-x86_64 \
         --external-dns-domain=cdoan.stolostron.io \
         --endpoint-access=Public \
         --render > $CLUSTER_NAME-hosted-cluster.yaml
 
+        # --release-image quay.io/openshift-release-dev/ocp-release:4.12.0-ec.3-x86_64 \
+        
       echo "🖐️ creating hostedcluster aws $CLUSTER_NAME"
       oc apply -f $CLUSTER_NAME-hosted-cluster.yaml
       oc annotate hostedcluster $CLUSTER_NAME "cluster.open-cluster-management.io/hypershiftdeployment=default/local-cluster" -n local-cluster --overwrite
