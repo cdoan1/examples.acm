@@ -56,14 +56,14 @@ spec:
 
       git clone https://github.com/openshift/hypershift.git
       cd hypershift
-      git checkout -b release-11
+      git checkout -b release-12
       make build
-      install -m 0755 bin/hypershift /usr/local/bin/hypershift
-      hypershift version
+      install -m 0755 bin/hypershift /usr/local/bin/hypershift.12
+      hypershift.12 version
       cd $TOP
 
       echo "🖐️ creating infra aws $CLUSTER_NAME"
-      hypershift create infra aws --name $CLUSTER_NAME \
+      hypershift.12 create infra aws --name $CLUSTER_NAME \
         --aws-creds $AWS_CREDS \
         --base-domain $HOSTED_CLUSTER_BASE_DOMAIN \
         --infra-id $CLUSTER_NAME \
@@ -79,7 +79,7 @@ spec:
       echo "local zone id: $LOCAL_ZONE_ID"
       
       echo "🖐️ creating iam aws $CLUSTER_NAME"
-      hypershift create iam aws --infra-id $CLUSTER_NAME \
+      hypershift.12 create iam aws --infra-id $CLUSTER_NAME \
         --aws-creds $AWS_CREDS \
         --oidc-storage-provider-s3-bucket-name $OIDC_BUCKET_NAME \
         --oidc-storage-provider-s3-region $OIDC_BUCKET_REGION \
@@ -90,7 +90,7 @@ spec:
         --output-file $OUTPUT_IAM_FILE
 
       echo "🖐️ generate hostedcluster $CLUSTER_NAME manifest ..."
-      hypershift create cluster aws \
+      hypershift.12 create cluster aws \
         --name $CLUSTER_NAME \
         --infra-id $CLUSTER_NAME \
         --infra-json $OUTPUT_INFRA_FILE \
@@ -101,6 +101,8 @@ spec:
         --generate-ssh \
         --node-pool-replicas 3 \
         --namespace local-cluster \
+        --endpoint-access=Public \
+        --external-dns-domain=cdoan.stolostron.io \
         --render > $CLUSTER_NAME-hosted-cluster.yaml
 
       # --release-image $RELEASE \
