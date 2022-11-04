@@ -74,12 +74,6 @@ spec:
     runAfter:
     - enable-kubeconfig
     params:
-    - name: kubeconfig
-      value: $(params.kubeconfig)
-    - name: start-snapshot
-      value: $(params.start-snapshot)
-    - name: upgrade-snapshot
-      value: $(params.upgrade-snapshot)
     taskRef:
       name: mce-hypershift-build-hypershift-cli
     workspaces:
