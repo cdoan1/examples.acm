@@ -105,6 +105,8 @@ spec:
       #     --external-dns-domain=jparrill-hosted-public.aws.kerbeross.com \
       #     --endpoint-access=PublicAndPrivate
 
+      # Reference: https://hypershift-docs.netlify.app/how-to/external-dns/
+      
       RELEASE=quay.io/openshift-release-dev/ocp-release:4.11.11-x86_64
 
       echo "🖐️ generate hostedcluster $CLUSTER_NAME manifest ..."
