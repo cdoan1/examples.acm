@@ -73,7 +73,6 @@ spec:
   - name: build-hypershift-cli
     runAfter:
     - enable-kubeconfig
-    params:
     taskRef:
       name: mce-hypershift-build-hypershift-cli
     workspaces:
