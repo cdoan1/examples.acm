@@ -70,6 +70,21 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
+  - name: build-hypershift-cli
+    runAfter:
+    - enable-kubeconfig
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    - name: start-snapshot
+      value: $(params.start-snapshot)
+    - name: upgrade-snapshot
+      value: $(params.upgrade-snapshot)
+    taskRef:
+      name: mce-hypershift-build-hypershift-cli
+    workspaces:
+    - name: source
+      workspace: shared-workspace
   - name: wait-ready
     runAfter:
     - deploy-acm
@@ -119,6 +134,7 @@ spec:
   - name: enable-hypershift
     runAfter:
     - rolling-upgrade-wait-ready
+    - build-hypershift-cli
     params:
     - name: kubeconfig
       value: $(params.kubeconfig)

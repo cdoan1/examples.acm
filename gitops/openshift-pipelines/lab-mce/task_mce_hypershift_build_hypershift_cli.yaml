@@ -1,0 +1,53 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: mce-hypershift-build-hypershift-cli
+  namespace: open-cluster-management-pipelines-mce
+spec:
+  params:
+  steps:
+  - args:
+    - |-
+      set -e
+      set -x
+
+      TOP=$(pwd)
+      PULL_SECRET=$TOP/pull-secret-hypershift.json
+      export NS=open-cluster-management-pipelines-rhacm
+      oc get secret multiclusterhub-operator-pull-secret-basic -n $NS -ojsonpath='{.data.\.dockerconfigjson}' | base64 --decode > $PULL_SECRET
+
+      if [ -f $(pwd)/remote.kubeconfig ]; then
+        export KUBECONFIG=$(pwd)/remote.kubeconfig
+      else
+        echo "Expected to find remote.kubeconfig. Existing."
+        exit 1
+      fi
+
+      oc cluster-info
+
+      git clone https://github.com/openshift/hypershift.git
+      cd hypershift
+
+      git checkout -b release-11
+      make build
+      install -m 0755 bin/hypershift /usr/local/bin/hypershift
+      hypershift version
+
+      git checkout -b release-11
+      make build
+      install -m 0755 bin/hypershift /usr/local/bin/hypershift.12
+      hypershift.12 version
+
+      set +x
+      set +e
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/acm-sre/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source
