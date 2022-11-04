@@ -22,11 +22,13 @@ spec:
   - name: start-snapshot
     type: string
     description: "snapshot version to initially install."
-    default: "2.7.0-DOWNSTREAM-2022-10-07-00-46-31"
+    default: "2.7.0-DOWNSTREAM-2022-11-03-10-46-20"
+    # default: "2.7.0-DOWNSTREAM-2022-10-07-00-46-31"
   - name: upgrade-snapshot
     type: string
     description: "snapshot version to upgrade too."
-    default: "2.7.0-DOWNSTREAM-2022-10-20-05-23-04"
+    default: "2.7.0-DOWNSTREAM-2022-11-03-10-46-20"
+    # default: "2.7.0-DOWNSTREAM-2022-10-20-05-23-04"
   tasks:
   - name: fetch-repo
     params:
