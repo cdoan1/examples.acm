@@ -32,12 +32,13 @@ spec:
       git checkout release-4.11
       make build
       install -m 0755 bin/hypershift /usr/local/bin/hypershift
-      hypershift version
+      $TOP/hypershift/bin/hypershift version
 
       git checkout release-4.12
       make build
       install -m 0755 bin/hypershift /usr/local/bin/hypershift.12
-      hypershift.12 version
+      install -m 0755 bin/hypershift bin/hypershift.12
+      $TOP/hypershift/bin/hypershift.12 version
 
       set +x
       set +e

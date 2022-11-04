@@ -54,7 +54,7 @@ spec:
       OUTPUT_IAM_FILE=$TOP/$CLUSTER_NAME-hypershift_test_iam.json
 
       # echo "🖐️ creating infra aws $CLUSTER_NAME"
-      # hypershift.12 create infra aws --name $CLUSTER_NAME \
+      # $HYPERSHIIFT create infra aws --name $CLUSTER_NAME \
       #   --aws-creds $AWS_CREDS \
       #   --base-domain $HOSTED_CLUSTER_BASE_DOMAIN \
       #   --infra-id $CLUSTER_NAME \
@@ -70,7 +70,7 @@ spec:
       # echo "local zone id: $LOCAL_ZONE_ID"
       
       # echo "🖐️ creating iam aws $CLUSTER_NAME"
-      # hypershift.12 create iam aws --infra-id $CLUSTER_NAME \
+      # $HYPERSHIIFT create iam aws --infra-id $CLUSTER_NAME \
       #   --aws-creds $AWS_CREDS \
       #   --oidc-storage-provider-s3-bucket-name $OIDC_BUCKET_NAME \
       #   --oidc-storage-provider-s3-region $OIDC_BUCKET_REGION \
@@ -99,10 +99,11 @@ spec:
 
       # Reference: https://hypershift-docs.netlify.app/how-to/external-dns/
       
+      HYPERSHIFT=$(pwd)/hypershift/bin/hypershift.12
       RELEASE=quay.io/openshift-release-dev/ocp-release:4.12.11-x86_64
 
       echo "🖐️ generate hostedcluster $CLUSTER_NAME manifest ..."
-      hypershift.12 create cluster aws \
+      $HYPERSHIIFT create cluster aws \
         --aws-creds $AWS_CREDS \
         --region $REGION \
         --generate-ssh \

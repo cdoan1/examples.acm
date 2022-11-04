@@ -52,16 +52,18 @@ spec:
       OUTPUT_INFRA_FILE=$TOP/hypershift_test_infra.json
       OUTPUT_IAM_FILE=$TOP/hypershift_test_iam.json
 
-      git clone https://github.com/openshift/hypershift.git
-      cd hypershift
-      git checkout -b release-11
-      make build
-      install -m 0755 bin/hypershift /usr/local/bin/hypershift
-      hypershift version
-      cd $TOP
+      # git clone https://github.com/openshift/hypershift.git
+      # cd hypershift
+      # git checkout -b release-11
+      # make build
+      # install -m 0755 bin/hypershift /usr/local/bin/hypershift
+      # hypershift version
+      # cd $TOP
+
+      HYPERSHIFT=$(pwd)/hypershift/bin/hypershift
 
       echo "🖐️ creating infra aws $CLUSTER_NAME"
-      hypershift create infra aws --name $CLUSTER_NAME \
+      $HYPERSHIIFT create infra aws --name $CLUSTER_NAME \
         --aws-creds $AWS_CREDS \
         --base-domain $BASE_DOMAIN \
         --infra-id $CLUSTER_NAME \
@@ -77,7 +79,7 @@ spec:
       echo "local zone id: $LOCAL_ZONE_ID"
       
       echo "🖐️ creating iam aws $CLUSTER_NAME"
-      hypershift create iam aws --infra-id $CLUSTER_NAME \
+      $HYPERSHIIFT create iam aws --infra-id $CLUSTER_NAME \
         --aws-creds $AWS_CREDS \
         --oidc-storage-provider-s3-bucket-name $OIDC_BUCKET_NAME \
         --oidc-storage-provider-s3-region $OIDC_BUCKET_REGION \
@@ -88,7 +90,7 @@ spec:
         --output-file $OUTPUT_IAM_FILE
 
       echo "🖐️ generate hostedcluster $CLUSTER_NAME manifest ..."
-      hypershift create cluster aws \
+      $HYPERSHIIFT create cluster aws \
         --name $CLUSTER_NAME \
         --infra-id $CLUSTER_NAME \
         --infra-json $OUTPUT_INFRA_FILE \
