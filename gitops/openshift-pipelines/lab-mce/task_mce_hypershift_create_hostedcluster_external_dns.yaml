@@ -86,7 +86,7 @@ spec:
         --pull-secret $PULL_SECRET \
         --release-image quay.io/openshift-release-dev/ocp-release:4.12.0-ec.3-x86_64 \
         --external-dns-domain=cdoan.stolostron.io \
-        --endpoint-access=PublicAndPrivate \
+        --endpoint-access=Public \
         --render > $CLUSTER_NAME-hosted-cluster.yaml
 
       echo "🖐️ creating hostedcluster aws $CLUSTER_NAME"
