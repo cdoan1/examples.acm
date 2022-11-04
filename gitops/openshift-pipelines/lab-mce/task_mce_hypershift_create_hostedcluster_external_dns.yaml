@@ -73,7 +73,7 @@ spec:
       RELEASE=quay.io/openshift-release-dev/ocp-release:4.12.11-x86_64
 
       echo "🖐️ generate hostedcluster $CLUSTER_NAME manifest ..."
-      $HYPERSHIIFT create cluster aws \
+      $HYPERSHIFT create cluster aws \
         --aws-creds $AWS_CREDS \
         --region $REGION \
         --generate-ssh \
