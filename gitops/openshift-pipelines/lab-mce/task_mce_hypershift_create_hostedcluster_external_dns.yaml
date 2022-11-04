@@ -39,7 +39,6 @@ spec:
       BASE_DOMAIN=demo.red-chesterfield.com
       HOSTED_CLUSTER_BASE_DOMAIN=stolostron.io
 
-      # RELEASE=quay.io/openshift-release-dev/ocp-release:4.11.11-x86_64
 
       CLUSTER_NAME=$(params.managed-cluster)-hostedcluster
       INFRA_ID=$CLUSTER_NAME
@@ -91,26 +90,37 @@ spec:
 
 
       # hypershift create cluster aws --name=example --endpoint-access=PublicAndPrivate --external-dns-domain=service.hypershift.example.org ...
+      # hypershift create cluster aws \
+      #     --aws-creds ${AWS_CREDS} \
+      #     --instance-type m6i.xlarge \
+      #     --region ${REGION} \
+      #     --auto-repair \
+      #     --generate-ssh \
+      #     --name jparrill-hosted \
+      #     --namespace clusters \
+      #     --base-domain jparrill-dev-public.aws.kerbeross.com \
+      #     --node-pool-replicas 2 \
+      #     --pull-secret ${HOME}/pull_secret.json \
+      #     --release-image quay.io/openshift-release-dev/ocp-release:4.12.0-ec.3-x86_64 \
+      #     --external-dns-domain=jparrill-hosted-public.aws.kerbeross.com \
+      #     --endpoint-access=PublicAndPrivate
 
+      RELEASE=quay.io/openshift-release-dev/ocp-release:4.11.11-x86_64
 
       echo "🖐️ generate hostedcluster $CLUSTER_NAME manifest ..."
       hypershift.12 create cluster aws \
-        --name $CLUSTER_NAME \
-        --infra-id $CLUSTER_NAME \
-        --infra-json $OUTPUT_INFRA_FILE \
-        --iam-json $OUTPUT_IAM_FILE \
         --aws-creds $AWS_CREDS \
-        --pull-secret $PULL_SECRET \
         --region $REGION \
         --generate-ssh \
-        --node-pool-replicas 3 \
+        --name $CLUSTER_NAME \
         --namespace local-cluster \
-        --endpoint-access=Public \
         --base-domain stolostron.io \
+        --node-pool-replicas 3 \
+        --pull-secret $PULL_SECRET \
+        --release-image $RELEASE \
         --external-dns-domain=cdoan.stolostron.io \
+        --endpoint-access=Public \
         --render > $CLUSTER_NAME-hosted-cluster.yaml
-
-      # --release-image $RELEASE \
 
       echo "🖐️ creating hostedcluster aws $CLUSTER_NAME"
       oc apply -f $CLUSTER_NAME-hosted-cluster.yaml
