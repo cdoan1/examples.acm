@@ -29,12 +29,12 @@ spec:
       git clone https://github.com/openshift/hypershift.git
       cd hypershift
 
-      git checkout -b release-11
+      git checkout release-4.11
       make build
       install -m 0755 bin/hypershift /usr/local/bin/hypershift
       hypershift version
 
-      git checkout -b release-11
+      git checkout release-4.12
       make build
       install -m 0755 bin/hypershift /usr/local/bin/hypershift.12
       hypershift.12 version
