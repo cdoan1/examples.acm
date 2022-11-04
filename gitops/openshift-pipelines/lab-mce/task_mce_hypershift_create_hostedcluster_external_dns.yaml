@@ -19,6 +19,8 @@ spec:
     - |-
       set -e
       set -x
+      
+      # Reference: https://hypershift-docs.netlify.app/how-to/external-dns/
 
       TOP=$(pwd)
       PULL_SECRET=$TOP/pull-secret-hypershift.json
@@ -38,8 +40,6 @@ spec:
       OIDC_BUCKET_REGION=us-west-1
       BASE_DOMAIN=demo.red-chesterfield.com
       HOSTED_CLUSTER_BASE_DOMAIN=stolostron.io
-
-
       CLUSTER_NAME=$(params.managed-cluster)-hostedcluster
       INFRA_ID=$CLUSTER_NAME
       REGION=us-west-1
@@ -52,34 +52,6 @@ spec:
       AWS_CREDS=credentials
       OUTPUT_INFRA_FILE=$TOP/$CLUSTER_NAME-hypershift_test_infra.json
       OUTPUT_IAM_FILE=$TOP/$CLUSTER_NAME-hypershift_test_iam.json
-
-      # echo "🖐️ creating infra aws $CLUSTER_NAME"
-      # $HYPERSHIIFT create infra aws --name $CLUSTER_NAME \
-      #   --aws-creds $AWS_CREDS \
-      #   --base-domain $HOSTED_CLUSTER_BASE_DOMAIN \
-      #   --infra-id $CLUSTER_NAME \
-      #   --region $REGION \
-      #   --output-file $OUTPUT_INFRA_FILE
-
-      # PUBLIC_ZONE_ID=$(cat $OUTPUT_INFRA_FILE | jq '.publicZoneID' | tr -d '"')
-      # PRIVATE_ZONE_ID=$(cat $OUTPUT_INFRA_FILE | jq '.privateZoneID' | tr -d '"')
-      # LOCAL_ZONE_ID=$(cat $OUTPUT_INFRA_FILE | jq '.localZoneID' | tr -d '"')
-
-      # echo "public zone id: $PUBLIC_ZONE_ID"
-      # echo "private zone id: $PRIVATE_ZONE_ID"
-      # echo "local zone id: $LOCAL_ZONE_ID"
-      
-      # echo "🖐️ creating iam aws $CLUSTER_NAME"
-      # $HYPERSHIIFT create iam aws --infra-id $CLUSTER_NAME \
-      #   --aws-creds $AWS_CREDS \
-      #   --oidc-storage-provider-s3-bucket-name $OIDC_BUCKET_NAME \
-      #   --oidc-storage-provider-s3-region $OIDC_BUCKET_REGION \
-      #   --region $REGION \
-      #   --public-zone-id $PUBLIC_ZONE_ID \
-      #   --private-zone-id $PRIVATE_ZONE_ID \
-      #   --local-zone-id $LOCAL_ZONE_ID \
-      #   --output-file $OUTPUT_IAM_FILE
-
 
       # hypershift create cluster aws --name=example --endpoint-access=PublicAndPrivate --external-dns-domain=service.hypershift.example.org ...
       # hypershift create cluster aws \
@@ -97,8 +69,6 @@ spec:
       #     --external-dns-domain=jparrill-hosted-public.aws.kerbeross.com \
       #     --endpoint-access=PublicAndPrivate
 
-      # Reference: https://hypershift-docs.netlify.app/how-to/external-dns/
-      
       HYPERSHIFT=$(pwd)/hypershift/bin/hypershift.12
       RELEASE=quay.io/openshift-release-dev/ocp-release:4.12.11-x86_64
 
