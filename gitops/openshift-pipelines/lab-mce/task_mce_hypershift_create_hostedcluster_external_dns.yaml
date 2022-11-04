@@ -54,8 +54,8 @@ spec:
       OUTPUT_INFRA_FILE=$TOP/$CLUSTER_NAME-hypershift_test_infra.json
       OUTPUT_IAM_FILE=$TOP/$CLUSTER_NAME-hypershift_test_iam.json
 
-      git clone https://github.com/openshift/hypershift.git
-      cd hypershift
+      git clone https://github.com/openshift/hypershift.git hypershift.12
+      cd hypershift.12
       git checkout -b release-12
       make build
       install -m 0755 bin/hypershift /usr/local/bin/hypershift.12
