@@ -27,6 +27,7 @@ spec:
     type: string
     description: "snapshot version to upgrade too."
     default: "2.7.0-DOWNSTREAM-2022-10-20-05-23-04"
+
   tasks:
   - name: fetch-repo
     params:
@@ -84,7 +85,6 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
-
 
   - name: deploy-acm
     runAfter:

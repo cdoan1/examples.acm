@@ -76,6 +76,8 @@ spec:
       $HYPERSHIFT create cluster aws \
         --aws-creds $AWS_CREDS \
         --region $REGION \
+        --auto-repair \
+        --instance-type m6i.xlarge \
         --generate-ssh \
         --name $CLUSTER_NAME \
         --namespace local-cluster \

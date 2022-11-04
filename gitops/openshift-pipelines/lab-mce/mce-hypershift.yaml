@@ -55,6 +55,7 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
+  
   - name: deploy-acm
     runAfter:
     - enable-kubeconfig
@@ -78,6 +79,7 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
+  
   - name: wait-ready
     runAfter:
     - deploy-acm
@@ -124,6 +126,7 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
+  
   - name: enable-hypershift
     runAfter:
     - rolling-upgrade-wait-ready
@@ -158,5 +161,6 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
+  
   workspaces:
   - name: shared-workspace
