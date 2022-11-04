@@ -53,14 +53,6 @@ spec:
       OUTPUT_INFRA_FILE=$TOP/$CLUSTER_NAME-hypershift_test_infra.json
       OUTPUT_IAM_FILE=$TOP/$CLUSTER_NAME-hypershift_test_iam.json
 
-      git clone https://github.com/openshift/hypershift.git hypershift.12
-      cd hypershift.12
-      git checkout -b release-12
-      make build
-      install -m 0755 bin/hypershift /usr/local/bin/hypershift.12
-      hypershift.12 version
-      cd $TOP
-
       # echo "🖐️ creating infra aws $CLUSTER_NAME"
       # hypershift.12 create infra aws --name $CLUSTER_NAME \
       #   --aws-creds $AWS_CREDS \
@@ -107,7 +99,7 @@ spec:
 
       # Reference: https://hypershift-docs.netlify.app/how-to/external-dns/
       
-      RELEASE=quay.io/openshift-release-dev/ocp-release:4.11.11-x86_64
+      RELEASE=quay.io/openshift-release-dev/ocp-release:4.12.11-x86_64
 
       echo "🖐️ generate hostedcluster $CLUSTER_NAME manifest ..."
       hypershift.12 create cluster aws \
@@ -119,9 +111,9 @@ spec:
         --base-domain stolostron.io \
         --node-pool-replicas 3 \
         --pull-secret $PULL_SECRET \
-        --release-image $RELEASE \
+        --release-image quay.io/openshift-release-dev/ocp-release:4.12.0-ec.3-x86_64 \
         --external-dns-domain=cdoan.stolostron.io \
-        --endpoint-access=Public \
+        --endpoint-access=PublicAndPrivate \
         --render > $CLUSTER_NAME-hosted-cluster.yaml
 
       echo "🖐️ creating hostedcluster aws $CLUSTER_NAME"
