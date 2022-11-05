@@ -215,6 +215,7 @@ spec:
     runAfter:
     - rolling-upgrade-wait-ready
     - build-hypershift-cli
+    - ensure-prereqs
     params:
     - name: kubeconfig
       value: $(params.kubeconfig)
