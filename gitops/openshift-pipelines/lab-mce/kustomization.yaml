@@ -18,6 +18,7 @@ resources:
 - task_mce_wait_ready.yaml
 - task_mce_check_status.yaml
 - task_mce_rolling_upgrade_acm.yaml
+- task_mce_rolling_upgrade_acm_26.yaml
 - task_mce_hypershift_build_hypershift_cli.yaml
 - task_mce_hypershift_enable_hypershift.yaml
 - task_mce_hypershift_create_hostedcluster.yaml
