@@ -38,11 +38,13 @@ spec:
   - name: start-snapshot
     type: string
     description: "snapshot version to initially install."
-    default: "2.7.0-DOWNSTREAM-2022-10-07-00-46-31"
+    default: "2.7.0-DOWNSTREAM-2022-11-03-10-46-20"
+    # default: "2.7.0-DOWNSTREAM-2022-10-07-00-46-31"
   - name: upgrade-snapshot
     type: string
     description: "snapshot version to upgrade too."
-    default: "2.7.0-DOWNSTREAM-2022-10-20-05-23-04"
+    default: "2.7.0-DOWNSTREAM-2022-11-03-10-46-20"
+    # default: "2.7.0-DOWNSTREAM-2022-10-20-05-23-04"
 
   - name: kubeconfig
     type: string
@@ -144,6 +146,16 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
+
+  - name: build-hypershift-cli
+    runAfter:
+    - post-cleanup
+    taskRef:
+      name: mce-hypershift-build-hypershift-cli
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
   - name: wait-ready
     runAfter:
     - deploy-acm
@@ -163,6 +175,44 @@ spec:
       value: $(params.kubeconfig)
     taskRef:
       name: mce-check-status
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
+  - name: rolling-upgrade
+    runAfter:
+    - check-status
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    - name: upgrade-snapshot
+      value: $(params.upgrade-snapshot)
+    taskRef:
+      name: mce-rolling-upgrade-acm
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: rolling-upgrade-wait-ready
+    runAfter:
+    - rolling-upgrade
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-wait-ready
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  
+  - name: enable-hypershift
+    runAfter:
+    - rolling-upgrade-wait-ready
+    - build-hypershift-cli
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-hypershift-enable-hypershift
     workspaces:
     - name: source
       workspace: shared-workspace
