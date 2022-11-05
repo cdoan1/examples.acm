@@ -146,12 +146,19 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
-
   - name: build-hypershift-cli
     runAfter:
     - post-cleanup
     taskRef:
       name: mce-hypershift-build-hypershift-cli
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: ensure-prereqs
+    runAfter:
+    - post-cleanup
+    taskRef:
+      name: deploy-ds-acm-hyper-prereqs
     workspaces:
     - name: source
       workspace: shared-workspace

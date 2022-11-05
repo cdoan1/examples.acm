@@ -1,0 +1,60 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deploy-ds-acm-hyper-prereqs
+spec:
+  params:
+  - name: namespace
+    default: open-cluster-management
+    description: The namespace to deploy ACM into
+    type: string
+  - name: snapshot
+    default: ""
+    description: The SNAPSHOT Tag used to deploy the catalogsources
+    type: string
+  - name: imagePullSecret
+    default: ""
+    description: The image pull secret used to deploy the catalogsources. Copied from clusterPoolNamespace
+    type: string
+  steps:
+  - args:
+    - |-
+      #!/bin/bash
+      set -e
+
+      # inject secrets from the deployer cluster (ACM HUB) to tekton pod
+      oc extract secret/aws-credentials
+      mkdir ~/.aws
+      cp credentials ~/.aws
+
+      # _LOGIN_CMD=$(cat login.sh)
+      # eval "$_LOGIN_CMD"
+
+      # echo "Creating Namespace..."
+      # oc create namespace $(inputs.params.namespace) --dry-run=client -o yaml | oc apply -f -
+
+      # UNCOMMENT TO SUPPORT PRIVATE CATALOGSOURCES...
+      # echo "Creating ImagePullSecret..."
+      # _TEMPLATE="apiVersion: v1
+      # data:
+      #   .dockerconfigjson: $(inputs.params.imagePullSecret)
+      # kind: Secret
+      # metadata:
+      #   name: acm-pull-secret
+      # type: kubernetes.io/dockerconfigjson"
+      # echo "$_TEMPLATE" | oc apply -n $(inputs.params.namespace) -f  -
+      # echo "$_TEMPLATE" | oc apply -n openshift-marketplace -f -
+
+      # echo "Applying cluster and machine autoscaling ..."
+
+      # oc apply -f samples/hypershift-pipelines/resources/clusterautoscaler.yaml
+      # oc apply -f samples/hypershift-pipelines/resources/machineautoscaler.yaml
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/zkayyali812/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source

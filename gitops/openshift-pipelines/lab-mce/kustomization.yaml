@@ -29,3 +29,4 @@ resources:
 - task_checkoutCluster.yaml
 - task_loginToCluster.yaml
 - task_notifyStatus.yaml
+- task_applyPrereqsDownstream.yaml
