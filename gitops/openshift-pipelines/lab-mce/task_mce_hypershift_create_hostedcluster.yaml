@@ -51,10 +51,10 @@ spec:
       AWS_CREDS=credentials
       OUTPUT_INFRA_FILE=$TOP/hypershift_test_infra.json
       OUTPUT_IAM_FILE=$TOP/hypershift_test_iam.json
-      HYPERSHIFT=$(pwd)/hypershift/bin/hypershift
+      export HYPERSHIFT=$(pwd)/hypershift/bin/hypershift
 
       echo "🖐️ creating infra aws $CLUSTER_NAME"
-      $HYPERSHIFT create infra aws --name $CLUSTER_NAME \
+      ${HYPERSHIFT} create infra aws --name $CLUSTER_NAME \
         --aws-creds $AWS_CREDS \
         --base-domain $BASE_DOMAIN \
         --infra-id $CLUSTER_NAME \
@@ -70,7 +70,7 @@ spec:
       echo "local zone id: $LOCAL_ZONE_ID"
       
       echo "🖐️ creating iam aws $CLUSTER_NAME"
-      $HYPERSHIFT create iam aws --infra-id $CLUSTER_NAME \
+      ${HYPERSHIFT} create iam aws --infra-id $CLUSTER_NAME \
         --aws-creds $AWS_CREDS \
         --oidc-storage-provider-s3-bucket-name $OIDC_BUCKET_NAME \
         --oidc-storage-provider-s3-region $OIDC_BUCKET_REGION \
@@ -81,7 +81,7 @@ spec:
         --output-file $OUTPUT_IAM_FILE
 
       echo "🖐️ generate hostedcluster $CLUSTER_NAME manifest ..."
-      $HYPERSHIFT create cluster aws \
+      ${HYPERSHIFT} create cluster aws \
         --name $CLUSTER_NAME \
         --infra-id $CLUSTER_NAME \
         --infra-json $OUTPUT_INFRA_FILE \
