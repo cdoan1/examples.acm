@@ -195,7 +195,7 @@ spec:
     - name: upgrade-snapshot
       value: $(params.upgrade-snapshot)
     taskRef:
-      name: mce-rolling-upgrade-acm-26
+      name: mce-rolling-upgrade-acm
     workspaces:
     - name: source
       workspace: shared-workspace
