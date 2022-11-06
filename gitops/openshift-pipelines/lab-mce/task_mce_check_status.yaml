@@ -56,7 +56,7 @@ spec:
       echo "current mce csv phase                                 : $(check $rc22)" 
 
       _ATTEMPTS=0
-      until oc get sub mch multiclusterhub -n $NS -o jsonpath='{.status.phase}' | grep -q "Running";
+      until oc get mch multiclusterhub -n $NS -o jsonpath='{.status.phase}' | grep -q "Running";
       do 
           echo "Waiting 60s for MCH..."
           _ATTEMPTS=$((_ATTEMPTS + 1))
