@@ -41,19 +41,19 @@ spec:
       acm_current_csv=$(oc get sub -n open-cluster-management -l operators.coreos.com/advanced-cluster-management.open-cluster-management= -ojsonpath='{.items[].status.currentCSV}')
       mce_current_csv=$(oc get sub -n multicluster-engine -ojsonpath='{.items[].status.currentCSV}')
 
-      rc=$(oc get mch multiclusterhub -n $NS -ojsonpath='{.status.phase}')      
+      rc=$(oc get mch multiclusterhub -n $NS -ojsonpath='{.status.phase}')
+      rc11=$(oc get csv $acm_current_csv -n $NS -ojsonpath='{.status.phase}')
+
       echo "current mch operator phase                            : $(check $rc)"
       echo "current acm subscription currentCSV version           : $acm_current_csv"
+      echo "current acm csv phase                                 : $(check $rc11)"
 
-      rc=$(oc get csv advanced-cluster-management.v2.7.0 -n $NS -ojsonpath='{.status.phase}')
-      echo "current acm csv phase                                 : $(check $rc)"
+      rc21=$(oc get mce multiclusterengine -n $NS -ojsonpath='{.status.phase}')
+      rc22=$(oc get csv $mce_current_csv -n $NS2 -ojsonpath='{.status.phase}')
 
-      rc1=$(oc get mce multiclusterengine -n $NS -ojsonpath='{.status.phase}')
-      rc2=$(oc get csv $mce_current_csv -n $NS2 -ojsonpath='{.status.phase}')
-
-      echo "current mce operator phase                            : $(check $rc1)"
+      echo "current mce operator phase                            : $(check $rc21)"
       echo "current mce subscription currentCSV version           : $mce_current_csv"
-      echo "current mce csv phase                                 : $(check $rc2)" 
+      echo "current mce csv phase                                 : $(check $rc22)" 
 
       echo "acm snapshot                                          : $(oc get pods -n open-cluster-management -o yaml | grep image: | sort -u | grep custom-registry | cut -d':' -f4 | sort -u)"
       echo "mce snapshot                                          : $(oc get pods -n multicluster-engine -o yaml | grep image: | sort -u | grep custom-registry | cut -d':' -f4 | sort -u)"
