@@ -89,6 +89,8 @@ spec:
       oc get mch -o yaml -n open-cluster-management
       oc get mce -o yaml -n multicluster-engine 
 
+      oc get packagemanifest advanced-cluster-management -n open-cluster-management -o yaml | grep version | grep -v v1
+
       oc get pods -n open-cluster-management-agent -o yaml | grep "image:" | sort -u | grep -v f:image | sed s'#    -#     #' | sort -u
       for i in open-cluster-management open-cluster-management-hub multicluster-engine
       do
