@@ -12,6 +12,7 @@ resources:
 - mce-hypershift.yaml
 - mce-hypershift-uninstall.yaml
 - mce_hypershift_e2e.yaml
+- mce_hypershift_27_27_e2e.yaml
 - task_mce_enable_kubeconfig.yaml
 - task_mce_install_acm.yaml
 - task_mce_install_acm_26.yaml
