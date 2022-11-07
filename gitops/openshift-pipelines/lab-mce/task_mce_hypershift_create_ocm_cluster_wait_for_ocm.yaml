@@ -2,7 +2,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: task-mce-hypershift-create-ocm-cluster
+  name: task-mce-hypershift-create-ocm-cluster-wait-for-ocm
 spec:
   params:
   - name: cluster-name
@@ -48,34 +48,37 @@ spec:
 
       ocm login --token=$TOKEN --url 'staging'
       ocm get clusters
-      if ocm list clusters cdoanocm | grep cdoanocm; then
-        echo "cluster cdoanocm already exists ..."
-      else
-        echo "creating cluster cdoanocm in staging ..."
-        if [[ "$(params.multi-az)" == "true" ]]; then
-          ocm create cluster cdoanocm \
-            --aws-account-id $AWS_ACCOUNT_ID \
-            --aws-access-key-id $ACCESS_KEY_ID \
-            --aws-secret-access-key $SECRET_ACCESS_KEY \
-            --ccs --version $(params.ocp-version) \
-            --provider aws \
-            --region us-east-1 \
-            --multi-az \
-            --compute-nodes 3
-        else
-          ocm create cluster cdoanocm \
-            --aws-account-id $AWS_ACCOUNT_ID \
-            --aws-access-key-id $ACCESS_KEY_ID \
-            --aws-secret-access-key $SECRET_ACCESS_KEY \
-            --ccs --version $(params.ocp-version) \
-            --provider aws \
-            --region us-east-1 \
-            --compute-nodes 3
-        fi
-      fi
 
-      # delete the OCM cluster
-      # ocm delete /api/clusters_mgmt/v1/clusters/1urqrlklfmaokp1locgof68fsg4kq130
+      echo "Waiting for OCM cluster to be ready ..."
+      while true;
+      do
+        check=$(ocm list clusters cdoanocm --columns state --no-headers | tr -d " ")
+        if [[ "$check" != "ready" ]]; then
+          echo "waiting 60s ..."
+          sleep 60
+        else
+          echo "ocm cluster is ($check) ..."
+          break
+        fi
+      done
+
+      if ocm list idps --cluster cdoanocm | grep htpasswd; then
+        echo "htpasswd already defined ..."
+      else
+        echo "Setup IDP ..."
+        ocm create idp --cluster=cdoanocm \
+          --type=htpasswd \
+          --username $USER \
+          --password $PW \
+          --name htpasswd || true
+
+        ocm create user $USER \
+          --cluster=cdoanocm \
+          --group=cluster-admins || true
+
+        echo "Wait 60s for IDP to be setup ..."
+        sleep 90
+      fi
 
       echo "Done task ..."
       exit 0 
