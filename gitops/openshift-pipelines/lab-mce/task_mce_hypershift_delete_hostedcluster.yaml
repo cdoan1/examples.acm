@@ -53,14 +53,19 @@ spec:
       OUTPUT_IAM_FILE=$TOP/hypershift_test_iam.json
       export HYPERSHIFT=$(pwd)/hypershift/bin/hypershift.12
 
+      echo "Waiting 5m ..."
+      sleep 300
 
       list=$(oc get hostedcluster -n local-cluster -o name)
       for i in $list
       do
-        echo $i
-        oc delete % -n local-cluster
+        oc delete $i -n local-cluster
+        _MC=$(echo $i | cut -f2 -d'/')
+        oc delete managedcluster $_MC -n $_MC
       done
 
+      oc get hostedcluster -A
+      oc get managedclusters -A
 
       echo "Done with hostedcluster task ..."
 
