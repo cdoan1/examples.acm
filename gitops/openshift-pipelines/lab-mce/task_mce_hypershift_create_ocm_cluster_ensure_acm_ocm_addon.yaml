@@ -35,7 +35,6 @@ spec:
 
       USER=admin-22
       PW=$(oc get secret cdoanocm-kubeadmin-password -ojsonpath='{.data.password}')
-      echo "{$PW}"
 
       ocm login --token=$TOKEN --url 'staging'
       ocm get clusters
@@ -68,18 +67,22 @@ spec:
         ocm post /api/clusters_mgmt/v1/clusters/$ID/addons --body=addon.json
       fi
 
-      while [ $(ocm get /api/clusters_mgmt/v1/clusters/$ID/addons/advanced-cluster-management | jq -r '.state') != 'ready' ]
-      do
-        echo "waiting 60s ..."
-        sleep 60
-      done
+      # while [ $(ocm get /api/clusters_mgmt/v1/clusters/$ID/addons/advanced-cluster-management | jq -r '.state') != 'ready' ]
+      # do
+      #   echo "waiting 60s ..."
+      #   sleep 60
+      # done
+
+      sleep 120
 
       oc extract secret/multiclusterhub-operator-pull-secret
+      oc extract secret/gps -n open-cluster-management-pipelines-ocm
 
       API=$(ocm get /api/clusters_mgmt/v1/clusters/$ID | jq '.api.url' | tr -d '"')
       export KUBECONFIG=local.kubeconfig
       oc login -s $API -u $USER -p $PW --insecure-skip-tls-verify=true
       oc cluster-info
+      oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=gps.cfg
 
       set -x
 
