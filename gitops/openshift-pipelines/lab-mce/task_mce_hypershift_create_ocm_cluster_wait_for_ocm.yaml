@@ -14,7 +14,7 @@ spec:
     description: "true | false - Deploy to multiple data centers."
     type: string
   - name: ocp-version
-    default: "4.10.38"
+    default: "4.11.9"
     description: "ocp version - example: 4.10.38"
     type: string
   - name: GITOPS_SECRET_NAME

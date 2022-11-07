@@ -14,7 +14,7 @@ spec:
     description: "true | false - Deploy to multiple data centers."
     type: string
   - name: ocp-version
-    default: "4.10.38"
+    default: "4.11.9"
     description: "ocp version - example: 4.10.38"
     type: string
   - name: GITOPS_SECRET_NAME
@@ -59,7 +59,8 @@ spec:
             --aws-account-id $AWS_ACCOUNT_ID \
             --aws-access-key-id $ACCESS_KEY_ID \
             --aws-secret-access-key $SECRET_ACCESS_KEY \
-            --ccs --version $(params.ocp-version) \
+            --ccs \
+            --version $(params.ocp-version) \
             --provider aws \
             --region us-east-1 \
             --multi-az \
@@ -69,7 +70,8 @@ spec:
             --aws-account-id $AWS_ACCOUNT_ID \
             --aws-access-key-id $ACCESS_KEY_ID \
             --aws-secret-access-key $SECRET_ACCESS_KEY \
-            --ccs --version $(params.ocp-version) \
+            --ccs \
+            --version $(params.ocp-version) \
             --provider aws \
             --region us-east-1 \
             --compute-nodes 3
