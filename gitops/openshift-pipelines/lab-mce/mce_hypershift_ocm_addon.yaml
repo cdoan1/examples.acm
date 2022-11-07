@@ -47,8 +47,8 @@ spec:
     #   value: $(params.cluster-name)
     # - name: multi-az
     #   value: $(params.multi-az)
-    - name: ocp-version
-      value: $(params.ocp-version)
+    # - name: ocp-version
+    #   value: $(params.ocp-version)
     taskRef:
       name: task-mce-hypershift-create-ocm-cluster
     timeout: "1h30m0s"
@@ -63,8 +63,8 @@ spec:
     #   value: $(params.cluster-name)
     # - name: multi-az
     #   value: $(params.multi-az)
-    - name: ocp-version
-      value: $(params.ocp-version)
+    # - name: ocp-version
+    #   value: $(params.ocp-version)
     taskRef:
       name: task-mce-hypershift-create-ocm-cluster-wait-for-ocm
     workspaces:
