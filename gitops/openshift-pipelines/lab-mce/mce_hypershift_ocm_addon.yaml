@@ -42,7 +42,7 @@ spec:
   - name: create-ocm-cluster
     runAfter:
     - fetch-repo
-    params:
+    # params:
     # - name: cluster-name
     #   value: $(params.cluster-name)
     # - name: multi-az
@@ -58,7 +58,7 @@ spec:
   - name: wait-ocm-cluster
     runAfter:
     - create-ocm-cluster
-    params:
+    # params:
     # - name: cluster-name
     #   value: $(params.cluster-name)
     # - name: multi-az
