@@ -224,6 +224,18 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
+  - name: create-hostedcluster
+    runAfter:
+    - enable-hypershift
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-hypershift-create-hostedcluster
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
 
   workspaces:
   - name: shared-workspace
