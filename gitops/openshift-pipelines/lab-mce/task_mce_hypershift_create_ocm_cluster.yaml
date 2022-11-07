@@ -10,7 +10,7 @@ spec:
     description: name of cluster to install MGH
     type: string
   - name: multi-az
-    default: "false"
+    default: "true"
     description: "true | false - Deploy to multiple data centers."
     type: string
   - name: ocp-version
