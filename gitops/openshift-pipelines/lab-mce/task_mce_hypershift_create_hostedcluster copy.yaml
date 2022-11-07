@@ -51,7 +51,7 @@ spec:
       AWS_CREDS=credentials
       OUTPUT_INFRA_FILE=$TOP/hypershift_test_infra.json
       OUTPUT_IAM_FILE=$TOP/hypershift_test_iam.json
-      export HYPERSHIFT=$(pwd)/hypershift/bin/hypershift.12
+      export HYPERSHIFT=$(pwd)/hypershift/bin/hypershift
 
       echo "🖐️ creating infra aws $CLUSTER_NAME"
       ${HYPERSHIFT} create infra aws --name $CLUSTER_NAME \
