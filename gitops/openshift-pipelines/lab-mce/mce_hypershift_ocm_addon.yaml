@@ -35,5 +35,22 @@ spec:
     - name: output
       workspace: shared-workspace
   
+  - name: create-ocm-cluster
+    runAfter:
+    - fetch-repo
+    params:
+    - name: cluster-name
+      value: $(params.cluster-name)
+    - name: multi-az
+      value: $(params.multi-az)
+    - name: ocp-version
+      value: $(params.ocp-version)
+    taskRef:
+      name: task-mce-hypershift-create-ocm-cluster
+    timeout: "1h30m0s"
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
   workspaces:
   - name: shared-workspace

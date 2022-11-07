@@ -33,3 +33,4 @@ resources:
 - task_loginToCluster.yaml
 - task_notifyStatus.yaml
 - task_applyPrereqsDownstream.yaml
+- task_mce_hypershift_create_ocm_cluster.yaml
