@@ -1,0 +1,40 @@
+---
+
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: mce-hypershift-ocm-addon
+  namespace: open-cluster-management-pipelines-mce
+spec:
+  params:
+  - name: kubeconfig
+    description: "base64 encoded kubeconfig of the cluster we want to run this task on. Default to empty string, use the current cluster."
+    default: ""
+    type: string
+  - name: hostedcluster-name
+    type: string
+    description: "hostedcluster name to create."
+    default: ""
+  - name: release-image
+    type: string
+    description: "ocp release image version to install the hostedcluster."
+    default: ""
+
+  tasks:
+  - name: fetch-repo
+    params:
+    - name: url
+      value: https://github.com/cdoan1/examples.acm.git
+    - name: revision
+      value: main
+    - name: deleteExisting
+      value: "true"
+    taskRef:
+      kind: ClusterTask
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-workspace
+  
+  workspaces:
+  - name: shared-workspace
