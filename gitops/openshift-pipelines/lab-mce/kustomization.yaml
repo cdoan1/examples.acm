@@ -35,4 +35,4 @@ resources:
 - task_applyPrereqsDownstream.yaml
 - task_mce_hypershift_create_ocm_cluster.yaml
 - task_mce_hypershift_create_ocm_cluster_wait_for_ocm.yaml
-- task_mce_hypershift_create_ocm_clsuter_ensure_acm_ocm_addon.yaml
+- task_mce_hypershift_create_ocm_cluster_ensure_acm_ocm_addon.yaml
