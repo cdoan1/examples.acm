@@ -6,7 +6,7 @@ metadata:
 spec:
   params:
   - name: cluster-name
-    default: ""
+    default: "cdoanocm"
     description: name of cluster to install MGH
     type: string
   - name: multi-az
@@ -30,7 +30,7 @@ spec:
       # secrets
       #  ocm-staging
       #  cdoanocm-kubeadmin-password
-      #
+
       TOKEN=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.token}' | base64 --decode)
       AWS_ACCOUNT_ID=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.AWS_ACCOUNT_ID}' | base64 --decode)
       ACCESS_KEY_ID=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.ACCESS_KEY_ID}' | base64 --decode)
@@ -47,13 +47,15 @@ spec:
       fi
 
       ocm login --token=$TOKEN --url 'staging'
+      
       ocm get clusters
-      if ocm list clusters cdoanocm | grep cdoanocm; then
-        echo "cluster cdoanocm already exists ..."
+
+      if ocm list clusters $(params.cluster-name) | grep $(params.cluster-name); then
+        echo "cluster $(params.cluster-name) already exists ..."
       else
-        echo "creating cluster cdoanocm in staging ..."
+        echo "creating cluster $(params.cluster-name) in staging ..."
         if [[ "$(params.multi-az)" == "true" ]]; then
-          ocm create cluster cdoanocm \
+          ocm create cluster $(params.cluster-name) \
             --aws-account-id $AWS_ACCOUNT_ID \
             --aws-access-key-id $ACCESS_KEY_ID \
             --aws-secret-access-key $SECRET_ACCESS_KEY \
@@ -63,7 +65,7 @@ spec:
             --multi-az \
             --compute-nodes 3
         else
-          ocm create cluster cdoanocm \
+          ocm create cluster $(params.cluster-name) \
             --aws-account-id $AWS_ACCOUNT_ID \
             --aws-access-key-id $ACCESS_KEY_ID \
             --aws-secret-access-key $SECRET_ACCESS_KEY \
@@ -73,9 +75,6 @@ spec:
             --compute-nodes 3
         fi
       fi
-
-      # delete the OCM cluster
-      # ocm delete /api/clusters_mgmt/v1/clusters/1urqrlklfmaokp1locgof68fsg4kq130
 
       echo "Done task ..."
       exit 0 
