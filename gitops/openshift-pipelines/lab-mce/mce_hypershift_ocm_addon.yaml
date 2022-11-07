@@ -42,13 +42,6 @@ spec:
   - name: create-ocm-cluster
     runAfter:
     - fetch-repo
-    # params:
-    # - name: cluster-name
-    #   value: $(params.cluster-name)
-    # - name: multi-az
-    #   value: $(params.multi-az)
-    # - name: ocp-version
-    #   value: $(params.ocp-version)
     taskRef:
       name: task-mce-hypershift-create-ocm-cluster
     timeout: "1h30m0s"
@@ -58,15 +51,17 @@ spec:
   - name: wait-ocm-cluster
     runAfter:
     - create-ocm-cluster
-    # params:
-    # - name: cluster-name
-    #   value: $(params.cluster-name)
-    # - name: multi-az
-    #   value: $(params.multi-az)
-    # - name: ocp-version
-    #   value: $(params.ocp-version)
     taskRef:
       name: task-mce-hypershift-create-ocm-cluster-wait-for-ocm
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
+  - name: deploy-acm-ocm-addon
+    runAfter:
+    - wait-ocm-cluster
+    taskRef:
+      name: task-mce-hypershift-create-ocm-cluster-ensure-acm-ocm-addon
     workspaces:
     - name: source
       workspace: shared-workspace

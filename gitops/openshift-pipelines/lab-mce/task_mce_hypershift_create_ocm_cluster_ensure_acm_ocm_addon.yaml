@@ -1,0 +1,112 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-mce-hypershift-create-ocm-cluster-ensure-acm-ocm-addon
+spec:
+  params:
+  - name: cluster-name
+    default: "cdoanocm"
+    description: name of cluster to install MGH
+    type: string
+  - name: multi-az
+    default: "true"
+    description: "true | false - Deploy to multiple data centers."
+    type: string
+  - name: ocp-version
+    default: "4.11.9"
+    description: "ocp version - example: 4.10.38"
+    type: string
+  - name: GITOPS_SECRET_NAME
+    default: 'ocm-staging'
+    description: Name of the secret that contains credentials
+    type: string  
+  steps:
+  - args:
+    - |-
+      set -e
+
+      echo "Start task ..."
+
+      TOKEN=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.token}' | base64 --decode)
+      AWS_ACCOUNT_ID=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.AWS_ACCOUNT_ID}' | base64 --decode)
+      ACCESS_KEY_ID=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.ACCESS_KEY_ID}' | base64 --decode)
+      SECRET_ACCESS_KEY=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.SECRET_ACCESS_KEY}' | base64 --decode)
+
+      USER=admin-22
+      PW=$(oc get secret cdoanocm-kubeadmin-password -ojsonpath='{.data.password}')
+      echo "{$PW}"
+
+      ocm login --token=$TOKEN --url 'staging'
+      ocm get clusters
+      if ocm list clusters cdoanocm | grep cdoanocm; then
+        echo "cluster cdoanocm already exists ..."
+      else
+        echo "creating cluster cdoanocm in staging ..."
+      fi
+
+      # get the current id of the clusters
+      ID=$(ocm get /api/clusters_mgmt/v1/clusters | jq -r '.items[].id')
+
+      echo "cluster id: $ID"
+
+      cat > addon.json <<EOF
+      {
+        "kind": "AddOnInstallation",
+        "id": "advanced-cluster-management",
+        "href": "/api/clusters_mgmt/v1/clusters/$ID/addons/advanced-cluster-management",
+        "addon": {
+          "kind": "AddOnLink",
+          "href": "/api/clusters_mgmt/v1/addons/advanced-cluster-management",
+          "id": "advanced-cluster-management"
+        }
+      }
+      EOF
+
+      if [[ $(ocm get /api/clusters_mgmt/v1/clusters/$ID/addons/advanced-cluster-management | jq -r '.state') == "" ]]; then
+        echo "installing the latest ACM addon ..."
+        ocm post /api/clusters_mgmt/v1/clusters/$ID/addons --body=addon.json
+      fi
+
+      while [ $(ocm get /api/clusters_mgmt/v1/clusters/$ID/addons/advanced-cluster-management | jq -r '.state') != 'ready' ]
+      do
+        echo "waiting 60s ..."
+        sleep 60
+      done
+
+      oc extract secret/multiclusterhub-operator-pull-secret
+
+      API=$(ocm get /api/clusters_mgmt/v1/clusters/$ID | jq '.api.url' | tr -d '"')
+      export KUBECONFIG=local.kubeconfig
+      oc login -s $API -u $USER -p $PW --insecure-skip-tls-verify=true
+      oc cluster-info
+
+      set -x
+
+      oc create secret generic multiclusterhub-operator-pull-secret --from-file=.dockerconfigjson=.dockerconfigjson \
+        --type=kubernetes.io/dockerconfigjson \
+        -n redhat-open-cluster-management || true
+
+      if oc get catalogsource addon-advanced-cluster-management-catalog --namespace openshift-marketplace | grep addon-advanced-cluster-management-catalog; then
+        echo "already exists ..."
+      else
+        oc get catalogsource addon-advanced-cluster-management-catalog --namespace redhat-open-cluster-management -o yaml | yq eval '.metadata.namespace = "openshift-marketplace"' - | oc apply -f -
+      fi
+
+      oc apply -k gitops/kustomization/rhacm-instance/overlays/addon-release-2.7-catalogsource
+
+      oc wait --for="condition=complete" mch multiclusterhub -n redhat-open-cluster-management --timeout=600s
+      set +x
+      
+      echo "Done task ..."
+
+      exit 0 
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/cdoan_rh22/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source
