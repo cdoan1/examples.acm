@@ -1,7 +1,0 @@
-#
-# main upgrade pipeline in the open-cluster-management-pipelines-upgrade namespace.
-# this manifest will include the pipeline definition as well as the tasks definitions.
-#
-# install: oc apply -k gitops/openshift-pipelines/upgrade/rhacm/
-#
----
