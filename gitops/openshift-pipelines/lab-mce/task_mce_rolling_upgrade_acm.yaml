@@ -29,8 +29,6 @@ spec:
       set -x
       if [ -f $(pwd)/remote.kubeconfig ]; then
         export KUBECONFIG=$(pwd)/remote.kubeconfig
-      else
-        exit 1
       fi
       
       oc cluster-info

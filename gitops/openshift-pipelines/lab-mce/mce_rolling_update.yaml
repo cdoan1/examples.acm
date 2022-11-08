@@ -72,41 +72,41 @@ spec:
     - name: source
       workspace: shared-workspace
 
-  # - name: rolling-upgrade
-  #   runAfter:
-  #   - check-status
-  #   params:
-  #   - name: kubeconfig
-  #     value: $(params.kubeconfig)
-  #   - name: upgrade-snapshot
-  #     value: $(params.upgrade-snapshot)
-  #   taskRef:
-  #     name: mce-rolling-upgrade-acm
-  #   workspaces:
-  #   - name: source
-  #     workspace: shared-workspace
-  # - name: rolling-upgrade-wait-ready
-  #   runAfter:
-  #   - rolling-upgrade
-  #   params:
-  #   - name: kubeconfig
-  #     value: $(params.kubeconfig)
-  #   taskRef:
-  #     name: mce-wait-ready
-  #   workspaces:
-  #   - name: source
-  #     workspace: shared-workspace
-  # - name: rolling-upgrade-check-status
-  #   runAfter:
-  #   - rolling-upgrade-wait-ready
-  #   params:
-  #   - name: kubeconfig
-  #     value: $(params.kubeconfig)
-  #   taskRef:
-  #     name: mce-check-status
-  #   workspaces:
-  #   - name: source
-  #     workspace: shared-workspace
+  - name: rolling-upgrade
+    runAfter:
+    - check-status
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    - name: upgrade-snapshot
+      value: $(params.upgrade-snapshot)
+    taskRef:
+      name: mce-rolling-upgrade-acm
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: rolling-upgrade-wait-ready
+    runAfter:
+    - rolling-upgrade
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-wait-ready
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: rolling-upgrade-check-status
+    runAfter:
+    - rolling-upgrade-wait-ready
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-check-status
+    workspaces:
+    - name: source
+      workspace: shared-workspace
     
   workspaces:
   - name: shared-workspace
