@@ -62,32 +62,27 @@ spec:
       }
       EOF
 
-      if [[ $(ocm get /api/clusters_mgmt/v1/clusters/$ID/addons/advanced-cluster-management | jq -r '.state') == "" ]]; then
-        echo "installing the latest ACM addon ..."
-        ocm post /api/clusters_mgmt/v1/clusters/$ID/addons --body=addon.json
-      fi
-
-      # while [ $(ocm get /api/clusters_mgmt/v1/clusters/$ID/addons/advanced-cluster-management | jq -r '.state') != 'ready' ]
-      # do
-      #   echo "waiting 60s ..."
-      #   sleep 60
-      # done
-
-      sleep 120
-
       oc extract secret/multiclusterhub-operator-pull-secret
       oc extract secret/gps -n open-cluster-management-pipelines-ocm
 
       API=$(ocm get /api/clusters_mgmt/v1/clusters/$ID | jq '.api.url' | tr -d '"')
       export KUBECONFIG=local.kubeconfig
       oc login -s $API -u $USER -p $PW --insecure-skip-tls-verify=true
-      oc cluster-info
-      
+      oc cluster-info      
+      oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=gps.cfg
+      oc apply -f ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d-catalogsource/rhacm-repo.yaml
+
       set -x
 
-      oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=gps.cfg
-      
-      oc apply -f ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d-catalogsource/rhacm-repo.yaml
+      if [[ $(ocm get /api/clusters_mgmt/v1/clusters/$ID/addons/advanced-cluster-management | jq -r '.state') == "" ]]; then
+        echo "installing the latest ACM addon ..."
+        ocm post /api/clusters_mgmt/v1/clusters/$ID/addons --body=addon.json
+      fi
+      while [ $(ocm get /api/clusters_mgmt/v1/clusters/$ID/addons/advanced-cluster-management | jq -r '.state') != 'ready' ]
+      do
+        echo "waiting 60s ..."
+        sleep 60
+      done
 
       oc create secret generic multiclusterhub-operator-pull-secret --from-file=.dockerconfigjson=.dockerconfigjson \
         --type=kubernetes.io/dockerconfigjson \
@@ -99,11 +94,9 @@ spec:
         oc get catalogsource addon-advanced-cluster-management-catalog --namespace redhat-open-cluster-management -o yaml | yq eval '.metadata.namespace = "openshift-marketplace"' - | oc apply -f -
       fi
 
-      oc apply -k gitops/kustomization/rhacm-instance/overlays/addon-release-2.7-catalogsource
+      oc apply -k gitops/kustomization/rhacm-instance/overlays/addon-release-2.7.0-acm-ocm-addon-2.7.2
 
       oc wait --for="condition=complete" mch multiclusterhub -n redhat-open-cluster-management --timeout=600s
-
-      set +x
       
       echo "Done task ..."
 
