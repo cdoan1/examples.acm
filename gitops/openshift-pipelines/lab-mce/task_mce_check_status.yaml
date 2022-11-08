@@ -71,9 +71,9 @@ spec:
       echo "current mce csv phase                                 : $(check $rc22)" 
 
       echo "acm snapshot                                          : "$(oc get pods -n open-cluster-management -o yaml | grep image: | sort -u | grep custom-registry | cut -d':' -f4 | sort -u)
-      echo "acm snapshot                                          : "$(oc get pods -n openshift-marketplace -o yaml | grep " image:"  | grep acm-custom | grep -v "\- image:" | sort -u | awk '{print $2}')
+      echo "acm snapshot                                          : "$(oc get pods -n openshift-marketplace -o yaml | grep " image:"  | grep acm-custom | grep -v "\- image:" | sort -u | awk '{print $2}' | cut -d':' -f3)
       echo "mce snapshot                                          : "$(oc get pods -n multicluster-engine -o yaml | grep image: | sort -u | grep custom-registry | cut -d':' -f4 | sort -u)
-      echo "mce snapshot                                          : "$(oc get pods -n openshift-marketplace -o yaml | grep " image:"  | grep mce-custom | grep -v "\- image:" | sort -u | awk '{print $2}')
+      echo "mce snapshot                                          : "$(oc get pods -n openshift-marketplace -o yaml | grep " image:"  | grep mce-custom | grep -v "\- image:" | sort -u | awk '{print $2}' | cut -d':' -f3)
       echo "count current managed clusters                        : "$( oc get managedcluster -A | wc -l )
       echo "count current manifestwork                            : "$( oc get manifestwork -A | wc -l )
 
