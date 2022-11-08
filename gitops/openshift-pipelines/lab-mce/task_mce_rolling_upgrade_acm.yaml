@@ -86,13 +86,13 @@ spec:
 
       oc wait --for="condition=Ready" pod -l olm.catalogSource=acm-custom-registry -n open-cluster-management --timeout=60s || true
 
-      oc -n open-cluster-management delete csv advanced-cluster-management.v2.7.0 || exit 1
-      oc -n multicluster-engine delete csv multicluster-engine.v2.2.0 || exit 1
+      oc -n open-cluster-management delete csv advanced-cluster-management.v2.7.0 || true
+      oc -n multicluster-engine delete csv multicluster-engine.v2.2.0 || true
 
       # new: advanced-cluster-management
       # old: acm-operator-subscription
 
-      oc -n open-cluster-management delete subscription.operator advanced-cluster-management || exit 1
+      oc -n open-cluster-management delete subscription.operator advanced-cluster-management || oc -n open-cluster-management delete subscription.operator acm-operator-subscription || true
       oc -n multicluster-engine delete subscription.operator multicluster-engine || exit 1
       
       sleep 10
