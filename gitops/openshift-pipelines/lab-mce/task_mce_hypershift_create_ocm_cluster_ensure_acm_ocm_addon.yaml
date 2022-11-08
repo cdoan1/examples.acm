@@ -82,6 +82,7 @@ spec:
       export KUBECONFIG=local.kubeconfig
       oc login -s $API -u $USER -p $PW --insecure-skip-tls-verify=true
       oc cluster-info
+      
       oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=gps.cfg
 
       set -x
@@ -99,6 +100,7 @@ spec:
       oc apply -k gitops/kustomization/rhacm-instance/overlays/addon-release-2.7-catalogsource
 
       oc wait --for="condition=complete" mch multiclusterhub -n redhat-open-cluster-management --timeout=600s
+
       set +x
       
       echo "Done task ..."
