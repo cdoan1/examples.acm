@@ -62,6 +62,7 @@ spec:
       }
       EOF
 
+      oc cluster-info
       oc extract secret/multiclusterhub-operator-pull-secret
       oc extract secret/gps -n open-cluster-management-pipelines-ocm
 
