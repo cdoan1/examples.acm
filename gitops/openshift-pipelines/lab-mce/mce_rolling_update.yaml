@@ -49,32 +49,33 @@ spec:
     - name: source
       workspace: shared-workspace
     
-  - name: wait-ready
-    runAfter:
-    - enable-kubeconfig
-    params:
-    - name: kubeconfig
-      value: $(params.kubeconfig)
-    taskRef:
-      name: mce-wait-ready
-    workspaces:
-    - name: source
-      workspace: shared-workspace
-  - name: check-status
-    runAfter:
-    - wait-ready
-    params:
-    - name: kubeconfig
-      value: $(params.kubeconfig)
-    taskRef:
-      name: mce-check-status
-    workspaces:
-    - name: source
-      workspace: shared-workspace
+  # - name: wait-ready
+  #   runAfter:
+  #   - enable-kubeconfig
+  #   params:
+  #   - name: kubeconfig
+  #     value: $(params.kubeconfig)
+  #   taskRef:
+  #     name: mce-wait-ready
+  #   workspaces:
+  #   - name: source
+  #     workspace: shared-workspace
+  # - name: check-status
+  #   runAfter:
+  #   - wait-ready
+  #   params:
+  #   - name: kubeconfig
+  #     value: $(params.kubeconfig)
+  #   taskRef:
+  #     name: mce-check-status
+  #   workspaces:
+  #   - name: source
+  #     workspace: shared-workspace
 
   - name: rolling-upgrade
     runAfter:
-    - check-status
+    - fetch-repo
+    # - check-status
     params:
     - name: kubeconfig
       value: $(params.kubeconfig)
