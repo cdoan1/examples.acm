@@ -79,6 +79,7 @@ spec:
         echo "installing the latest ACM addon ..."
         ocm post /api/clusters_mgmt/v1/clusters/$ID/addons --body=addon.json
       fi
+      
       # while [ $(ocm get /api/clusters_mgmt/v1/clusters/$ID/addons/advanced-cluster-management | jq -r '.state') != 'ready' ]
       # do
       #   echo "waiting 60s ..."
