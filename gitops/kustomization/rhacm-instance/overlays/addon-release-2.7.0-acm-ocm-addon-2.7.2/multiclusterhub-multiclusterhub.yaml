@@ -1,0 +1,10 @@
+apiVersion: operator.open-cluster-management.io/v1
+kind: MultiClusterHub
+metadata:
+  name: multiclusterhub
+  namespace: open-cluster-management
+  annotations:
+    installer.open-cluster-management.io/mce-subscription-spec: '{"channel": "beta","installPlanApproval": "Automatic","name": "multicluster-engine","source": "addon-advanced-cluster-management-catalog","sourceNamespace": "openshift-marketplace"}'
+    mch-imageRepository: "quay.io:443/acm-d"
+spec:
+  availabilityConfig: High
