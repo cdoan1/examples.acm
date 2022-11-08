@@ -97,7 +97,7 @@ spec:
         oc get catalogsource addon-advanced-cluster-management-catalog --namespace redhat-open-cluster-management -o yaml | yq eval '.metadata.namespace = "openshift-marketplace"' - | oc apply -f -
       fi
 
-      oc apply -k gitops/kustomization/rhacm-instance/overlays/addon-release-2.7.0-acm-ocm-addon-2.7.2
+      oc apply -k gitops/kustomization/rhacm-instance-ocm-addon/overlays/addon-release-2.7.0-acm-ocm-addon-2.7.2
 
       oc wait --for="condition=complete" mch multiclusterhub -n redhat-open-cluster-management --timeout=600s
       
