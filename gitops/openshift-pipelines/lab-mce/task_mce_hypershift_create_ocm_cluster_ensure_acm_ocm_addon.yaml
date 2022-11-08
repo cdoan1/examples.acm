@@ -83,9 +83,11 @@ spec:
       oc login -s $API -u $USER -p $PW --insecure-skip-tls-verify=true
       oc cluster-info
       
-      oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=gps.cfg
-
       set -x
+
+      oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=gps.cfg
+      
+      oc apply -f ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d-catalogsource/rhacm-repo.yaml
 
       oc create secret generic multiclusterhub-operator-pull-secret --from-file=.dockerconfigjson=.dockerconfigjson \
         --type=kubernetes.io/dockerconfigjson \
