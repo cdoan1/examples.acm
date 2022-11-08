@@ -8,4 +8,5 @@ bases:
   - ../../base
 
 resources:
+  - ns.yaml
   - mce-subscription.yaml
