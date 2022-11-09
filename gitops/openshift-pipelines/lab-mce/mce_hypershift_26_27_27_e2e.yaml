@@ -10,7 +10,7 @@ spec:
   - name: skip26
     type: string
     description: Skip the 2.6 install
-    default: false
+    default: "false"
   - name: clusterPoolName
     type: string
     description: The name of the clusterpool to use
