@@ -167,6 +167,8 @@ spec:
     runAfter:
     - check-status
     params:
+    - name: skip26
+      value: "true"
     - name: kubeconfig
       value: $(params.kubeconfig)
     - name: upgrade-snapshot
@@ -181,6 +183,35 @@ spec:
     - rolling-upgrade
     params:
     - name: skip26
+      value: "true"
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-wait-ready
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
+  - name: rolling-upgrade-27
+    runAfter:
+    - rolling-upgrade-wait-ready
+    params:
+    - name: skip26
+      value: "false"
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    - name: upgrade-snapshot
+      value: $(params.upgrade-snapshot)
+    taskRef:
+      name: mce-rolling-upgrade-acm
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: rolling-upgrade-wait-ready-27
+    runAfter:
+    - rolling-upgrade-27
+    params:
+    - name: skip26
       value: "false"
     - name: kubeconfig
       value: $(params.kubeconfig)
@@ -189,7 +220,7 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
-  
+
   - name: enable-hypershift
     runAfter:
     - rolling-upgrade-wait-ready
