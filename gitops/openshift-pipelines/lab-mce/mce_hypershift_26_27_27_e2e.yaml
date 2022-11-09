@@ -1,0 +1,241 @@
+---
+
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: mce-hypershift-26-27-27-e2e
+  namespace: open-cluster-management-pipelines-mce
+spec:
+  params:
+  - name: clusterPoolName
+    type: string
+    description: The name of the clusterpool to use
+    default: "hypershift-cluster-pool"
+  - name: clusterClaimName
+    type: string
+    description: The name of the clusterclaim to claim
+    default: "hs-ci-ds-cluster-playback"
+  - name: clusterClaimLifetime
+    type: string
+    description: The length of the lifetime of the clusterclaim. Default 8h
+    default: "4h"
+  - name: keepClusterClaim
+    type: string
+    description: Reuse existing clusterclaim if it exists.
+    default: "true"
+  - name: namespace
+    type: string
+    description: The namespace to deploy ACM onto the target cluster
+    default: "open-cluster-management"
+  - name: snapshot
+    type: string
+    description: The downstream SNAPSHOT to used to deploy ACM
+    default: "2.0-latest"
+  - name: sendNotification
+    type: string
+    description: Sends notification to slack if value is true
+    default: "false"
+  - name: start-snapshot
+    type: string
+    description: "snapshot version to initially install."
+    default: "2.6.2-RC2"
+  - name: upgrade-snapshot
+    type: string
+    description: "snapshot version to upgrade too."
+    default: "2.7.0-DOWNSTREAM-2022-11-03-10-46-20"
+
+  - name: kubeconfig
+    type: string
+    description: "not used."
+    default: ""
+
+  tasks:
+  - name: fetch-repo
+    params:
+    - name: url
+      value: https://github.com/cdoan1/examples.acm.git
+    - name: revision
+      value: main
+    - name: deleteExisting
+      value: "true"
+    taskRef:
+      kind: ClusterTask
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-workspace
+  - name: checkout-hub-cluster
+    runAfter:
+    - fetch-repo
+    params:
+    - name: clusterClaimName
+      value: $(params.clusterClaimName)
+    - name: clusterPoolName
+      value: $(params.clusterPoolName)
+    - name: clusterClaimLifetime
+      value: $(params.clusterClaimLifetime)
+    - name: keepClusterClaim
+      value: $(params.keepClusterClaim)
+    taskRef:
+      name: deploy-acm-hyper-checkout-cluster
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: login-to-hub-cluster
+    params:
+    - name: username
+      value: "$(tasks.checkout-hub-cluster.results.username)"
+    - name: password
+      value: "$(tasks.checkout-hub-cluster.results.password)"
+    - name: api
+      value: "$(tasks.checkout-hub-cluster.results.api)"
+    runAfter:
+    - checkout-hub-cluster
+    taskRef:
+      kind: Task
+      name: deploy-acm-hyper-login-to-cluster
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
+  - name: deploy-acm
+    runAfter:
+    - login-to-hub-cluster
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    - name: start-snapshot
+      value: $(params.start-snapshot)
+    - name: upgrade-snapshot
+      value: $(params.upgrade-snapshot)
+    taskRef:
+      name: mce-install-acm-26
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: build-hypershift-cli
+    runAfter:
+    - login-to-hub-cluster
+    taskRef:
+      name: mce-hypershift-build-hypershift-cli
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: ensure-prereqs
+    runAfter:
+    - login-to-hub-cluster
+    taskRef:
+      name: deploy-ds-acm-hyper-prereqs
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
+  - name: wait-ready
+    runAfter:
+    - deploy-acm
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-wait-ready
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: check-status
+    runAfter:
+    - wait-ready
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-check-status
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
+  - name: rolling-upgrade
+    runAfter:
+    - check-status
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    - name: upgrade-snapshot
+      value: $(params.upgrade-snapshot)
+    taskRef:
+      name: mce-rolling-upgrade-acm
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: rolling-upgrade-wait-ready
+    runAfter:
+    - rolling-upgrade
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-wait-ready
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  
+  - name: enable-hypershift
+    runAfter:
+    - rolling-upgrade-wait-ready
+    - build-hypershift-cli
+    - ensure-prereqs
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-hypershift-enable-hypershift
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: create-hostedcluster
+    runAfter:
+    - enable-hypershift
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-hypershift-create-hostedcluster
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+  - name: delete-hostedcluster
+    runAfter:
+    - create-hostedcluster
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-hypershift-delete-hostedcluster
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
+
+  workspaces:
+  - name: shared-workspace
+
+  finally:
+  - name: notify-status-ds
+    params:
+    - name: sendNotification
+      value: "$(params.sendNotification)"
+    - name: snapshot
+      value: "$(params.snapshot)"
+    - name: runStatus
+      value: "$(tasks.status)"
+    - name: hubOcLogin
+      value: "$(tasks.checkout-hub-cluster.results.ocLogin)"
+    # - name: mchStatus
+    #   value: "$(tasks.ensure-mch.status)"
+    # - name: hubHd
+    #   value: "$(tasks.ensure-hypershiftdeployment-hub.results.hdStatus)"
+    taskRef:
+      kind: Task
+      name: notify-status-ds
+    workspaces:
+    - name: source
+      workspace: shared-workspace
