@@ -7,6 +7,10 @@ metadata:
   namespace: open-cluster-management-pipelines-mce
 spec:
   params:
+  - name: skip26
+    type: string
+    description: Skip the 2.6 install
+    default: false
   - name: clusterPoolName
     type: string
     description: The name of the clusterpool to use
@@ -102,6 +106,8 @@ spec:
     runAfter:
     - login-to-hub-cluster
     params:
+    - name: skip26
+      value: $(params.skip26)
     - name: kubeconfig
       value: $(params.kubeconfig)
     - name: start-snapshot
@@ -162,7 +168,7 @@ spec:
     - name: upgrade-snapshot
       value: $(params.upgrade-snapshot)
     taskRef:
-      name: mce-rolling-upgrade-acm
+      name: mce-rolling-upgrade-acm-26
     workspaces:
     - name: source
       workspace: shared-workspace

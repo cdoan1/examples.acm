@@ -92,8 +92,8 @@ spec:
       oc -n open-cluster-management get csv --show-labels
       oc -n multicluster-engine get csv --show-labels
 
-      oc -n open-cluster-management delete csv advanced-cluster-management.v2.6.1 || exit 1
-      oc -n multicluster-engine delete csv multicluster-engine.v2.1.1 || exit 1
+      oc -n open-cluster-management delete csv advanced-cluster-management.v2.6.2 || exit 1
+      oc -n multicluster-engine delete csv multicluster-engine.v2.1.2 || exit 1
 
       # new: advanced-cluster-management
       # old: acm-operator-subscription
