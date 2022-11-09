@@ -207,7 +207,7 @@ spec:
 
   - name: enable-hypershift
     runAfter:
-    - rolling-upgrade-wait-ready
+    - rolling-upgrade-check-status
     - build-hypershift-cli
     - ensure-prereqs
     params:
