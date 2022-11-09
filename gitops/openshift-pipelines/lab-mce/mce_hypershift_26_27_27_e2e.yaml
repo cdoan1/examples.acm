@@ -140,6 +140,8 @@ spec:
     runAfter:
     - deploy-acm
     params:
+    - name: skip26
+      value: $(params.skip26)
     - name: kubeconfig
       value: $(params.kubeconfig)
     taskRef:
@@ -151,6 +153,8 @@ spec:
     runAfter:
     - wait-ready
     params:
+    - name: skip26
+      value: $(params.skip26)
     - name: kubeconfig
       value: $(params.kubeconfig)
     taskRef:
@@ -163,6 +167,8 @@ spec:
     runAfter:
     - check-status
     params:
+    - name: skip26
+      value: "false"
     - name: kubeconfig
       value: $(params.kubeconfig)
     - name: upgrade-snapshot
@@ -176,6 +182,8 @@ spec:
     runAfter:
     - rolling-upgrade
     params:
+    - name: skip26
+      value: "false"
     - name: kubeconfig
       value: $(params.kubeconfig)
     taskRef:
