@@ -191,6 +191,19 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
+  - name: rolling-upgrade-check-status
+    runAfter:
+    - rolling-upgrade-wait-ready
+    params:
+    - name: skip26
+      value: $(params.skip26)
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-check-status
+    workspaces:
+    - name: source
+      workspace: shared-workspace
 
   - name: enable-hypershift
     runAfter:
