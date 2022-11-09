@@ -8,7 +8,7 @@ spec:
   params:
   - name: skip26
     default: "false"
-    description: ""
+    description: "skip this task"
     type: string
   - name: kubeconfig
     default: ""
