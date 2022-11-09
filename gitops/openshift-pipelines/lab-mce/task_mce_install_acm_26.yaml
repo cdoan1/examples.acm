@@ -59,7 +59,7 @@ spec:
       oc apply -k ./gitops/kustomization/rhacm-operator/base-downstream-release-2.6-acm-d-catalogsource
 
       sleep 60
-      oc wait --for condition=Ready pods -n open-cluster-management -l name=multiclusterhub-operator --timeout=300s
+      oc wait --for condition=Ready pods -n open-cluster-management -l name=multiclusterhub-operator --timeout=300s || true
       
       # todo(cdoan): hack create the mch pull secret
       oc get secret pull-secret -n openshift-config -o yaml \
