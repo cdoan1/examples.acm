@@ -167,8 +167,6 @@ spec:
     runAfter:
     - check-status
     params:
-    - name: skip26
-      value: "false"
     - name: kubeconfig
       value: $(params.kubeconfig)
     - name: upgrade-snapshot
