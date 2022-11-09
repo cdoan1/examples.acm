@@ -23,7 +23,7 @@ metadata:
   namespace: multicluster-engine
 spec:
   displayName: MultiCluster Engine
-  image: quay.io:443/acm-d/mce-custom-registry:v2.6.2-RC2
+  image: quay.io:443/acm-d/mce-custom-registry:v2.1.2-RC2
   publisher: Red Hat
   sourceType: grpc
   updateStrategy:
