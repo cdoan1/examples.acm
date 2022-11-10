@@ -56,12 +56,12 @@ spec:
       echo "Waiting 5m ..."
       sleep 300
 
-      list=$(oc get hostedcluster -n local-cluster -o name)
+      list=$(oc get hostedcluster -n local-cluster | awk '{print $1}' | grep -v NAME)
       for i in $list
       do
         oc delete $i -n local-cluster
-        _MC=$(echo $i | cut -f2 -d'/')
-        oc delete managedcluster $_MC -n $_MC
+        # _MC=$(echo $i | cut -f2 -d'/')
+        oc delete managedcluster $i
       done
 
       oc get hostedcluster -A
