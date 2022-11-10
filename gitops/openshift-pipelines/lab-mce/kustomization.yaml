@@ -14,6 +14,7 @@ resources:
 - mce_hypershift_e2e.yaml
 - mce_hypershift_27_27_e2e.yaml
 - mce_hypershift_26_27_e2e.yaml
+- mce_hypershift_26_27_e2e_partial.yaml
 - mce_hypershift_26_27_27_e2e.yaml
 - mce_hypershift_ocm_addon.yaml
 - task_mce_enable_kubeconfig.yaml
