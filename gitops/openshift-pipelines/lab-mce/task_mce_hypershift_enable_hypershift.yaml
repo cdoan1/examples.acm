@@ -77,6 +77,8 @@ spec:
       EOF
       
       oc get managedclusteraddons -n local-cluster hypershift-addon
+      
+      oc wait --for="condition=Available" managedclusteraddons hypershift-addon -n local-cluster --timeout=300s
 
       set +e
       exit 0
