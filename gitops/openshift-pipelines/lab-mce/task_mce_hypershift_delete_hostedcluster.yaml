@@ -59,7 +59,7 @@ spec:
       list=$(oc get hostedcluster -n local-cluster | awk '{print $1}' | grep -v NAME)
       for i in $list
       do
-        oc delete $i -n local-cluster
+        oc delete hostedcluster $i -n local-cluster
         # _MC=$(echo $i | cut -f2 -d'/')
         oc delete managedcluster $i
       done
