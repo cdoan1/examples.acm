@@ -255,10 +255,6 @@ spec:
       value: "$(tasks.status)"
     - name: hubOcLogin
       value: "$(tasks.checkout-hub-cluster.results.ocLogin)"
-    # - name: mchStatus
-    #   value: "$(tasks.ensure-mch.status)"
-    # - name: hubHd
-    #   value: "$(tasks.ensure-hypershiftdeployment-hub.results.hdStatus)"
     taskRef:
       kind: Task
       name: notify-status-ds
