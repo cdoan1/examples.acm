@@ -9,11 +9,11 @@ spec:
   - name: clusterPoolName
     type: string
     description: The name of the clusterpool to use
-    default: "hypershift-cluster-pool"
+    default: "hypershift-sno"
   - name: clusterClaimName
     type: string
     description: The name of the clusterclaim to claim
-    default: "hs-ci-ds-cluster-playback"
+    default: "hs-ci-ds-cluster-sno"
   - name: clusterClaimLifetime
     type: string
     description: The length of the lifetime of the clusterclaim. Default 8h
@@ -33,7 +33,7 @@ spec:
   - name: sendNotification
     type: string
     description: Sends notification to slack if value is true
-    default: "false"
+    default: "true"
   - name: start-snapshot
     type: string
     description: "snapshot version to initially install."
