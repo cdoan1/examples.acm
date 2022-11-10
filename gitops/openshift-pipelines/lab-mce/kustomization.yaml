@@ -17,6 +17,7 @@ resources:
 - mce_hypershift_26_27_e2e_partial.yaml
 - mce_hypershift_26_27_27_e2e.yaml
 - mce_hypershift_ocm_addon.yaml
+- mce_hypershift_ocm_addon_check_managed_tenant_bundles.yaml
 - task_mce_enable_kubeconfig.yaml
 - task_mce_install_acm.yaml
 - task_mce_install_acm_26.yaml
