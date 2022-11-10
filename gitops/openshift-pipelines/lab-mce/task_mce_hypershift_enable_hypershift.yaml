@@ -76,9 +76,9 @@ spec:
         installNamespace: open-cluster-management-agent-addon
       EOF
       
-      oc get managedclusteraddons -n local-cluster hypershift-addon
       
       oc wait --for="condition=Available" managedclusteraddons hypershift-addon -n local-cluster --timeout=300s
+      oc get managedclusteraddons -n local-cluster hypershift-addon
 
       set +e
       exit 0
