@@ -229,17 +229,17 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
-  # - name: delete-hostedcluster
-  #   runAfter:
-  #   - create-hostedcluster
-  #   params:
-  #   - name: kubeconfig
-  #     value: $(params.kubeconfig)
-  #   taskRef:
-  #     name: mce-hypershift-delete-hostedcluster
-  #   workspaces:
-  #   - name: source
-  #     workspace: shared-workspace
+  - name: delete-hostedcluster
+    runAfter:
+    - create-hostedcluster
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    taskRef:
+      name: mce-hypershift-delete-hostedcluster
+    workspaces:
+    - name: source
+      workspace: shared-workspace
 
   workspaces:
   - name: shared-workspace
