@@ -55,6 +55,7 @@ spec:
     - name: keepClusterClaim
       value: $(params.keepClusterClaim)
     taskRef:
+      kind: ClusterTask
       name: deploy-acm-hyper-checkout-cluster
     workspaces:
     - name: source
@@ -70,7 +71,7 @@ spec:
     runAfter:
     - checkout-hub-cluster
     taskRef:
-      kind: Task
+      kind: ClusterTask
       name: deploy-acm-hyper-login-to-cluster
     workspaces:
     - name: source
