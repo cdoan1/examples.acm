@@ -16,8 +16,9 @@ spec:
       set -x
 
       echo "✅ login to cluster ..."
+      TOP=$(pwd)
       export KUBECONFIG=$TOP/remote.kubeconfig
-      
+
       oc cluster-info
       oc get ns
       oc new-project vault || oc project vault
