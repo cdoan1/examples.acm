@@ -1,0 +1,88 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-vault-setup
+spec:
+  params:
+  - name: cluster-name
+    default: ""
+    description: "OPTIONAL - name of managed cluster to install vault, by default, we'll create a clusterclaim"
+    type: string
+  steps:
+  - args:
+    - |-
+      set -e
+      set -x
+
+      echo "✅ login to cluster ..."
+      oc cluster-info
+      oc get ns
+      oc new-project vault || oc project vault
+
+      BASEDOMAIN=$(oc status | sed -n -e 's/^.*server //p' | sed -n -e 's/^.*api.//p' | cut -d':' -f1)
+      echo "✅ basedomain: $BASEDOMAIN"
+      
+      helm repo add hashicorp https://helm.releases.hashicorp.com
+      helm search repo hashicorp/vault
+
+      export CONFIG=$(cat <<EOF
+      listener "tcp" {
+        telemetry {
+          unauthenticated_metrics_access = "true"
+        }
+      }
+      telemetry {
+        prometheus_retention_time = "30s",
+        disable_hostname = true
+      }
+      EOF
+      )
+
+      helm install vault hashicorp/vault \
+        --set "global.openshift=true" \
+        --set "server.dev.enabled=true" \
+        --set "ui.enabled=true" \
+        --set "server.dev.config=$CONFIG" \
+        --version 0.21.0
+
+      sleep 10
+
+
+      cat <<EOF | kubectl create -f -
+      apiVersion: route.openshift.io/v1
+      kind: Route
+      metadata:
+        annotations:
+          openshift.io/host.generated: "true"
+        labels:
+          app.kubernetes.io/instance: vault
+          app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/name: vault
+          helm.sh/chart: vault-0.21.0
+        name: vault-console
+        namespace: vault
+      spec:
+        host: "vault-console-vault.apps.$BASEDOMAIN"
+        port:
+          targetPort: http
+        tls:
+          insecureEdgeTerminationPolicy: Redirect
+          termination: edge
+        to:
+          kind: Service
+          name: vault
+          weight: 100
+        wildcardPolicy: None
+      EOF
+
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/cdoan_rh22/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source
