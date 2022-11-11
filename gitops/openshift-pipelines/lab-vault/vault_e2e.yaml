@@ -2,7 +2,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: vault_e2e
+  name: vault-e2e
 spec:
   params:
   - name: cluster-name
