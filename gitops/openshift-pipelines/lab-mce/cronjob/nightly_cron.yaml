@@ -1,0 +1,21 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nightly-pipeline-mce-hypershift-e2e
+  namespace: open-cluster-management-pipelines-mce
+spec:
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 1
+  concurrencyPolicy: Replace
+  schedule: "0 7 * * 1-5"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: pipeline
+          containers:
+          - name: nightly-pipeline-mce
+            image: quay.io/openshift/origin-cli:4.6
+            command: ["/bin/bash", "-c", "kubectl delete pipelinerun mce-hypershift-26-27-e2e || true;kubectl create -f https://raw.githubusercontent.com/cdoan1/examples.acm/main/gitops/openshift-pipelines/lab-mce/pipelinerun/pipelinerun_mce_hypershift_26_27_e2e.yaml"]
+          restartPolicy: Never
