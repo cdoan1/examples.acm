@@ -1,11 +1,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: open-cluster-management-pipelines-mce
+# namespace: open-cluster-management-pipelines-vault
 
 generatorOptions:
   disableNameSuffixHash: true
 
 resources:
+- ns.yaml
 - vault_e2e.yaml
 - task_vault_setup.yaml
