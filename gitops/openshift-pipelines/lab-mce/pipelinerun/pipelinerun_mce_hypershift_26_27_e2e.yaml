@@ -1,0 +1,41 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  labels:
+    app.kubernetes.io/instance: sre-pipelines
+    tekton.dev/pipeline: mce-hypershift-26-27-e2e
+  name: mce-hypershift-26-27-e2e
+  namespace: open-cluster-management-pipelines-mce
+spec:
+  params:
+  - name: skip26
+    value: "false"
+  - name: clusterPoolName
+    value: hypershift-cluster-pool
+  - name: clusterClaimName
+    value: hs-ci-ds-cluster-playback
+  - name: clusterClaimLifetime
+    value: 4h
+  - name: keepClusterClaim
+    value: "false"
+  - name: namespace
+    value: open-cluster-management
+  - name: snapshot
+    value: 2.0-latest
+  - name: sendNotification
+    value: "false"
+  - name: start-snapshot
+    value: 2.6.2-RC2
+  - name: upgrade-snapshot
+    value: 2.7.0-DOWNSTREAM-2022-11-09-15-06-40
+    # value: 2.7.0-DOWNSTREAM-2022-11-08-22-55-45
+  - name: kubeconfig
+    value: ""
+  pipelineRef:
+    name: mce-hypershift-26-27-e2e
+  serviceAccountName: pipeline
+  timeout: 2h0m0s
+  workspaces:
+  - name: shared-workspace
+    persistentVolumeClaim:
+      claimName: shared-storage-pvc
