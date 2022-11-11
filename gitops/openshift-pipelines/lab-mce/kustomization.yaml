@@ -7,6 +7,7 @@ generatorOptions:
   disableNameSuffixHash: true
 
 resources:
+- cronjob/nightly_cron.yaml
 - ns.yaml
 - shared-workspace-pvc.yaml
 - mce-hypershift.yaml
