@@ -53,6 +53,7 @@ spec:
 
       sleep 10
 
+      if ! oc get route vault-console -n vault ; then
       cat <<EOF | kubectl create -f -
       apiVersion: route.openshift.io/v1
       kind: Route
@@ -78,7 +79,8 @@ spec:
           name: vault
           weight: 100
         wildcardPolicy: None
-      EOF || true
+      EOF
+      fi
 
       exit 0
     command:
