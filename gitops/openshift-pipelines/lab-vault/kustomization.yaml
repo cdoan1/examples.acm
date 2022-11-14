@@ -7,7 +7,7 @@ generatorOptions:
   disableNameSuffixHash: true
 
 resources:
-# - ns.yaml
+- ns.yaml
 - vault_e2e.yaml
 - task_vault_setup.yaml
 - shared-workspace-pvc.yaml
