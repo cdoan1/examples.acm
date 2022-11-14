@@ -42,15 +42,16 @@ spec:
       EOF
       )
 
-      helm install vault hashicorp/vault \
-        --set "global.openshift=true" \
-        --set "server.dev.enabled=true" \
-        --set "ui.enabled=true" \
-        --set "server.dev.config=$CONFIG" \
-        --version 0.21.0
+      if ! helm list -A | grep vault ; then
+        helm install vault hashicorp/vault \
+          --set "global.openshift=true" \
+          --set "server.dev.enabled=true" \
+          --set "ui.enabled=true" \
+          --set "server.dev.config=$CONFIG" \
+          --version 0.21.0 || true
+      fi
 
       sleep 10
-
 
       cat <<EOF | kubectl create -f -
       apiVersion: route.openshift.io/v1
