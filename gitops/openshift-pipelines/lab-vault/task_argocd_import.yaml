@@ -1,0 +1,62 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-argocd-import
+spec:
+  params:
+  - name: cluster-name
+    default: ""
+    description: "OPTIONAL - name of managed cluster to install vault, by default, we'll create a clusterclaim"
+    type: string
+  - name: clusterClaimName
+    default: ""
+    type: string
+  steps:
+  - args:
+    - |-
+      set -e
+      set -x
+
+      clusterNamespace=$(oc get clusterclaim.hive $(params.clusterClaimName) -ojsonpath='{.spec.namespace}')
+      oc get secret -n $clusterNamespace
+
+      echo "✅ login to cluster ..."
+      TOP=$(pwd)
+      export KUBECONFIG=$TOP/remote.kubeconfig
+
+      oc --kubeconfig=$TOP/remote.kubeconfig cluster-info
+      oc --kubeconfig=$TOP/remote.kubeconfig project
+
+      BASEDOMAIN=$(oc --kubeconfig=$TOP/remote.kubeconfig status | sed -n -e 's/^.*server //p' | sed -n -e 's/^.*api.//p' | cut -d':' -f1)
+      echo "✅ basedomain: $BASEDOMAIN"
+
+
+
+      echo "✅ login to managed cluster ..."
+      kubectl --kubeconfig=$TOP/remote.kubeconfig config get-contexts
+      kubectl --kubeconfig=$TOP/remote.kubeconfig config current-context
+      context=$(kubectl --kubeconfig=$TOP/remote.kubeconfig config current-context)
+      kubectl --kubeconfig=$TOP/remote.kubeconfig config rename-context $context $clusterNamespace
+      kubectl --kubeconfig=$TOP/remote.kubeconfig config get-contexts
+      kubectl --kubeconfig=$TOP/remote.kubeconfig config current-context
+      
+      echo "✅ login to hub cluster ..."
+      oc cluster-info
+      kubectl config get-contexts
+
+      PW=$(oc get secrets openshift-gitops-cluster -n openshift-gitops -ojsonpath='{.data.admin\.password}' | base64 --decode)
+      argocd login --insecure --grpc-web openshift-gitops-server-openshift-gitops.apps.playback-next.demo.red-chesterfield.com --username admin --password $PW
+      argocd cluster list
+      argocd cluster add $clusterNamespace --kubeconfig mc.kubeconfig
+      
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/cdoan_rh22/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source
