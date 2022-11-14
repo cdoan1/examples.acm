@@ -48,7 +48,7 @@ spec:
           --set "server.dev.enabled=true" \
           --set "ui.enabled=true" \
           --set "server.dev.config=$CONFIG" \
-          --version 0.21.0 || true
+          --version 0.21.0
       fi
 
       sleep 10
@@ -78,7 +78,7 @@ spec:
           name: vault
           weight: 100
         wildcardPolicy: None
-      EOF
+      EOF || true
 
       exit 0
     command:
