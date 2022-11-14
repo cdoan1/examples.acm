@@ -47,12 +47,15 @@ spec:
         oc delete clusterclaim.hive $(inputs.params.clusterClaimName) || true
       fi
       
+      export poolNS=open-cluster-management-pipelines-mce
+
       _TEMPLATE="apiVersion: hive.openshift.io/v1
       kind: ClusterClaim
       metadata:
         annotations:
           cluster.open-cluster-management.io/createmanagedcluster: 'false'
         name: $(inputs.params.clusterClaimName)
+        namespace: $poolNS
       spec:
         clusterPoolName: $(inputs.params.clusterPoolName)
         lifetime: $(inputs.params.clusterClaimLifetime)
@@ -66,9 +69,9 @@ spec:
 
       echo "$_TEMPLATE" | oc apply -f -
 
-      oc wait --for=condition=ClusterRunning clusterclaim.hive/$(inputs.params.clusterClaimName) --timeout=90m
+      oc wait --for=condition=ClusterRunning clusterclaim.hive/$(inputs.params.clusterClaimName) --timeout=90m -n $poolNS
 
-      NAMESPACE=$(oc get clusterclaim.hive $(inputs.params.clusterClaimName) -o=jsonpath='{.spec.namespace}')
+      NAMESPACE=$(oc get clusterclaim.hive $(inputs.params.clusterClaimName) -o=jsonpath='{.spec.namespace}' -n $poolNS )
       CD_INFO=$(oc get clusterdeployment ${NAMESPACE} -n ${NAMESPACE} -o yaml -o=jsonpath='{.spec.clusterMetadata.adminPasswordSecretRef.name}')
       KUBECONFIG_SECRET=$(oc get cd ${NAMESPACE} -n ${NAMESPACE} -o yaml | yq eval '.spec.clusterMetadata.adminKubeconfigSecretRef.name' -)
 
