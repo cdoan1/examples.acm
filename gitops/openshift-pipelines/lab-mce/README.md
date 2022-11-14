@@ -17,10 +17,9 @@ The pipeline supports the following workflow:
 ### ClusterPools
 
 Ensure that all artifacts have the `playback-next` label to designate reference the origin.
+Secrets will use external secrets to a vault.
 
 | name | ns | description |
 |------|----|-------------|
-| mce-pool-compact | open-cluster-management-pipelines-mce | |
 | mce-pool-basic | open-cluster-management-pipelines-mce | |
-| mce-pool-sno | open-cluster-management-pipelines-mce | |
 | mce-pool-service-cluster | open-cluster-management-pipelines-mce | 8x32 worker nodes to handle hypershift hosted clusters |
