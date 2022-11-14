@@ -11,7 +11,8 @@ spec:
   - name: skip26
     value: "false"
   - name: clusterPoolName
-    value: hypershift-cluster-pool
+    # value: hypershift-cluster-pool
+    value: mce-pool-service-cluster
   - name: clusterClaimName
     value: hs-ci-ds-cluster-playback
   - name: clusterClaimLifetime

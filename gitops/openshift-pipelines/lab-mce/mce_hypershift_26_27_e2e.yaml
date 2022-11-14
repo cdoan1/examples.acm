@@ -14,7 +14,7 @@ spec:
   - name: clusterPoolName
     type: string
     description: The name of the clusterpool to use
-    default: "hypershift-cluster-pool"
+    default: mce-pool-service-cluster
   - name: clusterClaimName
     type: string
     description: The name of the clusterclaim to claim
