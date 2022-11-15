@@ -16,7 +16,6 @@ spec:
   - args:
     - |-
       set -e
-      set -x
 
       clusterNamespace=$(oc get clusterclaim.hive $(params.clusterClaimName) -ojsonpath='{.spec.namespace}' -n open-cluster-management-pipelines-mce)
       oc get secret -n $clusterNamespace
