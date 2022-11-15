@@ -47,7 +47,7 @@ spec:
       PW=$(oc get secrets openshift-gitops-cluster -n openshift-gitops -ojsonpath='{.data.admin\.password}' | base64 --decode)
       argocd login --insecure --grpc-web openshift-gitops-server-openshift-gitops.apps.playback-next.demo.red-chesterfield.com --username admin --password $PW
       argocd cluster list
-      argocd cluster add $clusterNamespace --kubeconfig mc.kubeconfig
+      argocd cluster add $clusterNamespace --kubeconfig $TOP/remote.kubeconfig
       
       exit 0
     command:
