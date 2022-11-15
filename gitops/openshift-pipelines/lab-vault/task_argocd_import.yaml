@@ -23,7 +23,6 @@ spec:
 
       echo "✅ login to cluster ..."
       TOP=$(pwd)
-      export KUBECONFIG=$TOP/remote.kubeconfig
 
       oc --kubeconfig=$TOP/remote.kubeconfig cluster-info
       oc --kubeconfig=$TOP/remote.kubeconfig project
