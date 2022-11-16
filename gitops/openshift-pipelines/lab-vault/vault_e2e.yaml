@@ -103,6 +103,20 @@ spec:
     - name: source
       workspace: shared-workspace
 
+  - name: deploy-operators
+    runAfter:
+    - vault-setup
+    params:
+    - name: cluster-name
+      value: $(params.cluster-name)
+    - name: clusterClaimName
+      value: $(params.clusterClaimName)
+    taskRef:
+      name: task-deploy-cert-manager
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
   workspaces:
   - name: shared-workspace
 
