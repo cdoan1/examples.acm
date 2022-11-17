@@ -18,14 +18,25 @@ spec:
       set -e
       set -x
 
+      oc get secret cert-manager-dns-credentials -oyaml > cert-manager-dns-credentials.yaml
+
       TOP=$(pwd)
       oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/patch-operator/overlay/dev
+
+      # hack
+      oc adm policy add-cluster-role-to-user cluster-admin \
+        system:serviceaccount:patch-operator:mutatingwebhook-patcher
 
       sleep 60
       oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/cert-manager/overlay/dev
 
-      # sleep 60
-      # oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/cert-manager-config/overlay/dev
+      sleep 60
+      oc apply -f cert-manager-dns-credentials.yaml -n cert-manager
+      
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/patch-operator-config/base
+
+      sleep 60
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/cert-manager-config/overlay/dev
 
       exit 0
     command:
