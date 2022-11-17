@@ -48,6 +48,10 @@ spec:
       sleep 60
       oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/cert-manager-config/overlay/dev
 
+      echo "Waiting 10m for ingress pods to be ready ..."
+      oc --kubeconfig=$TOP/remote.kubeconfig wait --for="condition=Available=True" deployment router-default -n openshift-ingress --timeout=600s
+      oc --kubeconfig=$TOP/remote.kubeconfig get pods -n openshift-ingress
+
       exit 0
     command:
     - /bin/bash
