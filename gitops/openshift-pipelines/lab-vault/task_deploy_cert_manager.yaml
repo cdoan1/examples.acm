@@ -31,7 +31,8 @@ spec:
       oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/cert-manager/overlay/dev
 
       sleep 60
-      oc --kubeconfig=$TOP/remote.kubeconfig adm oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:cert-manager:cert-manager
+      oc --kubeconfig=$TOP/remote.kubeconfig adm policy add-cluster-role-to-user cluster-admin \
+        system:serviceaccount:cert-manager:cert-manager
       
       oc --kubeconfig=$TOP/remote.kubeconfig apply -f cert-manager-dns-credentials.yaml -n cert-manager
 
