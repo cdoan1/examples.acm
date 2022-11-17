@@ -3,4 +3,4 @@ kind: Kustomization
 
 resources:
 - ../../base
-# - cert-manager.v1.10.1.csv.yaml
+- patch-csv-ns-aws-fix.yaml
