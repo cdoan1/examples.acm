@@ -1,0 +1,22 @@
+# patch manifests can be in one namespace with SA with access
+# and modify resources in other namespaces
+apiVersion: redhatcop.redhat.io/v1alpha1
+kind: Patch
+metadata:
+  name: letsencrypt-ingress-operator
+  namespace: patch-operator
+spec:
+  serviceAccountRef:
+    name: mutatingwebhook-patcher
+  patches:
+    letsencrypt-ingress-operator-patch:
+      targetObjectRef:
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        name: default
+        namespace: openshift-ingress-operator
+      patchTemplate: |
+        spec:
+          defaultCertificate:
+            name: lets-encrypt-certs-tls
+      patchType: application/merge-patch+json

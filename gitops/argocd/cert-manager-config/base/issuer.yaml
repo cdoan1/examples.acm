@@ -1,0 +1,34 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: public-issuer
+  namespace: cert-manager
+  annotations:
+    "redhat-cop.redhat.io/patch": |
+      spec:
+        acme:
+          solvers:
+          - dns01:
+              route53:
+                accessKeyID: {{ (lookup "v1" "Secret" .metadata.namespace "cert-manager-dns-credentials").data.aws_access_key_id | b64dec }}
+                secretAccessKeySecretRef:
+                  name: cert-manager-dns-credentials
+                  key: aws_secret_access_key
+                region: {{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").status.platformStatus.aws.region }}
+                hostedZoneID: {{ (lookup "config.openshift.io/v1" "DNS" "" "cluster").spec.publicZone.id }} 
+    "redhat-cop.redhat.io/patch-type": "application/merge-patch+json"
+spec:
+  acme:
+    server: 'https://acme-v02.api.letsencrypt.org/directory'
+    email: cdoan@redhat.com
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+    - dns01:
+        route53:
+          accessKeyID: << access_key >>
+          secretAccessKeySecretRef:
+            name: cert-manager-dns-credentials
+            key: aws_secret_access_key
+          region: << region >>
+          hostedZoneID: << hosted_zone_id >>

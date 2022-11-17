@@ -1,0 +1,39 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+    "redhat-cop.redhat.io/patch": |
+      spec:
+        dnsNames:
+          - 'apps.{{ (lookup "config.openshift.io/v1" "DNS" "" "cluster").spec.baseDomain }}'
+          - '*.apps.{{ (lookup "config.openshift.io/v1" "DNS" "" "cluster").spec.baseDomain }}'
+    "redhat-cop.redhat.io/patch-type": "application/merge-patch+json"
+  name: letsencrypt-tls-cert
+  namespace: openshift-ingress
+  labels:
+    use-dns01-solver: "true"
+spec:
+  secretName: lets-encrypt-certs-tls
+  subject:
+    organizations:
+    - Advanced Cluster Management
+  usages:
+    - server auth
+    - client auth
+  duration: 4h # 90d
+  renewBefore: 1h # 15d
+  privateKey:
+    algorithm: "RSA"
+    encoding: PKCS1
+    size: 2048
+  acme:
+    config:
+      - dns01:
+          privder: route53
+        domains:
+          - 'stolostron.io'
+  issuerRef:
+    group: cert-manager.io
+    name: public-issuer
+    kind: ClusterIssuer
