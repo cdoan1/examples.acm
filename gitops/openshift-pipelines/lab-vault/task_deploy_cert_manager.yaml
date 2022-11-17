@@ -18,9 +18,10 @@ spec:
       set -e
       set -x
 
+      TOP=$(pwd)
+
       oc get secret cert-manager-dns-credentials -oyaml > cert-manager-dns-credentials.yaml
 
-      TOP=$(pwd)
       oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/patch-operator/overlay/dev
 
       # hack
@@ -38,10 +39,9 @@ spec:
         | sed "s/namespace: open-cluster-management-pipelines-vault/namespace: cert-manager/g" \
         | sed "/  resourceVersion:/d" \
         | sed "/  uid:/d" \
-        | sed "/  creationTimestamp:/d" \
-        | cert-manager-dns-credentials.yaml.2
+        | sed "/  creationTimestamp:/d" > cert-manager-dns-credentials.yaml.2
 
-      oc --kubeconfig=$TOP/remote.kubeconfig apply -f cert-manager-dns-credentials.yaml.2 -n cert-manager
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -f cert-manager-dns-credentials.yaml.2
 
       oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/patch-operator-config/base
 
