@@ -24,7 +24,7 @@ spec:
   - name: keepClusterClaim
     type: string
     description: Reuse existing clusterclaim if it exists.
-    default: "true"
+    default: "false"
 
   tasks:
   - name: fetch-repo
