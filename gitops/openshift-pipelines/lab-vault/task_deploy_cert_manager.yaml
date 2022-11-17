@@ -24,8 +24,8 @@ spec:
       sleep 60
       oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/cert-manager/overlay/dev
 
-      sleep 60
-      oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/cert-manager-config/overlay/dev
+      # sleep 60
+      # oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/cert-manager-config/overlay/dev
 
       exit 0
     command:
