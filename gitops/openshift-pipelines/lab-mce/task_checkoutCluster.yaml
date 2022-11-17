@@ -44,7 +44,7 @@ spec:
       if [[ "$(params.keepClusterClaim)" != "true" ]]; then
         # Delete cluster claim if it exists
         echo "Deleting hub clusterclaim: $(inputs.params.clusterClaimName)"
-        oc delete clusterclaim.hive $(inputs.params.clusterClaimName) || true
+        oc delete clusterclaim.hive $(inputs.params.clusterClaimName) -n open-cluster-management-pipelines-mce || true
       fi
       
       export poolNS=open-cluster-management-pipelines-mce
