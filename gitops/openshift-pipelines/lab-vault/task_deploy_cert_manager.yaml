@@ -33,8 +33,15 @@ spec:
       sleep 60
       oc --kubeconfig=$TOP/remote.kubeconfig adm policy add-cluster-role-to-user cluster-admin \
         system:serviceaccount:cert-manager:cert-manager
-      
-      oc --kubeconfig=$TOP/remote.kubeconfig apply -f cert-manager-dns-credentials.yaml -n cert-manager
+
+      cat cert-manager-dns-credentials.yaml \
+        | sed "s/namespace: open-cluster-management-pipelines-vault/namespace: cert-manager/g" \
+        | sed "/  resourceVersion:/d" \
+        | sed "/  uid:/d" \
+        | sed "/  creationTimestamp:/d" \
+        | oc -kubeconfig=$TOP/remote.kubeconfig apply -f -n cert-manager -
+
+      # oc --kubeconfig=$TOP/remote.kubeconfig apply -f cert-manager-dns-credentials.yaml -n cert-manager
 
       oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/patch-operator-config/base
 
