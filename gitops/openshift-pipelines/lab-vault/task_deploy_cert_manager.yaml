@@ -39,7 +39,7 @@ spec:
         | sed "/  resourceVersion:/d" \
         | sed "/  uid:/d" \
         | sed "/  creationTimestamp:/d" \
-        | oc -kubeconfig=$TOP/remote.kubeconfig apply -f -n cert-manager -
+        | oc -kubeconfig=$TOP/remote.kubeconfig apply -f -
 
       # oc --kubeconfig=$TOP/remote.kubeconfig apply -f cert-manager-dns-credentials.yaml -n cert-manager
 
