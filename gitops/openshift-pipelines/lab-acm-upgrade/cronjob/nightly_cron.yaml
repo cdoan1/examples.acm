@@ -1,0 +1,21 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nightly-pipeline-acm-rolling-upgrade
+  namespace: open-cluster-management-pipelines-upgrade
+spec:
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 1
+  concurrencyPolicy: Replace
+  schedule: "0 */2 * * 1-5"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: pipeline
+          containers:
+          - name: nightly-pipeline-acm-rolling-upgrade
+            image: quay.io/openshift/origin-cli:4.6
+            command: ["/bin/bash", "-c", "kubectl delete pipelinerun acm-rolling-upgrade-27 || true;kubectl create -f https://raw.githubusercontent.com/cdoan1/examples.acm/main/gitops/openshift-pipelines/lab-acm-upgrade/pipelinerun/acm-rolling-upgrade-27.yaml"]
+          restartPolicy: Never

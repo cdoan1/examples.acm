@@ -1,0 +1,39 @@
+---
+
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: create-mco
+  namespace: open-cluster-management-pipelines-upgrade
+spec:
+  workspaces:
+  - name: source
+  params:
+  - name: GITOPS_SECRET_NAME
+    default: 'install-secret'
+    description: Name of the secret that contains credentials
+    type: string
+  steps:
+  - args:
+    - |-
+      
+      _PS=$(oc get secret $(params.GITOPS_SECRET_NAME) -ojsonpath='{.data.globalPullSecretEncoded}' | base64 --decode)
+      NS=open-cluster-management-observability
+      TOP=$(pwd)
+
+      oc cluster-info
+
+      set -x
+      if [ -f $TOP/mco.yaml ]; then
+        cat $TOP/mco.yaml
+        oc apply -f $TOP/mco.yaml
+      fi
+
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/zkayyali812/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source

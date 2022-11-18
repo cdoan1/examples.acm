@@ -1,0 +1,22 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  labels:
+    tekton.dev/pipeline: acm-rolling-upgrade-27
+  name: acm-rolling-upgrade-27
+  namespace: open-cluster-management-pipelines-upgrade
+spec:
+  params:
+  - name: namespace
+    value: open-cluster-management
+  - name: upgrade-snapshot
+    value: 2.7.0-DOWNSTREAM-2022-11-17-03-53-08
+  pipelineRef:
+    name: acm-rolling-upgrade-27
+  serviceAccountName: pipeline
+  timeout: 1h0m0s
+  workspaces:
+  - name: shared-workspace
+    persistentVolumeClaim:
+      claimName: shared-storage-pvc
