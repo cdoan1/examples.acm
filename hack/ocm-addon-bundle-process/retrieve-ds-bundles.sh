@@ -53,7 +53,7 @@ overrideVersionDash() {
     _resultsDir=$1
     _versionDash=$2
     
-    _LOWER_BOUND=$(cat ${_resultsDir}/manifests/${_csvName} | yq eval '.metadata.annotations."olm.skipRange"' | cut -d' ' -f1)
+    _LOWER_BOUND=$(cat ${_resultsDir}/manifests/${_csvName} | yq eval '.metadata.annotations."olm.skipRange"' - | cut -d' ' -f1)
 
     # Step 1-3: Rename the skipRange, name, version to dash version
     _VALUE="$_LOWER_BOUND <${_versionDash}" yq eval -i '.metadata.annotations."olm.skipRange" = strenv(_VALUE)' ${_resultsDir}/manifests/${_csvName}
