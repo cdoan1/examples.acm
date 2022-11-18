@@ -56,7 +56,7 @@ overrideVersionDash() {
     _LOWER_BOUND=$(cat ${_resultsDir}/manifests/${_csvName} | yq '.metadata.annotations."olm.skipRange"' | cut -d' ' -f1)
 
     # Step 1-3: Rename the skipRange, name, version to dash version
-    _VALUE="$_LOWER_BOUND <v${_versionDash}" yq eval -i '.metadata.annotations."olm.skipRange" = strenv(_VALUE)' ${_resultsDir}/manifests/${_csvName}
+    _VALUE="$_LOWER_BOUND <${_versionDash}" yq eval -i '.metadata.annotations."olm.skipRange" = strenv(_VALUE)' ${_resultsDir}/manifests/${_csvName}
     _VALUE="$operator.v${_versionDash}" yq eval -i '.metadata.name = strenv(_VALUE)' ${_resultsDir}/manifests/${_csvName}
     _VALUE=$_versionDash yq eval -i '.spec.version = strenv(_VALUE)' ${_resultsDir}/manifests/${_csvName}
 
@@ -64,7 +64,7 @@ overrideVersionDash() {
     mv ${_resultsDir}/manifests/${_csvName} ${_resultsDir}/manifests/${operator}.v${_versionDash}.clusterserviceversion.yaml
 }
 
-_DOCKER_OR_PODMAN=docker
+_DOCKER_OR_PODMAN=podman
 if ! command -v ${_DOCKER_OR_PODMAN} &> /dev/null
 then
     _DOCKER_OR_PODMAN=docker
