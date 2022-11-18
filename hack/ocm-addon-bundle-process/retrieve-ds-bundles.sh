@@ -81,6 +81,7 @@ for bundle in "${bundles[@]}"; do
     operator=$(echo "$bundle" | yq e '.operator' -)
     parent=$(echo "$bundle" | yq e '.parent' -)
     csvNameOverride=$(echo "$bundle" | yq e '.csvNameOverride' -)
+    dash=$(echo "$bundle" | yq e '.dash' -)
 
     if [[ "$parent" != "null" ]]; then
         resultsDir="bundles/${parent}/${operator}/${version}"
@@ -98,7 +99,7 @@ for bundle in "${bundles[@]}"; do
     overrideMetadata $resultsDir $addonChannel
     fixCSVs $resultsDir $csvName
 
-    export versionDash=$version-pre2
+    export versionDash=$version-$dash
 
     overrideVersionDash $resultsDir $versionDash
 
