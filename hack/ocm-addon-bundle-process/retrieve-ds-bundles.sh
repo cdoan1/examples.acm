@@ -100,14 +100,16 @@ for bundle in "${bundles[@]}"; do
     fixCSVs $resultsDir $csvName
 
     export versionDash=$version-$dash
+    export addon="3.7.0"
+    export addonDash=$addon-$dash
 
     overrideVersionDash $resultsDir $versionDash
 
-    # Step 5: rename folder name dash version
+    # Step 5: rename folder addon version to dash version
     if [[ "$parent" != "null" ]]; then
         mv $resultsDir bundles/${parent}/${operator}/${versionDash}
     else
-        mv $resultsDir bundles/${operator}/main/${versionDash}
+        mv $resultsDir bundles/${operator}/main/${addonDash}
     fi
 
     echo ""
