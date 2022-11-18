@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x
 
 extractBundlesFromImage () {
     _image=$1
@@ -48,8 +49,22 @@ fixCSVs () {
     yq eval -i 'del(.spec.customresourcedefinitions.owned.[].group)' ${_resultsDir}/manifests/${_csvName}
 }
 
+overrideVersionDash() {
+    _resultsDir=$1
+    _versionDash=$2
+    
+    _LOWER_BOUND=$(cat ${_resultsDir}/manifests/${_csvName} | yq '.metadata.annotations."olm.skipRange"' | cut -d' ' -f1)
 
-_DOCKER_OR_PODMAN=podman
+    # Step 1-3: Rename the skipRange, name, version to dash version
+    _VALUE="$_LOWER_BOUND <v${_versionDash}" yq eval -i '.metadata.annotations."olm.skipRange" = strenv(_VALUE)' ${_resultsDir}/manifests/${_csvName}
+    _VALUE="$operator.v${_versionDash}" yq eval -i '.metadata.name = strenv(_VALUE)' ${_resultsDir}/manifests/${_csvName}
+    _VALUE=$_versionDash yq eval -i '.spec.version = strenv(_VALUE)' ${_resultsDir}/manifests/${_csvName}
+
+    # Step 4: Rename the csv file dash version
+    mv ${_resultsDir}/manifests/${_csvName} ${_resultsDir}/manifests/${operator}.v${_versionDash}.clusterserviceversion.yaml
+}
+
+_DOCKER_OR_PODMAN=docker
 if ! command -v ${_DOCKER_OR_PODMAN} &> /dev/null
 then
     _DOCKER_OR_PODMAN=docker
@@ -82,6 +97,17 @@ for bundle in "${bundles[@]}"; do
     extractBundlesFromImage $image $resultsDir
     overrideMetadata $resultsDir $addonChannel
     fixCSVs $resultsDir $csvName
+
+    export versionDash=$version-pre2
+
+    overrideVersionDash $resultsDir $versionDash
+
+    # Step 5: rename folder name dash version
+    if [[ "$parent" != "null" ]]; then
+        mv $resultsDir bundles/${parent}/${operator}/${versionDash}
+    else
+        mv $resultsDir bundles/${operator}/main/${versionDash}
+    fi
 
     echo ""
 done
