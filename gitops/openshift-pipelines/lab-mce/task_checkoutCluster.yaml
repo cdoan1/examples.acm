@@ -68,7 +68,7 @@ spec:
           name: system:serviceaccounts:managed-services
         - apiGroup: rbac.authorization.k8s.io
           kind: Group
-          name: system:serviceaccount:$poolNS"
+          name: system:serviceaccount:open-cluster-management-pipelines-mce"
       echo "$_TEMPLATE" | oc apply -f -
 
       oc wait --for=condition=ClusterRunning clusterclaim.hive/$(inputs.params.clusterClaimName) --timeout=90m -n $poolNS
