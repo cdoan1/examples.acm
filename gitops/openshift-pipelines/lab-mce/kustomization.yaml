@@ -42,3 +42,5 @@ resources:
 - task_mce_hypershift_create_ocm_cluster_wait_for_ocm.yaml
 - task_mce_hypershift_create_ocm_cluster_ensure_acm_ocm_addon.yaml
 - mce_rolling_update.yaml
+- mce_hypershift_managedtenantbundle_e2e.yaml
+- task_mce_install_acm_27_mtb.yaml
