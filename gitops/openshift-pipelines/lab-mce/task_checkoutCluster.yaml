@@ -68,7 +68,7 @@ spec:
           name: system:serviceaccounts:managed-services
         - apiGroup: rbac.authorization.k8s.io
           kind: Group
-          name: system:serviceaccount:open-cluster-management-pipelines-vault"
+          name: system:serviceaccount:open-cluster-management-pipelines-vault
         - apiGroup: rbac.authorization.k8s.io
           kind: Group
           name: system:serviceaccount:open-cluster-management-pipelines-mce"
