@@ -11,6 +11,8 @@ The pipeline supports the following workflow:
 | name | description |
 |------|-------------|
 | mce-rolling-update | given a snapshot version, trigger a rolling update of ACM/MCE downstream deployment |
+| mce_hypershift_26_27_e2e.yaml ||
+| mce_hypershift_managedtenantbundle_e2e.yaml | checkout a cluster, deploy the generated mgt index image |
 
 ## Prerequisites
 
