@@ -13,17 +13,17 @@ spec:
     registryPoll:
       interval: 10m
 
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: CatalogSource
-metadata:
-  name: addon-advanced-cluster-management-catalog
-  namespace: openshift-marketplace
-spec:
-  displayName: MultiCluster Engine
-  image: quay.io/cdoan_rh/advanced-cluster-management-multicluster-engine-bundle@sha256:8a233424c7806889107e43f2cb19d393738a5ad5e0b964f6f924c5caa374153a
-  publisher: Red Hat
-  sourceType: grpc
-  updateStrategy:
-    registryPoll:
-      interval: 10m
+# ---
+# apiVersion: operators.coreos.com/v1alpha1
+# kind: CatalogSource
+# metadata:
+#   name: addon-advanced-cluster-management-catalog
+#   namespace: openshift-marketplace
+# spec:
+#   displayName: MultiCluster Engine
+#   image: quay.io/cdoan_rh/advanced-cluster-management-multicluster-engine-bundle@sha256:8a233424c7806889107e43f2cb19d393738a5ad5e0b964f6f924c5caa374153a
+#   publisher: Red Hat
+#   sourceType: grpc
+#   updateStrategy:
+#     registryPoll:
+#       interval: 10m
