@@ -6,7 +6,7 @@ metadata:
   namespace: redhat-open-cluster-management
 spec:
   displayName: Advanced Cluster Management
-  image: quay.io/cdoan_rh/advanced-cluster-management-multicluster-engine-bundle@sha256:8a233424c7806889107e43f2cb19d393738a5ad5e0b964f6f924c5caa374153a
+  image: quay.io/cdoan_rh/advanced-cluster-management-index@sha256:1c56f960cd2344accaddf391e05063bb2ffcff8c38c4f47a348596659219e1e8
   publisher: Red Hat
   sourceType: grpc
   updateStrategy:
@@ -21,7 +21,7 @@ spec:
 #   namespace: openshift-marketplace
 # spec:
 #   displayName: MultiCluster Engine
-#   image: quay.io/cdoan_rh/advanced-cluster-management-multicluster-engine-bundle@sha256:8a233424c7806889107e43f2cb19d393738a5ad5e0b964f6f924c5caa374153a
+#   image: quay.io/cdoan_rh/advanced-cluster-management-index@sha256:1c56f960cd2344accaddf391e05063bb2ffcff8c38c4f47a348596659219e1e8
 #   publisher: Red Hat
 #   sourceType: grpc
 #   updateStrategy:
