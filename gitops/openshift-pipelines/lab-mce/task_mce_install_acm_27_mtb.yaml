@@ -32,6 +32,8 @@ spec:
       set -e
       set -x
 
+      TOP=$(pwd)
+
       if [ -f $(pwd)/remote.kubeconfig ]; then
         export KUBECONFIG=$(pwd)/remote.kubeconfig
       else
@@ -61,7 +63,7 @@ spec:
       oc --kubeconfig=$TOP/remote.kubeconfig apply -k ./gitops/kustomization/rhacm-instance-ocm-addon/overlays/addon-release-2.7.0-acm-ocm-addon-$(params.addonVersion)
       
       sleep 120
-      
+
       exit 0
     command:
     - /bin/bash
