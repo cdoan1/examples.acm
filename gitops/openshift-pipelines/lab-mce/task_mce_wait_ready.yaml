@@ -10,6 +10,10 @@ spec:
     default: "false"
     description: "skip this task"
     type: string
+  - name: namespace
+    default: "open-cluster-management"
+    description: "namespace where ACM is installed"
+    type: string
   - name: kubeconfig
     default: ""
     description: "base64 encoded kubeconfig of the cluster we want to run this task on. Default to empty string, use the current cluster."
@@ -33,19 +37,19 @@ spec:
       
       oc cluster-info
 
-      NS=open-cluster-management
+      NS=$(params.namespace)
       NS2=multicluster-engine
 
       date -u
-      oc wait --for="condition=Complete" mch multiclusterhub -n open-cluster-management --timeout=600s
+      oc wait --for="condition=Complete" mch multiclusterhub -n $NS --timeout=600s
       oc wait --for="condition=Available" mce multiclusterengine -n multicluster-engine --timeout=900s
       date -u
       
       mce_current_csv=$(oc get sub -n multicluster-engine -ojsonpath='{.items[].status.currentCSV}')
       _mce_csv_condition=$(oc get csv -n multicluster-engine $mce_current_csv -ojsonpath='{.status.conditions[-1].phase}')
 
-      ace_current_csv=$(oc get sub -n open-cluster-management -l operators.coreos.com/advanced-cluster-management.open-cluster-management= -ojsonpath='{.items[].status.currentCSV}')
-      _acm_csv_condition=$(oc get csv -n open-cluster-management $ace_current_csv -ojsonpath='{.status.conditions[-1].phase}')
+      ace_current_csv=$(oc get sub -n $NS -l operators.coreos.com/advanced-cluster-management.$NS= -ojsonpath='{.items[].status.currentCSV}')
+      _acm_csv_condition=$(oc get csv -n $NS $ace_current_csv -ojsonpath='{.status.conditions[-1].phase}')
 
       echo " mce csv: $_mce_csv_condition"
       echo " acm csv: $_acm_csv_condition"

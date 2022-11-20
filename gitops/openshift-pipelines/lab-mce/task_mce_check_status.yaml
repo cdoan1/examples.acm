@@ -10,6 +10,10 @@ spec:
     default: "false"
     description: "skip this task"
     type: string
+  - name: namespace
+    default: "open-cluster-management"
+    description: "namespace of acm"
+    type: string
   - name: kubeconfig
     default: ""
     description: "base64 encoded kubeconfig of the cluster we want to run this task on. Default to empty string, use the current cluster."
@@ -32,7 +36,7 @@ spec:
       
       oc cluster-info
 
-      NS=open-cluster-management
+      NS=$(params.namespace)
       NS2=multicluster-engine
 
       function check() {
@@ -44,7 +48,7 @@ spec:
         echo "$1 $icon"
       }
 
-      acm_current_csv=$(oc get sub -n open-cluster-management -l operators.coreos.com/advanced-cluster-management.open-cluster-management= -ojsonpath='{.items[].status.currentCSV}')
+      acm_current_csv=$(oc get sub -n $NS -l operators.coreos.com/advanced-cluster-management.$NS= -ojsonpath='{.items[].status.currentCSV}')
       mce_current_csv=$(oc get sub -n multicluster-engine -ojsonpath='{.items[].status.currentCSV}')
 
       rc=$(oc get mch multiclusterhub -n $NS -ojsonpath='{.status.phase}')
@@ -78,7 +82,7 @@ spec:
       echo "current mce subscription currentCSV version           : $mce_current_csv"
       echo "current mce csv phase                                 : $(check $rc22)" 
 
-      echo "acm snapshot                                          : "$(oc get pods -n open-cluster-management -o yaml | grep image: | sort -u | grep custom-registry | cut -d':' -f4 | sort -u)
+      echo "acm snapshot                                          : "$(oc get pods -n $NS -o yaml | grep image: | sort -u | grep custom-registry | cut -d':' -f4 | sort -u)
       echo "acm snapshot                                          : "$(oc get pods -n openshift-marketplace -o yaml | grep " image:"  | grep acm-custom | grep -v "\- image:" | sort -u | awk '{print $2}' | cut -d':' -f3)
       echo "mce snapshot                                          : "$(oc get pods -n multicluster-engine -o yaml | grep image: | sort -u | grep custom-registry | cut -d':' -f4 | sort -u)
       echo "mce snapshot                                          : "$(oc get pods -n openshift-marketplace -o yaml | grep " image:"  | grep mce-custom | grep -v "\- image:" | sort -u | awk '{print $2}' | cut -d':' -f3)
@@ -87,7 +91,7 @@ spec:
 
       oc get packagemanifest advanced-cluster-management -o yaml | grep " version:" | grep -v v1 | sed "s/^[ \t]*//"
 
-      for i in open-cluster-management open-cluster-management-hub multicluster-engine
+      for i in $NS open-cluster-management-hub multicluster-engine
       do
         oc get pods -n $i -o yaml | grep "image:" | sort -u | grep -v f:image | sed s'#    -#     #' | sort -u > $i.image-manifests.txt
       done
