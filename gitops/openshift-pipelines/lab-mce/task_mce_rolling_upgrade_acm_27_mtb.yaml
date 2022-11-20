@@ -2,7 +2,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: mce-rolling-upgrade-acm
+  name: mce-upgrade-acm-mtb
   namespace: open-cluster-management-pipelines-mce
 spec:
   params:
