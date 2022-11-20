@@ -44,3 +44,4 @@ resources:
 - mce_rolling_update.yaml
 - mce_hypershift_managedtenantbundle_e2e.yaml
 - task_mce_install_acm_27_mtb.yaml
+- task_mce_rolling_upgrade_acm_27_mtb.yaml
