@@ -150,7 +150,7 @@ spec:
 
   - name: wait-ready
     runAfter:
-    - deploy-acm
+    - deploy-acm-mtb
     params:
     - name: kubeconfig
       value: $(params.kubeconfig)
