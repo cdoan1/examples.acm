@@ -7,6 +7,10 @@ metadata:
   namespace: open-cluster-management-pipelines-mce
 spec:
   params:
+  - name: addonVersion
+    type: string
+    description: "OSD OCM Addon Version - 3.7.0-pre1, 3.7.0-pre2"
+    default: "3.7.0-pre2"
   - name: clusterPoolName
     type: string
     description: The name of the clusterpool to use
@@ -103,6 +107,8 @@ spec:
     runAfter:
     - login-to-hub-cluster
     params:
+    - name: addonVersion
+      value: $(params.addonVersion)
     - name: kubeconfig
       value: $(params.kubeconfig)
     - name: start-snapshot
