@@ -46,11 +46,11 @@ spec:
 
       oc --kubeconfig=$TOP/remote.kubeconfig apply -k ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7.0-acm-ocm-addon-$(params.addonVersion)
 
-      sleep 60
+      sleep 10
 
       oc --kubeconfig=$TOP/remote.kubeconfig get pods -n $NS
 
-      oc --kubeconfig=$TOP/remote.kubeconfig wait --for condition=Ready pods -n $NS -l name=multiclusterhub-operator --timeout=600s || true
+      oc --kubeconfig=$TOP/remote.kubeconfig wait --for condition=Ready pods -n $NS -l name=multiclusterhub-operator --timeout=120s || true
       
       oc --kubeconfig=$TOP/remote.kubeconfig get secret pull-secret -n openshift-config -o yaml \
         | sed "s/namespace: openshift-config/namespace: redhat-open-cluster-management/g" \
