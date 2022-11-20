@@ -44,7 +44,7 @@ spec:
 
       sleep 60
 
-      oc wait --for condition=Ready pods -n redhat-open-cluster-management -l name=multiclusterhub-operator --timeout=120s
+      oc wait --for condition=Ready pods -n redhat-open-cluster-management -l name=multiclusterhub-operator --timeout=600s
       
       # 2. Operand
       #
