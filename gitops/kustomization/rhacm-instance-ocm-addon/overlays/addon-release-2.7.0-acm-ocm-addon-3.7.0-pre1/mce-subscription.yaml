@@ -4,7 +4,7 @@ kind: Subscription
 metadata:
   labels:
     installer.name: multiclusterhub
-    installer.namespace: open-cluster-management
+    installer.namespace: redhat-open-cluster-management
     multiclusterhubs.operator.open-cluster-management.io/managed-by: "true"
     operators.coreos.com/multicluster-engine.multicluster-engine: ""
   name: multicluster-engine
