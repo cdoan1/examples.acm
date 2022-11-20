@@ -45,6 +45,8 @@ spec:
       oc wait --for="condition=Available" mce multiclusterengine -n multicluster-engine --timeout=900s
       date -u
       
+      oc get -n $NS sub.operator advanced-cluster-management -ojsonpath='{.status}' || true
+
       mce_current_csv=$(oc get sub -n multicluster-engine -ojsonpath='{.items[].status.currentCSV}')
       _mce_csv_condition=$(oc get csv -n multicluster-engine $mce_current_csv -ojsonpath='{.status.conditions[-1].phase}')
 
