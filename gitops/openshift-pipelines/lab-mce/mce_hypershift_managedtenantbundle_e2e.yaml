@@ -115,21 +115,6 @@ spec:
     - name: source
       workspace: shared-workspace
 
-  # - name: upgrade-acm-mtb
-  #   runAfter:
-  #   - deploy-acm-mtb
-  #   params:
-  #   - name: kubeconfig
-  #     value: $(params.kubeconfig)
-  #   - name: start-snapshot
-  #     value: $(params.start-snapshot)
-  #   - name: upgrade-snapshot
-  #     value: $(params.upgrade-snapshot)
-  #   taskRef:
-  #     name: mce-upgrade-acm-mtb
-  #   workspaces:
-  #   - name: source
-  #     workspace: shared-workspace
 
   # - name: build-hypershift-cli
   #   runAfter:
@@ -171,6 +156,23 @@ spec:
       value: "redhat-open-cluster-management"
     taskRef:
       name: mce-check-status
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
+
+  - name: upgrade-acm-mtb
+    runAfter:
+    - check-status
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    - name: start-snapshot
+      value: $(params.start-snapshot)
+    - name: upgrade-snapshot
+      value: $(params.upgrade-snapshot)
+    taskRef:
+      name: mce-upgrade-acm-mtb
     workspaces:
     - name: source
       workspace: shared-workspace
