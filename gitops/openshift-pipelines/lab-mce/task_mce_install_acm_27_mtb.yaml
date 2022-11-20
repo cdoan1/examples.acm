@@ -50,7 +50,7 @@ spec:
       #
       # todo(cdoan): hack create the mch pull secret
       oc get secret pull-secret -n openshift-config -o yaml \
-        | sed "s/namespace: openshift-config/namespace: open-cluster-management/g" \
+        | sed "s/namespace: openshift-config/namespace: redhat-open-cluster-management/g" \
         | sed "s/name: pull-secret/name: multiclusterhub-operator-pull-secret/g" \
         | sed "/  resourceVersion:/d" \
         | sed "/  uid:/d" \
