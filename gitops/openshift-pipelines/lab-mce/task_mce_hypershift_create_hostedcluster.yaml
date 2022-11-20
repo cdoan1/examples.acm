@@ -143,15 +143,18 @@ spec:
         installNamespace: open-cluster-management-agent-addon
       EOF
 
-      echo "🖐️ wait 10m for hostedcluster to be available ..."
-      oc wait --for="condition=Available" hostedcluster $CLUSTER_NAME -n local-cluster --timeout=600s
-      oc wait --for="condition=ReconciliationSucceeded" hostedcluster $CLUSTER_NAME -n local-cluster --timeout=600s
+      date -u
+      echo "🖐️ wait up to 20m for hostedcluster to be available ..."
+      oc wait --for="condition=Available" hostedcluster $CLUSTER_NAME -n local-cluster --timeout=1200s
+      oc wait --for="condition=ReconciliationSucceeded" hostedcluster $CLUSTER_NAME -n local-cluster --timeout=1200s
 
-      echo "🖐️ wait 15m for hostedcluster ReconciliationSucceeded to be true ..."
-      oc wait --for="condition=ReconciliationSucceeded" hostedcluster $CLUSTER_NAME -n local-cluster --timeout=900s
+      date -u
+      echo "🖐️ wait up to 20m for hostedcluster ReconciliationSucceeded to be true ..."
+      oc wait --for="condition=ReconciliationSucceeded" hostedcluster $CLUSTER_NAME -n local-cluster --timeout=1200s
 
-      echo "🖐️ wait 10m for managedcluster to be available ..."
-      oc wait --for="condition=ManagedClusterConditionAvailable" managedcluster $CLUSTER_NAME --timeout=600s
+      date -u
+      echo "🖐️ wait 20m for managedcluster to be available ..."
+      oc wait --for="condition=ManagedClusterConditionAvailable" managedcluster $CLUSTER_NAME --timeout=1200s
 
       oc get hostedclusters -A
       oc get managedclusters -A
