@@ -57,7 +57,7 @@ spec:
         | sed "/  creationTimestamp:/d" \
         | oc apply -f -
       
-      oc apply -k ./gitops/kustomization/rhacm-instance/overlays/addon-release-2.7.0-acm-ocm-addon-3.7.0-pre1
+      oc apply -k ./gitops/kustomization/rhacm-instance-ocm-addon/overlays/addon-release-2.7.0-acm-ocm-addon-3.7.0-pre1
       
       exit 0
     command:
