@@ -46,7 +46,7 @@ spec:
 
       oc --kubeconfig=$TOP/remote.kubeconfig apply -k ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7.0-acm-ocm-addon-$(params.addonVersion)
 
-      sleep 10
+      sleep 20
 
       oc --kubeconfig=$TOP/remote.kubeconfig get pods -n $NS
 
@@ -60,9 +60,10 @@ spec:
         | sed "/  creationTimestamp:/d" \
         | oc --kubeconfig=$TOP/remote.kubeconfig apply -f -
       
-      oc --kubeconfig=$TOP/remote.kubeconfig apply -k ./gitops/kustomization/rhacm-instance-ocm-addon/overlays/addon-release-2.7.0-acm-ocm-addon-$(params.addonVersion)
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -k ./gitops/kustomization/rhacm-instance-ocm-addon/overlays/addon-release-2.7.0-acm-ocm-addon-$(params.addonVersion) \
+        || ( sleep 5 && oc --kubeconfig=$TOP/remote.kubeconfig apply -k ./gitops/kustomization/rhacm-instance-ocm-addon/overlays/addon-release-2.7.0-acm-ocm-addon-$(params.addonVersion) )
       
-      sleep 120
+      sleep 60
 
       exit 0
     command:
