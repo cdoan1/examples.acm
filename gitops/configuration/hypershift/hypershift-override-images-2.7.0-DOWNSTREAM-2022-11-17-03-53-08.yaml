@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hypershift-override-images
+  namespace: local-cluster
+  labels:
+    reference-acm-snapshot-version: "2.7.0-DOWNSTREAM-2022-11-17-03-53-08"
+data:
+  apiserver-network-proxy: quay.io:443/acm-d/apiserver-network-proxy-rhel8@sha256:a618926ccd7f733c36cde0cc3e993c3a4832ff09158731a68cef3fca5bb71fd4
+  aws-encryption-provider: quay.io:443/acm-d/aws-encryption-provider-rhel8@sha256:abcd537acbb9acaf453e5e8c7a9b9fdad4fec0d5baf1d5f770271d7d8d1d16f0
+  cluster-api: quay.io:443/acm-d/cluster-api-rhel8@sha256:10fa7daaa0890727caa8eb1b5c17f1bfeefe83103b95bdf02b7a64a22bea3313
+  cluster-api-provider-agent: quay.io:443/acm-d/cluster-api-provider-agent-rhel8@sha256:ac81bbb6320f669ebd128b6bf5b48c9b7cef2dbde1db1b50d25661a1e15be16b
+  cluster-api-provider-aws: quay.io:443/acm-d/cluster-api-provider-aws-rhel8@sha256:eb221319d6efc56230eca150dc56f520c06c56a13161b56cf8451bd5ed9986a4
+  cluster-api-provider-azure: quay.io:443/acm-d/cluster-api-provider-azure-rhel8@sha256:c2454f2934028a855e498f8d722fda729fe344da9a1f923ee7223968dc66b8fa
+  cluster-api-provider-kubevirt: quay.io:443/acm-d/cluster-api-provider-kubevirt-rhel8@sha256:a9206b587319afebbfabcc8c63b17666363e5b543795e5f71a35fd4c2c2ab1de
+  hypershift-operator: quay.io:443/acm-d/hypershift-rhel8-operator@sha256:39757977a70a84e07eacb5063f5a812b32f7a816b42f994909abf49dac666555
