@@ -5,6 +5,7 @@ metadata:
   name: nightly-pipeline-acm-rolling-upgrade
   namespace: open-cluster-management-pipelines-upgrade
 spec:
+  suspend: true
   failedJobsHistoryLimit: 1
   successfulJobsHistoryLimit: 1
   concurrencyPolicy: Replace
