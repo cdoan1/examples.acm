@@ -146,6 +146,7 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
+
   - name: build-hypershift-cli
     runAfter:
     - login-to-hub-cluster

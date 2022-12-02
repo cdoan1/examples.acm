@@ -10,6 +10,7 @@ resources:
 - cronjob/nightly_cron.yaml
 - ns.yaml
 - shared-workspace-pvc.yaml
+- shared-workspace-e2e-pvc.yaml
 - mce-hypershift.yaml
 - mce-hypershift-uninstall.yaml
 - mce_hypershift_e2e.yaml
