@@ -1,0 +1,185 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-deploy-argo-application
+  namespace: open-cluster-management-pipelines-vault
+spec:
+  params:
+  - name: cluster-name
+    default: ""
+    description: "OPTIONAL - name of managed cluster to install vault, by default, we'll create a clusterclaim"
+    type: string
+  - name: clusterClaimName
+    default: ""
+    type: string
+  steps:
+  - args:
+    - |-
+      set -e
+      set -x
+
+      TOP=$(pwd)
+
+      oc get secret cert-manager-dns-credentials -o yaml -n open-cluster-management-pipelines-vault > cert-manager-dns-credentials.yaml
+      
+      baseDomain=$(oc --kubeconfig=$TOP/remote.kubeconfig get dns cluster -ojsonpath='{.spec.baseDomain}')
+      baseName=$(echo $baseDomain | cut -f1 -d'.')
+
+      echo "cluster-name: $baseName"
+
+      oc cluster-info
+      oc apply -f - <<EOF
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: patch-operator-$baseName
+        namespace: openshift-gitops
+      spec:
+        destination:
+          server: https://api.${baseDomain}:6443
+        project: default
+        source:
+          path: gitops/argocd/patch-operator/overlay/dev
+          repoURL: https://github.com/cdoan1/examples.acm.git
+          targetRevision: HEAD
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
+      EOF
+
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -f - <<EOF
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: mwh-patcher-cluster-admin
+      subjects:
+      - kind: ServiceAccount
+        name: mutatingwebhook-patcher
+        namespace: patch-operator
+      roleRef:
+        kind: ClusterRole
+        name: cluster-admin
+        apiGroup: rbac.authorization.k8s.io
+      EOF
+
+      sleep 60
+
+      oc apply -f - <<EOF
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: cert-manager-$baseName
+        namespace: openshift-gitops
+      spec:
+        destination:
+          server: https://api.${baseDomain}:6443
+        project: default
+        source:
+          path: gitops/argocd/cert-manager/overlay/dev
+          repoURL: https://github.com/cdoan1/examples.acm.git
+          targetRevision: HEAD
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
+      EOF
+
+      sleep 60
+
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -f - <<EOF
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: cert-manager-cluster-admin
+      subjects:
+      - kind: ServiceAccount
+        name: cert-manager
+        namespace: cert-manager
+      roleRef:
+        kind: ClusterRole
+        name: cluster-admin
+        apiGroup: rbac.authorization.k8s.io
+      EOF
+
+      cat cert-manager-dns-credentials.yaml \
+        | sed "s/namespace: open-cluster-management-pipelines-vault/namespace: cert-manager/g" \
+        | sed "/  resourceVersion:/d" \
+        | sed "/  uid:/d" \
+        | sed "/  creationTimestamp:/d" > cert-manager-dns-credentials.yaml.2
+
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -f cert-manager-dns-credentials.yaml.2
+
+      oc apply -f - <<EOF
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: patch-operator-config-$baseName
+        namespace: openshift-gitops
+      spec:
+        destination:
+          server: https://api.${baseDomain}:6443
+        ignoreDifferences:
+        - group: admissionregistration.k8s.io
+          jsonPointers:
+          - /webhooks/0/clientConfig/caBundle
+          kind: MutatingWebhookConfiguration
+        project: default
+        source:
+          path: gitops/argocd/patch-operator-config/base
+          repoURL: https://github.com/cdoan1/examples.acm.git
+          targetRevision: HEAD
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
+      EOF
+
+      sleep 60
+
+      oc apply -f - <<EOF
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: cert-manager-config-$baseName
+        namespace: openshift-gitops
+      operation:
+        initiatedBy:
+          automated: true
+        retry:
+          limit: 5
+        sync:
+          prune: true
+      spec:
+        destination:
+          server: https://api.${baseDomain}:6443
+        project: default
+        source:
+          path: gitops/argocd/cert-manager-config/overlay/dev
+          repoURL: https://github.com/cdoan1/examples.acm.git
+          targetRevision: HEAD
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
+      EOF
+
+
+      echo "Waiting 10m for ingress pods to be ready ..."
+      oc --kubeconfig=$TOP/remote.kubeconfig wait --for="condition=Available=True" deployment router-default -n openshift-ingress --timeout=600s
+      oc --kubeconfig=$TOP/remote.kubeconfig get pods -n openshift-ingress
+
+      oc --kubeconfig=$TOP/remote.kubeconfig get certificates -A
+      oc get certificaterequests -A
+
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/cdoan_rh22/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source

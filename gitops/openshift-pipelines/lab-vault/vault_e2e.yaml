@@ -60,6 +60,7 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
+
   - name: login-to-hub-cluster
     params:
     - name: username
@@ -103,20 +104,34 @@ spec:
     - name: source
       workspace: shared-workspace
 
-  - name: deploy-operators
+  # - name: deploy-operators
+  #   runAfter:
+  #   - vault-setup
+  #   params:
+  #   - name: cluster-name
+  #     value: $(params.cluster-name)
+  #   - name: clusterClaimName
+  #     value: $(params.clusterClaimName)
+  #   taskRef:
+  #     name: task-deploy-cert-manager
+  #   workspaces:
+  #   - name: source
+  #     workspace: shared-workspace
+
+  - name: deploy-argo-application
     runAfter:
-    - vault-setup
+    - vault-argocd-import
     params:
     - name: cluster-name
       value: $(params.cluster-name)
     - name: clusterClaimName
       value: $(params.clusterClaimName)
     taskRef:
-      name: task-deploy-cert-manager
+      name: task-deploy-argo-application
     workspaces:
     - name: source
       workspace: shared-workspace
-
+ 
   workspaces:
   - name: shared-workspace
 

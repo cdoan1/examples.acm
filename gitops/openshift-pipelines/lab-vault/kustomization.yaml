@@ -11,5 +11,6 @@ resources:
 - vault_e2e.yaml
 - task_vault_setup.yaml
 - task_argocd_import.yaml
-- task_deploy_cert_manager.yaml
+# - task_deploy_cert_manager.yaml
+- task_deploy_argo_application.yaml
 - shared-workspace-pvc.yaml
