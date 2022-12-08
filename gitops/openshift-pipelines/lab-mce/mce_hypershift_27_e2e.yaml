@@ -38,12 +38,11 @@ spec:
   - name: start-snapshot
     type: string
     description: "snapshot version to initially install."
-    default: "2.7.0-DOWNSTREAM-2022-11-17-03-53-08"
-    # default: "2.7.0-DOWNSTREAM-2022-11-03-10-46-20"
+    default: "2.7.0-DOWNSTREAM-2022-12-07-02-19-40"
   - name: upgrade-snapshot
     type: string
     description: "snapshot version to upgrade too."
-    default: "2.7.0-DOWNSTREAM-2022-11-17-03-53-08"
+    default: "2.7.0-DOWNSTREAM-2022-12-07-02-19-40"
 
   - name: kubeconfig
     type: string
