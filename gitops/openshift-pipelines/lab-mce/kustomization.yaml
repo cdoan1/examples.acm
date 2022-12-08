@@ -31,6 +31,7 @@ resources:
 - task_mce_hypershift_build_hypershift_cli.yaml
 - task_mce_hypershift_enable_hypershift.yaml
 - task_mce_hypershift_create_hostedcluster.yaml
+- task_mce_hypershift_create_hostedcluster_hostedmode.yaml
 - task_mce_hypershift_delete_hostedcluster.yaml
 - task_mce_hypershift_create_hostedcluster_external_dns.yaml
 - task_mce_uninstall_acm.yaml
