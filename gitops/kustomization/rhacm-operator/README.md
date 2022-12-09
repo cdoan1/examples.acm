@@ -2,6 +2,7 @@
 
 ```bash
 oc apply -k ./gitops/kustomization/rhacm-operator/base-release-2.4
+oc apply -k ./gitops/kustomization/rhacm-instance/overlays/release-2.4
 ```
 
 ## Infra Nodes

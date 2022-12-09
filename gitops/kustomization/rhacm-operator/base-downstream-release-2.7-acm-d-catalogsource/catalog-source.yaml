@@ -6,7 +6,7 @@ metadata:
   namespace: open-cluster-management
 spec:
   displayName: Advanced Cluster Management
-  image: quay.io:443/acm-d/acm-custom-registry:2.7.0-DOWNSTREAM-2022-10-25-02-23-54
+  image: quay.io:443/acm-d/acm-custom-registry:2.7.0-DOWNSTREAM-2022-12-01-19-03-34
   publisher: Red Hat
   secrets:
   - multiclusterhub-operator-pull-secret
@@ -23,7 +23,7 @@ metadata:
   namespace: multicluster-engine
 spec:
   displayName: MultiCluster Engine
-  image: quay.io:443/acm-d/mce-custom-registry:2.7.0-DOWNSTREAM-2022-10-25-02-23-54
+  image: quay.io:443/acm-d/mce-custom-registry:2.7.0-DOWNSTREAM-2022-12-01-19-03-34
   publisher: Red Hat
   sourceType: grpc
   updateStrategy:
