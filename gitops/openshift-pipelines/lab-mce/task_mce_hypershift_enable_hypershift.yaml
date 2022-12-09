@@ -14,6 +14,10 @@ spec:
     default: "osdprestaging"
     description: "name of this managed cluster, will use this value to construct the hostedcluster name."
     type: string
+  - name: management-cluster
+    default: "local-cluster"
+    description: "name of the managed cluster that will be a management cluster"
+    type: string
   steps:
   - args:
     - |-
@@ -42,6 +46,8 @@ spec:
       # CLUSTER_NAME=$(params.managed-cluster)-hostedcluster
       REGION=us-west-1
 
+      MC=$(params.management-cluster)
+
       aws s3api create-bucket --acl public-read --bucket $OIDC_BUCKET_NAME \
         --create-bucket-configuration LocationConstraint=$OIDC_BUCKET_REGION \
         --region $OIDC_BUCKET_REGION || true
@@ -52,7 +58,7 @@ spec:
         --from-file=credentials=credentials \
         --from-literal=bucket=$OIDC_BUCKET_NAME \
         --from-literal=region=$OIDC_BUCKET_REGION \
-        -n local-cluster || true
+        -n $MC || true
 
       _aws_access_key_id=$(cat credentials | grep aws_access_key_id | cut -d'=' -f2 | tr -d " ")
       _aws_secret_access_key=$(cat credentials | grep aws_secret_access_key | cut -d'=' -f2 | tr -d " ")
@@ -64,20 +70,20 @@ spec:
         --from-literal=provider=aws \
         --from-literal=domain-filter=stolostron.io \
         --from-literal=txt-owner-id=cdoan \
-        -n local-cluster || true
+        -n $MC || true
 
       oc apply -f - <<EOF
       apiVersion: addon.open-cluster-management.io/v1alpha1
       kind: ManagedClusterAddOn
       metadata:
         name: hypershift-addon
-        namespace: local-cluster
+        namespace: $MC
       spec:
         installNamespace: open-cluster-management-agent-addon
       EOF
       
-      oc wait --for="condition=Available" managedclusteraddons hypershift-addon -n local-cluster --timeout=300s
-      oc get managedclusteraddons -n local-cluster hypershift-addon
+      oc wait --for="condition=Available" managedclusteraddons hypershift-addon -n $MC --timeout=300s
+      oc get managedclusteraddons -n $MC hypershift-addon
 
       set +e
       exit 0

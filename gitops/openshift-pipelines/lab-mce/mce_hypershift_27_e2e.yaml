@@ -43,6 +43,10 @@ spec:
     type: string
     description: "snapshot version to upgrade too."
     default: "2.7.0-DOWNSTREAM-2022-12-07-02-19-40"
+  - name: management-cluster
+    type: string
+    description: "managed cluster name for the management-cluster"
+    default: "management-cluster-01"
 
   - name: kubeconfig
     type: string
@@ -219,6 +223,20 @@ spec:
     params:
     - name: kubeconfig
       value: $(params.kubeconfig)
+    taskRef:
+      name: mce-hypershift-enable-hypershift
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
+  - name: enable-hypershift-remote
+    runAfter:
+    - enable-hypershift
+    params:
+    - name: kubeconfig
+      value: $(params.kubeconfig)
+    - name: management-cluster
+      value: $(params.management-cluster)
     taskRef:
       name: mce-hypershift-enable-hypershift
     workspaces:
