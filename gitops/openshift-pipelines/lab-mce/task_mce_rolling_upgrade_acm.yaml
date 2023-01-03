@@ -50,7 +50,7 @@ spec:
         echo "upgrade-snapshot cannot be undefined."
         exit 1
       fi
-      cat $KUSTOM | sed -r "s/    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54/    newTag: $S/g" > temp.yaml
+      cat $KUSTOM | sed -r "s/    newTag: 2.7.0-DOWNSTREAM-2022-12-01-19-03-34/    newTag: $S/g" > temp.yaml
       mv temp.yaml $KUSTOM
 
       NS=open-cluster-management
