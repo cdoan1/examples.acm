@@ -41,11 +41,11 @@ spec:
       KUSTOM=./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d-catalogsource/kustomization.yaml
       S=$(params.start-snapshot)
       echo "Updating start-snapshot: $S"
-      cat $KUSTOM | sed -r "s/    newTag: 2.7.0-DOWNSTREAM-2022-10-25-02-23-54/    newTag: $S/g" > temp.yaml
+      cat $KUSTOM | sed -r "s/    newTag: 2.7.0-DOWNSTREAM-2022-12-01-19-03-34/    newTag: $S/g" > temp.yaml
       mv temp.yaml $KUSTOM
 
       SOURCE=./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d-catalogsource/catalog-source.yaml
-      cat $SOURCE | sed -r "s/2.7.0-DOWNSTREAM-2022-10-25-02-23-54/$S/g" > temp.yaml
+      cat $SOURCE | sed -r "s/2.7.0-DOWNSTREAM-2022-12-01-19-03-34/$S/g" > temp.yaml
       mv temp.yaml $SOURCE
 
       oc apply -k ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-acm-d-catalogsource
