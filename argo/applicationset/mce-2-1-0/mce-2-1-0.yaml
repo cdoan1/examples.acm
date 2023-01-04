@@ -1,0 +1,28 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: mce-remote
+  namespace: openshift-gitops
+spec:
+  generators:
+  - list:
+      elements:
+      - cluster: "null"
+        url: "null"
+  template:
+    metadata:
+      name: '{{cluster}}-mce'
+    spec:
+      destination:
+        namespace: openshift-gitops
+        server: '{{url}}'
+      project: default
+      source:
+        path: cluster-bootstrap/mce/overlay/2.1.0
+        repoURL: https://github.com/cdoan1/acm-aap-aas-operations.git
+        targetRevision: city
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
