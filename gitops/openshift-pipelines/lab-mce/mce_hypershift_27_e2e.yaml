@@ -229,19 +229,19 @@ spec:
     - name: source
       workspace: shared-workspace
 
-  - name: enable-hypershift-remote
-    runAfter:
-    - enable-hypershift
-    params:
-    - name: kubeconfig
-      value: $(params.kubeconfig)
-    - name: management-cluster
-      value: $(params.management-cluster)
-    taskRef:
-      name: mce-hypershift-enable-hypershift
-    workspaces:
-    - name: source
-      workspace: shared-workspace
+  # - name: enable-hypershift-remote
+  #   runAfter:
+  #   - enable-hypershift
+  #   params:
+  #   - name: kubeconfig
+  #     value: $(params.kubeconfig)
+  #   - name: management-cluster
+  #     value: $(params.management-cluster)
+  #   taskRef:
+  #     name: mce-hypershift-enable-hypershift
+  #   workspaces:
+  #   - name: source
+  #     workspace: shared-workspace
 
   - name: create-hostedcluster
     runAfter:
