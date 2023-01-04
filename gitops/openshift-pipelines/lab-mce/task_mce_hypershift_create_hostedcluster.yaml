@@ -164,7 +164,11 @@ spec:
       oc get mce multiclusterengine -n multicluster-engine -ojsonpath='{.status.currentVersion}'
       
       oc get pods -n local-cluster-$CLUSTER_NAME
-      
+
+      echo "🖐️ wait 120s ..."
+      sleep 120
+
+      oc get pods -n local-cluster-$CLUSTER_NAME
       oc get pods -n klusterlet-$CLUSTER_NAME
       oc get pods -n klusterlet-$CLUSTER_NAME -o yaml | grep "image:" | sort -u | grep -v f:image | sed s'#    -#     #' | sort -u | sed 's/^[ \t]*//'
       
