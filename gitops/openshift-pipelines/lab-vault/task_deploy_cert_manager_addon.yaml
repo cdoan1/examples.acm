@@ -68,6 +68,8 @@ spec:
 
       oc --kubeconfig=$TOP/remote.kubeconfig apply -f cert-manager-dns-credentials.yaml.2
 
+      exit 0
+
       # 5. configure patch operator
       oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/patch-operator-config/base
 

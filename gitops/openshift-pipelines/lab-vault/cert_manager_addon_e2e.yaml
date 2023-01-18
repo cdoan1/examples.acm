@@ -5,10 +5,15 @@ metadata:
   name: cert-manager-addon-e2e
 spec:
   params:
+  - name: cluster-name
+    type: string
+    description: The name of the clusterpool to use
+    default: ""
   - name: clusterPoolName
     type: string
     description: The name of the clusterpool to use
-    default: "mce-pool-basic"
+    default: "mce-pool-service-cluster-412"
+    # default: "mce-pool-basic"
   - name: clusterClaimName
     type: string
     description: The name of the clusterclaim to claim
@@ -16,7 +21,7 @@ spec:
   - name: clusterClaimLifetime
     type: string
     description: The length of the lifetime of the clusterclaim. Default 8h
-    default: "8h"
+    default: "12h"
   - name: keepClusterClaim
     type: string
     description: Reuse existing clusterclaim if it exists.
@@ -100,7 +105,7 @@ spec:
     - name: source
       workspace: shared-workspace
 
-  - name: deploy-cert-manager
+  - name: deploy-cert-manager-addon
     runAfter:
     - vault-setup
     params:
@@ -112,19 +117,19 @@ spec:
     - name: source
       workspace: shared-workspace
 
-  - name: deploy-argo-application
-    runAfter:
-    - vault-argocd-import
-    params:
-    - name: cluster-name
-      value: $(params.cluster-name)
-    - name: clusterClaimName
-      value: $(params.clusterClaimName)
-    taskRef:
-      name: task-deploy-argo-application
-    workspaces:
-    - name: source
-      workspace: shared-workspace
+  # - name: deploy-argo-application
+  #   runAfter:
+  #   - vault-argocd-import
+  #   params:
+  #   - name: cluster-name
+  #     value: $(params.cluster-name)
+  #   - name: clusterClaimName
+  #     value: $(params.clusterClaimName)
+  #   taskRef:
+  #     name: task-deploy-argo-application
+  #   workspaces:
+  #   - name: source
+  #     workspace: shared-workspace
  
   workspaces:
   - name: shared-workspace
