@@ -1,0 +1,95 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-deploy-cert-manager-addon
+spec:
+  params:
+  - name: clusterClaimName
+    default: ""
+    type: string
+  steps:
+  - args:
+    - |-
+      set -e
+      set -x
+
+      TOP=$(pwd)
+
+      oc get secret cert-manager-dns-credentials -oyaml > cert-manager-dns-credentials.yaml
+
+      # 1. PATCH OPERATOR: Install
+
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/patch-operator/overlay/dev
+
+      # 2. PATCH OPERATOR: Elevate patch admission (overkill cluster-admin)
+
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -f - <<EOF
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: mwh-patcher-cluster-admin
+      subjects:
+      - kind: ServiceAccount
+        name: mutatingwebhook-patcher
+        namespace: patch-operator
+      roleRef:
+        kind: ClusterRole
+        name: cluster-admin
+        apiGroup: rbac.authorization.k8s.io
+      EOF
+
+      # 3. CERT_MANAGER: Install cert-manager
+
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/kustomization/redhat-cert-manager/1.9.1-24
+
+      # 4. elevate cert-manager (overkill cluster-admin)
+
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -f - <<EOF
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: cert-manager-cluster-admin
+      subjects:
+      - kind: ServiceAccount
+        name: cert-manager
+        namespace: cert-manager
+      roleRef:
+        kind: ClusterRole
+        name: cluster-admin
+        apiGroup: rbac.authorization.k8s.io
+      EOF
+
+      cat cert-manager-dns-credentials.yaml \
+        | sed "s/namespace: open-cluster-management-pipelines-vault/namespace: cert-manager/g" \
+        | sed "/  resourceVersion:/d" \
+        | sed "/  uid:/d" \
+        | sed "/  creationTimestamp:/d" > cert-manager-dns-credentials.yaml.2
+
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -f cert-manager-dns-credentials.yaml.2
+
+      # 5. configure patch operator
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/patch-operator-config/base
+
+      # 6. generate the certificate
+      sleep 60
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/cert-manager-config/overlay/dev
+
+      # 7. wait for the tls certs to be generated
+      echo "Waiting 10m for ingress pods to be ready ..."
+      oc --kubeconfig=$TOP/remote.kubeconfig wait --for="condition=Available=True" deployment router-default -n openshift-ingress --timeout=600s
+      oc --kubeconfig=$TOP/remote.kubeconfig get pods -n openshift-ingress
+
+      oc --kubeconfig=$TOP/remote.kubeconfig get certificates -A
+      oc --kubeconfig=$TOP/remote.kubeconfig get certificaterequests -A
+
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/cdoan_rh22/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source
