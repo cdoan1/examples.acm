@@ -1,0 +1,12 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: advanced-cluster-management
+  namespace: redhat-open-cluster-management
+spec:
+  channel: beta
+  installPlanApproval: Automatic
+  name: advanced-cluster-management
+  source: addon-advanced-cluster-management-catalog
+  sourceNamespace: redhat-open-cluster-management
+  startingCSV: advanced-cluster-management.v2.7.0-pre9

@@ -1,0 +1,29 @@
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: addon-advanced-cluster-management-catalog
+  namespace: redhat-open-cluster-management
+spec:
+  displayName: Advanced Cluster Management
+  image: quay.io/osd-addons/advanced-cluster-management-index@sha256:7353b70b9a0e9b5a8e4b52e724f24a7a44550ead946c1f63e2c451406f80930c
+  publisher: Red Hat
+  sourceType: grpc
+  updateStrategy:
+    registryPoll:
+      interval: 10m
+
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: addon-advanced-cluster-management-catalog
+  namespace: openshift-marketplace
+spec:
+  displayName: MultiCluster Engine
+  image: quay.io/osd-addons/advanced-cluster-management-index@sha256:7353b70b9a0e9b5a8e4b52e724f24a7a44550ead946c1f63e2c451406f80930c
+  publisher: Red Hat
+  sourceType: grpc
+  updateStrategy:
+    registryPoll:
+      interval: 10m
