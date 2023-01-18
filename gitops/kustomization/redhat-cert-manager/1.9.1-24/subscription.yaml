@@ -10,10 +10,8 @@ spec:
   channel: alpha
   installPlanApproval: Automatic
   name: cert-manager-operator-addon
-  # name: openshift-cert-manager-operator
   source: addon-cert-manager-catalog
   sourceNamespace: cert-manager
-  # startingCSV: openshift-cert-manager.v1.9.1-24
   config:
     resources:
       requests:
