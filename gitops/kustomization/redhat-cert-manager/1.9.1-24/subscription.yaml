@@ -1,0 +1,23 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: cert-manager
+  namespace: cert-manager
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+spec:
+  channel: alpha
+  installPlanApproval: Automatic
+  name: cert-manager-operator-addon
+  # name: openshift-cert-manager-operator
+  source: addon-cert-manager-catalog
+  sourceNamespace: cert-manager
+  # startingCSV: openshift-cert-manager.v1.9.1-24
+  config:
+    resources:
+      requests:
+        memory: "300Mi"
+        cpu: "100m"
+      limits:
+        memory: "2Gi"
