@@ -1,0 +1,28 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  labels:
+    tekton.dev/pipeline: cert-manager-addon-e2e
+  name: cert-manager-addon-e2e
+  namespace: open-cluster-management-pipelines-vault
+spec:
+  params:
+  - name: cluster-name
+    value: ""
+  - name: clusterPoolName
+    value: mce-pool-service-cluster
+  - name: clusterClaimName
+    value: vault-ci-ds-cluster-pb
+  - name: clusterClaimLifetime
+    value: 96h
+  - name: keepClusterClaim
+    value: "true"
+  pipelineRef:
+    name: cert-manager-addon-e2e
+  serviceAccountName: pipeline
+  timeout: 1h0m0s
+  workspaces:
+  - name: shared-workspace
+    persistentVolumeClaim:
+      claimName: shared-storage-pvc
