@@ -12,7 +12,8 @@ spec:
   # name: openshift-cert-manager-operator
   # name: cert-manager-operator
   # name: cert-manager-operator-addon - if this is the folder name, is this this SKU name
-  name: cert-manager-operator
+  # name: cert-manager-operator
+  name: openshift-cert-manager-operator
   source: addon-cert-manager-catalog
   sourceNamespace: cert-manager
   config:
