@@ -1,0 +1,14 @@
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: addon-cert-manager-catalog
+  namespace: cert-manager
+spec:
+  image: quay.io/swghosh/cert-manager-operator:index-v1.9-20230120
+  sourceType: grpc
+  updateStrategy:
+    registryPoll:
+      interval: 10m
+  publisher: Cert Manager Brew Staging
+  displayName: Red Hat Cert Manager Brew Staging

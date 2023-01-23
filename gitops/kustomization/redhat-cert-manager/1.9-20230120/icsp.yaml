@@ -1,0 +1,24 @@
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: brew-registry-redhat-io
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - brew.registry.redhat.io/rh-osbs/cert-manager-cert-manager-operator-bundle
+    source: registry-proxy.engineering.redhat.com/rh-osbs/cert-manager-cert-manager-operator-bundle
+  - mirrors:
+    - brew.registry.redhat.io/rh-osbs/cert-manager-cert-manager-operator-rhel8
+    source: registry-proxy.engineering.redhat.com/rh-osbs/cert-manager-cert-manager-operator-rhel8
+  - mirrors:
+    - brew.registry.redhat.io/rh-osbs/cert-manager-jetstack-cert-manager-rhel8
+    source: registry-proxy.engineering.redhat.com/rh-osbs/cert-manager-jetstack-cert-manager-rhel8
+  - mirrors:
+    - brew.registry.redhat.io/rh-osbs/cert-manager-cert-manager-operator-bundle
+    source: registry.redhat.io/cert-manager/cert-manager-operator-bundle
+  - mirrors:
+    - brew.registry.redhat.io/rh-osbs/cert-manager-cert-manager-operator-rhel8
+    source: registry.redhat.io/cert-manager/cert-manager-operator-rhel8
+  - mirrors:
+    - brew.registry.redhat.io/rh-osbs/cert-manager-jetstack-cert-manager-rhel8
+    source: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel8
