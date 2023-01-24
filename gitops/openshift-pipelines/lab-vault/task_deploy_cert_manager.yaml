@@ -45,7 +45,7 @@ spec:
 
       # 3. Install cert-manager
       sleep 60
-      oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/cert-manager/overlay/dev
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/argocd/cert-manager/overlay/v1.10.2
 
       # 4. elevate cert-manager (overkill cluster-admin)
       sleep 60
