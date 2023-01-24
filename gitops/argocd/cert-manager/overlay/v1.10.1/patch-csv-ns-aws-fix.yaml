@@ -1,0 +1,18 @@
+apiVersion: redhatcop.redhat.io/v1alpha1
+kind: Patch
+metadata:
+  name: cert-manager-csv
+  namespace: patch-operator
+spec:
+  serviceAccountRef:
+    name: mutatingwebhook-patcher
+  patches:
+    cert-manager-csv:
+      targetObjectRef:
+        apiVersion: operators.coreos.com/v1alpha1
+        kind: ClusterServiceVersion
+        # name: '{{ (lookup "operators.coreos.com/v1alpha1" "Subscription" "cert-manager" "cert-manager").status.currentCSV }}' # like cert-manager.v1.8.0
+        name: cert-manager.v1.10.1
+        namespace: cert-manager
+      patchTemplate: '[{"op":"replace","path":"/spec/install/spec/deployments/0/spec/template/spec/containers/0/args","value": ["--v=2","--cluster-resource-namespace=$(POD_NAMESPACE)", "--leader-election-namespace=kube-system", "--dns01-recursive-nameservers-only", "--dns01-recursive-nameservers=1.1.1.1:53,8.8.8.8:53"]}]'
+      patchType: application/json-patch+json
