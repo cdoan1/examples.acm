@@ -6,7 +6,7 @@ metadata:
     "redhat-cop.redhat.io/patch": |
       spec:
         dnsNames:
-          - 'api.{{ (lookup "config.openshift.io/v1" "DNS" "" "cluster").spec.baseDomain }}'
+          - '*.{{ (lookup "config.openshift.io/v1" "DNS" "" "cluster").spec.baseDomain }}'
     "redhat-cop.redhat.io/patch-type": "application/merge-patch+json"
   name: letsencrypt-api-tls-cert
   namespace: openshift-config
