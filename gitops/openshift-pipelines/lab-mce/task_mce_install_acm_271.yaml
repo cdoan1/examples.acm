@@ -1,0 +1,69 @@
+---
+
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: mce-install-acm-271
+  namespace: open-cluster-management-pipelines-mce
+spec:
+  params:
+  - name: kubeconfig
+    default: ""
+    description: "base64 encoded kubeconfig of the cluster we want to run this task on. Default to empty string, use the current cluster."
+    type: string
+  - name: managed-cluster
+    default: "osdprestaging"
+    description: "name of the managed cluster to run tasks on."
+    type: string
+  - name: start-snapshot
+    default: "2.7.0-DOWNSTREAM-2022-10-07-00-46-31"
+    description: "sprint 18"
+    type: string
+  - name: upgrade-snapshot
+    default: "2.7.0-DOWNSTREAM-2022-10-20-05-23-04"
+    description: "sprint 19"
+    type: string
+  steps:
+  - args:
+    - |-
+      set -e
+      set -x
+
+      if [ -f $(pwd)/remote.kubeconfig ]; then
+        export KUBECONFIG=$(pwd)/remote.kubeconfig
+      else
+        exit 1
+      fi
+      
+      oc cluster-info
+
+      KUSTOM=./gitops/kustomization/rhacm-operator/base-downstream-release-2.7.1/kustomization.yaml
+
+      S=$(params.start-snapshot)
+
+      oc apply -k ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7.1
+
+      sleep 60
+      
+      oc wait --for condition=Ready pods -n open-cluster-management -l name=multiclusterhub-operator --timeout=300s || true
+      
+      oc get secret pull-secret -n openshift-config -o yaml \
+        | sed "s/namespace: openshift-config/namespace: open-cluster-management/g" \
+        | sed "s/name: pull-secret/name: multiclusterhub-operator-pull-secret/g" \
+        | sed "/  resourceVersion:/d" \
+        | sed "/  uid:/d" \
+        | sed "/  creationTimestamp:/d" \
+        | oc apply -f -
+      
+      oc apply -k ./gitops/kustomization/rhacm-instance/overlays/downstream-release-2.7.1
+      
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/acm-sre/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source
