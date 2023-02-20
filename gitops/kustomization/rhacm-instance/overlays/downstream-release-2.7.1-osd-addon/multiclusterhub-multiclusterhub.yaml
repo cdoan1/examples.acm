@@ -1,0 +1,11 @@
+apiVersion: operator.open-cluster-management.io/v1
+kind: MultiClusterHub
+metadata:
+  name: multiclusterhub
+  namespace: open-cluster-management
+  annotations:
+    "installer.open-cluster-management.io/mce-subscription-spec": '{"channel": "stable-2.2","installPlanApproval": "Automatic","name": "multicluster-engine","source": "mce-custom-registry","sourceNamespace": "multicluster-engine"}'
+    "mch-imageRepository": "quay.io:443/acm-d"
+spec:
+  availabilityConfig: Basic
+  imagePullSecret: multiclusterhub-operator-pull-secret
