@@ -3,7 +3,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: mce-install-acm-271
+  name: mce-install-acm-271-osd-addon
   namespace: open-cluster-management-pipelines-mce
 spec:
   params:
@@ -45,17 +45,18 @@ spec:
 
       sleep 60
       
-      oc wait --for condition=Ready pods -n open-cluster-management -l name=multiclusterhub-operator --timeout=300s || true
+      oc wait --for condition=Ready pods -n redhat-open-cluster-management -l name=multiclusterhub-operator --timeout=300s || true
       
       oc get secret pull-secret -n openshift-config -o yaml \
-        | sed "s/namespace: openshift-config/namespace: open-cluster-management/g" \
+        | sed "s/namespace: openshift-config/namespace: redhat-open-cluster-management/g" \
         | sed "s/name: pull-secret/name: multiclusterhub-operator-pull-secret/g" \
         | sed "/  resourceVersion:/d" \
         | sed "/  uid:/d" \
         | sed "/  creationTimestamp:/d" \
         | oc apply -f -
       
-      oc apply -k ./gitops/kustomization/rhacm-instance/overlays/downstream-release-2.7.1-osd-addon
+      oc apply -k ./gitops/kustomization/rhacm-instance-ocm-addon/overlays/addon-release-2.7.1-acm-ocm-addon-3.7.0-rc04
+      
       
       exit 0
     command:
