@@ -6,9 +6,12 @@ metadata:
   namespace: redhat-open-cluster-management
 spec:
   displayName: Advanced Cluster Management
-  image: quay.io/osd-addons/advanced-cluster-management-index:daf1b9e
+  image: quay.io/osd-addons/advanced-cluster-management-index:706c83f
   publisher: Red Hat
   sourceType: grpc
+  updateStrategy:
+    registryPoll:
+      interval: 10m
 
 ---
 apiVersion: operators.coreos.com/v1alpha1
@@ -18,6 +21,9 @@ metadata:
   namespace: openshift-marketplace
 spec:
   displayName: MultiCluster Engine
-  image: quay.io/osd-addons/advanced-cluster-management-index:daf1b9e
+  image: quay.io/osd-addons/advanced-cluster-management-index:706c83f
   publisher: Red Hat
   sourceType: grpc
+  updateStrategy:
+    registryPoll:
+      interval: 10m
