@@ -26,9 +26,8 @@ spec:
   steps:
   - args:
     - |-
-      set -e
-      set -x
-
+      set -ex
+      
       if [ -f $(pwd)/remote.kubeconfig ]; then
         export KUBECONFIG=$(pwd)/remote.kubeconfig
       else
@@ -37,15 +36,15 @@ spec:
       
       oc cluster-info
 
-      KUSTOM=./gitops/kustomization/rhacm-operator/base-downstream-release-2.7.1-acm-osd-addon-3.7.0-rc04/kustomization.yaml
+      KUSTON=./gitops/kustomization/rhacm-operator/base-downstream-release-2.7.1-acm-osd-addon-3.7.1-1/kustomization.yaml
 
       S=$(params.start-snapshot)
 
-      oc apply -k ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7.1-acm-osd-addon-3.7.0-rc04
+      oc apply -k ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7.1-acm-osd-addon-3.7.1-1
 
       sleep 60
       
-      oc wait --for condition=Ready pods -n redhat-open-cluster-management -l name=multiclusterhub-operator --timeout=300s || true
+      oc wait --for condition=Ready pods -n redhat-open-cluster-management -l name=multiclusterhub-operator --timeout=300s
       
       oc get secret pull-secret -n openshift-config -o yaml \
         | sed "s/namespace: openshift-config/namespace: redhat-open-cluster-management/g" \
@@ -55,9 +54,8 @@ spec:
         | sed "/  creationTimestamp:/d" \
         | oc apply -f -
       
-      oc apply -k ./gitops/kustomization/rhacm-instance-ocm-addon/overlays/addon-release-2.7.1-acm-ocm-addon-3.7.0-rc04
-      
-      
+      oc apply -k ./gitops/kustomization/rhacm-instance-ocm-addon/overlays/addon-release-2.7.1-acm-ocm-addon-3.7.1-1
+
       exit 0
     command:
     - /bin/bash
