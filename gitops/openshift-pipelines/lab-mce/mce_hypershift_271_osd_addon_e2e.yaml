@@ -118,11 +118,28 @@ spec:
     - name: source
       workspace: shared-workspace
 
+  - name: ensure-prereqs
+    runAfter:
+    - login-to-hub-cluster
+    taskRef:
+      name: deploy-ds-acm-hyper-prereqs
+    workspaces:
+    - name: source
+      workspace: shared-workspace
 
+  - name: build-hypershift-cli
+    runAfter:
+    - login-to-hub-cluster
+    taskRef:
+      name: mce-hypershift-build-hypershift-cli
+    workspaces:
+    - name: source
+      workspace: shared-workspace
 
   - name: deploy-acm
     runAfter:
     - deploy-rhobs
+    - ensure-prereqs
     params:
     - name: kubeconfig
       value: $(params.kubeconfig)
@@ -138,23 +155,7 @@ spec:
     - name: source
       workspace: shared-workspace
 
-  - name: build-hypershift-cli
-    runAfter:
-    - login-to-hub-cluster
-    taskRef:
-      name: mce-hypershift-build-hypershift-cli
-    workspaces:
-    - name: source
-      workspace: shared-workspace
 
-  - name: ensure-prereqs
-    runAfter:
-    - login-to-hub-cluster
-    taskRef:
-      name: deploy-ds-acm-hyper-prereqs
-    workspaces:
-    - name: source
-      workspace: shared-workspace
 
   - name: wait-ready
     runAfter:
