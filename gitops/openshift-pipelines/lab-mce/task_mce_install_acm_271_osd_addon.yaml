@@ -55,7 +55,7 @@ spec:
 
       sleep 60
       
-      oc wait --for condition=Ready pods -n redhat-open-cluster-management -l name=multiclusterhub-operator --timeout=300s
+      oc wait --for condition=Ready pods -n redhat-open-cluster-management -l name=multiclusterhub-operator --timeout=300s || true
       
       oc get secret pull-secret -n openshift-config -o yaml \
         | sed "s/namespace: openshift-config/namespace: redhat-open-cluster-management/g" \
