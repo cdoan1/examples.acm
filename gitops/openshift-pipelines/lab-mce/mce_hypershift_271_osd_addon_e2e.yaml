@@ -47,6 +47,10 @@ spec:
     type: string
     description: "managed cluster name for the management-cluster"
     default: "management-cluster-01"
+  - name: use-brew
+    type: string
+    description: "Optional: String true | false"
+    default: "false"
 
   - name: kubeconfig
     type: string
