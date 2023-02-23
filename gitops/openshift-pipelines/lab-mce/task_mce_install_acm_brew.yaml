@@ -3,7 +3,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: mce-install-acm
+  name: mce-install-acm-brew
   namespace: open-cluster-management-pipelines-mce
 spec:
   params:
@@ -41,8 +41,8 @@ spec:
       SOURCE=./gitops/kustomization/rhacm-operator/base-downstream-release-2.7-brew
       S=$(params.start-snapshot)
       cat $SOURCE/$FILE \
-        | sed -r "s/  image: quay.io:443/acm-d/acm-custom-registry:.*$/  image: registry.redhat.io/rhacm2/acm-custom-registry:$S/g" \
-        | sed -r "s/  image: quay.io:443/acm-d/mce-custom-registry:.*$/  image: registry.redhat.io/rhacm2/mce-custom-registry:$S/g" > temp.yaml
+        | sed -r "s/  image: quay.io:443\/acm-d\/acm-custom-registry:.*$/  image: registry.redhat.io\/rhacm2\/acm-custom-registry:$S/g" \
+        | sed -r "s/  image: quay.io:443\/acm-d\/mce-custom-registry:.*$/  image: registry.redhat.io\/rhacm2\/mce-custom-registry:$S/g" > temp.yaml
       
       mv temp.yaml $SOURCE/$FILE
 

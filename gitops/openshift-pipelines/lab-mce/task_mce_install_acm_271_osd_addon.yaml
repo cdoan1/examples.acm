@@ -23,6 +23,9 @@ spec:
     default: "2.7.0-DOWNSTREAM-2022-10-20-05-23-04"
     description: "sprint 19"
     type: string
+  - name: use-brew
+    default: "false"
+    description: "OPTIONAL: set use-brew=true to deploy ACM from brew registry"
   steps:
   - args:
     - |-
@@ -35,6 +38,10 @@ spec:
       fi
       
       oc cluster-info
+
+      if [[ $(params.use-brew) == "true" ]]; then
+        # ensure that ICSP includes brew references
+      fi
 
       KUSTON=./gitops/kustomization/rhacm-operator/base-downstream-release-2.7.1-acm-osd-addon-3.7.1-1/kustomization.yaml
 
