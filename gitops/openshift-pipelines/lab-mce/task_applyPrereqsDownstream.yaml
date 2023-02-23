@@ -22,6 +22,8 @@ spec:
       #!/bin/bash
       set -e
 
+      TOP=$(pwd)
+
       # inject secrets from the deployer cluster (ACM HUB) to tekton pod
       oc extract secret/aws-credentials
       mkdir ~/.aws
@@ -49,6 +51,20 @@ spec:
 
       # oc apply -f samples/hypershift-pipelines/resources/clusterautoscaler.yaml
       # oc apply -f samples/hypershift-pipelines/resources/machineautoscaler.yaml
+
+      echo "Update Global Pull Secret"
+
+      oc get secret brew-pull-secret -n open-cluster-management-pipelines-mce -o yaml \
+      | sed "s/namespace: open-cluster-management-pipelines-mce/namespace: openshift-config/g" \
+      | sed "s/name: multiclusterhub-operator-pull-secret/name: pull-secret/g" \
+      | sed "/  resourceVersion:/d" \
+      | sed "/  uid:/d" \
+      | sed "/  creationTimestamp:/d" > update-global-pull-secret.yaml
+
+      if [ -f $TOP/remote.kubeconfig ]; then
+        oc --kubeconfig=$TOP/remote.kubeconfig apply -f update-global-pull-secret.yaml
+      fi
+
     command:
     - /bin/bash
     - -c
