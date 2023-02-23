@@ -1,0 +1,43 @@
+---
+
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: mce-install-rhobs
+  namespace: open-cluster-management-pipelines-mce
+spec:
+  params:
+  steps:
+  - args:
+    - |-
+      set -ex
+      
+      TOP=$(pwd)
+
+      if [ -f $(pwd)/remote.kubeconfig ]; then
+        export KUBECONFIG=$(pwd)/remote.kubeconfig
+      else
+        exit 1
+      fi
+      
+      oc cluster-info
+      oc project
+      
+      ls -al $TOP
+
+      git clone https://github.com/rhobs/observability-operator.git
+      
+      cd observability-operator
+      kubectl apply -f hack/olm/catalog-src.yaml
+      kubectl apply -f hack/olm/subscription.yaml 
+
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/acm-sre/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source

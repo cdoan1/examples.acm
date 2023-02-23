@@ -26,7 +26,7 @@ spec:
   - name: namespace
     type: string
     description: The namespace to deploy ACM onto the target cluster
-    default: "open-cluster-management"
+    default: "redhat-open-cluster-management"
   - name: snapshot
     type: string
     description: The downstream SNAPSHOT to used to deploy ACM
@@ -68,6 +68,7 @@ spec:
     workspaces:
     - name: output
       workspace: shared-workspace
+
   - name: checkout-hub-cluster
     runAfter:
     - fetch-repo
@@ -86,6 +87,7 @@ spec:
     workspaces:
     - name: source
       workspace: shared-workspace
+
   - name: login-to-hub-cluster
     params:
     - name: username
@@ -103,9 +105,18 @@ spec:
     - name: source
       workspace: shared-workspace
 
-  - name: deploy-acm
+  - name: deploy-rhobs
     runAfter:
     - login-to-hub-cluster
+    taskRef:
+      name: mce-install-rhobs
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
+  - name: deploy-acm
+    runAfter:
+    - deploy-rhobs
     params:
     - name: kubeconfig
       value: $(params.kubeconfig)
@@ -142,6 +153,8 @@ spec:
     params:
     - name: kubeconfig
       value: $(params.kubeconfig)
+    - name: namespace
+      value: $(params.namespace)
     taskRef:
       name: mce-wait-ready
     workspaces:
@@ -154,6 +167,8 @@ spec:
     params:
     - name: kubeconfig
       value: $(params.kubeconfig)
+    - name: namespace
+      value: $(params.namespace)
     taskRef:
       name: mce-check-status
     workspaces:

@@ -159,9 +159,8 @@ spec:
       oc get managedclusters -A
       oc get managedclusteraddon -A
       
-      oc get mch multiclusterhub -n open-cluster-management -ojsonpath='{.status.currentVersion}'
-      
-      oc get mce multiclusterengine -n multicluster-engine -ojsonpath='{.status.currentVersion}'
+      # oc get mch multiclusterhub -n open-cluster-management -ojsonpath='{.status.currentVersion}'
+      # oc get mce multiclusterengine -n multicluster-engine -ojsonpath='{.status.currentVersion}'
       
       oc get pods -n local-cluster-$CLUSTER_NAME
 
