@@ -65,6 +65,8 @@ spec:
         oc --kubeconfig=$TOP/remote.kubeconfig apply -f update-global-pull-secret.yaml
       fi
 
+      
+
     command:
     - /bin/bash
     - -c
