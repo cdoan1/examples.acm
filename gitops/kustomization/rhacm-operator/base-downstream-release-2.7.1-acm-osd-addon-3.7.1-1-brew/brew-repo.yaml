@@ -5,10 +5,10 @@ metadata:
 spec:
   repositoryDigestMirrors:
   - mirrors:
-    - quay.io:443/acm-d
+    - brew.registry.redhat.io/rhacm2
     source: registry.redhat.io/rhacm2
   - mirrors:
-    - quay.io:443/acm-d
+    - brew.registry.redhat.io/multicluster-engine
     source: registry.redhat.io/multicluster-engine
   - mirrors:
     - registry.redhat.io/openshift4/ose-oauth-proxy

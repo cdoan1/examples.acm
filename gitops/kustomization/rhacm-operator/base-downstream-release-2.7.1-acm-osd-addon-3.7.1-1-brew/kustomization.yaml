@@ -9,4 +9,4 @@ resources:
   - open-cluster-management-operatorgroup.yaml
   - catalog-source.yaml
   - advanced-cluster-management-sub.yaml
-  - rhacm-repo.yaml
+  - brew-repo.yaml

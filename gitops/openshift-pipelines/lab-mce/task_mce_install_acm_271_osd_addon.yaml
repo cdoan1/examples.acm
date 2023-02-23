@@ -40,14 +40,18 @@ spec:
       oc cluster-info
 
       if [[ $(params.use-brew) == "true" ]]; then
-        # ensure that ICSP includes brew references
+        SOURCE1=gitops/kustomization/rhacm-operator/base-downstream-release-2.7.1-acm-osd-addon-3.7.1-1-brew
+        SOURCE2=gitops/kustomization/rhacm-instance-ocm-addon/overlays/addon-release-2.7.1-acm-ocm-addon-3.7.1-1-brew
+      else
+        SOURCE1=gitops/kustomization/rhacm-operator/base-downstream-release-2.7.1-acm-osd-addon-3.7.1-1
+        SOURCE2=gitops/kustomization/rhacm-instance-ocm-addon/overlays/addon-release-2.7.1-acm-ocm-addon-3.7.1-1
       fi
 
-      KUSTON=./gitops/kustomization/rhacm-operator/base-downstream-release-2.7.1-acm-osd-addon-3.7.1-1/kustomization.yaml
+      KUSTON=$SOURCE1/kustomization.yaml
 
       S=$(params.start-snapshot)
 
-      oc apply -k ./gitops/kustomization/rhacm-operator/base-downstream-release-2.7.1-acm-osd-addon-3.7.1-1
+      oc apply -k $SOURCE1
 
       sleep 60
       
@@ -61,7 +65,7 @@ spec:
         | sed "/  creationTimestamp:/d" \
         | oc apply -f -
       
-      oc apply -k ./gitops/kustomization/rhacm-instance-ocm-addon/overlays/addon-release-2.7.1-acm-ocm-addon-3.7.1-1
+      oc apply -k $SOURCE2
 
       exit 0
     command:

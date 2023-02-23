@@ -9,4 +9,4 @@ spec:
   name: advanced-cluster-management
   source: addon-advanced-cluster-management-catalog
   sourceNamespace: redhat-open-cluster-management
-  startingCSV: advanced-cluster-management.v2.7.1-rc04
+  startingCSV: advanced-cluster-management.v2.7.1-1
