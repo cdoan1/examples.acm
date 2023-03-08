@@ -3,7 +3,7 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
   name: addon-cert-manager-catalog
-  namespace: cert-manager
+  namespace: cert-manager-operator
 spec:
   image: quay.io/swghosh/cert-manager-operator:index-v1.9-20230120
   sourceType: grpc

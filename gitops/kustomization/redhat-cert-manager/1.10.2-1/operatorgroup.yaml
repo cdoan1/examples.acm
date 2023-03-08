@@ -3,9 +3,8 @@ kind: OperatorGroup
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "-1"
-  name: cert-manager-operator
-  namespace: cert-manager-operator
+  name: cert-manager
+  namespace: cert-manager
 spec:
   targetNamespaces:
-  - cert-manager-operator
-  upgradeStrategy: Default
+  - "cert-manager"
