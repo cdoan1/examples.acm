@@ -46,12 +46,31 @@ spec:
 
       # oc adm policy add-role-to-user cluster-admin system:serviceaccount:cert-manager:cert-manager
       
-      BASE_DOMAIN=$(oc --kubeconfig=$TOP/remote.kubeconfig get dns cluster -o json | jq -r ".spec.baseDomain")
+      # BASE_DOMAIN=$(oc --kubeconfig=$TOP/remote.kubeconfig get dns cluster -o json | jq -r ".spec.baseDomain")
+      BASE_DOMAIN=$(oc --kubeconfig=$TOP/managedcluster.kubeconfig get dns cluster -o json | jq -r ".spec.baseDomain")
 
       echo "BASE_DOMAIN: $BASE_DOMAIN"
 
-      oc --kubeconfig=$TOP/remote.kubeconfig patch certmanager cluster --type merge \
-        -p '{"spec":{"unsupportedConfigOverrides":{"controller":{"args":["--dns01-recursive-nameservers=1.1.1.1:53,8.8.8.8:53","--dns01-recursive-nameservers-only"]}}}}'
+      # oc --kubeconfig=$TOP/remote.kubeconfig patch certmanager cluster --type merge \
+      #   -p '{"spec":{"unsupportedConfigOverrides":{"controller":{"args":["--dns01-recursive-nameservers=1.1.1.1:53,8.8.8.8:53","--dns01-recursive-nameservers-only"]}}}}'
+
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -f - <<EOF
+      apiVersion: operator.openshift.io/v1alpha1
+      kind: CertManager
+      metadata:
+        name: cluster
+      spec:
+        logLevel: Debug
+        managementState: Managed
+        observedConfig: null
+        operatorLogLevel: Debug
+        unsupportedConfigOverrides:
+          controller:
+            args:
+            - --dns01-recursive-nameservers=1.1.1.1:53,8.8.8.8:53
+            - --dns01-recursive-nameservers-only
+            - --cluster-resource-namespace=cert-manager
+      EOF
 
       sleep 20
 
@@ -79,6 +98,48 @@ spec:
                   key: aws_access_key_id
                   name: cert-manager-dns-credentials
       EOF
+
+      sleep 20
+
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -f - <<EOF
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        labels:
+          use-dns01-solver: "true"
+        name: managed-cluster-tls-cert
+        namespace: default
+      spec:
+        dnsNames:
+        - apps.$BASE_DOMAIN
+        - '*.apps.$BASE_DOMAIN'
+        duration: 4h0m0s
+        issuerRef:
+          group: cert-manager.io
+          kind: ClusterIssuer
+          name: public-issuer
+        privateKey:
+          algorithm: RSA
+          encoding: PKCS1
+          size: 2048
+        renewBefore: 1h0m0s
+        secretName: managed-cluster-certs-tls
+        subject:
+          organizations:
+          - Advanced Cluster Management
+        usages:
+        - server auth
+        - client auth
+      EOF
+
+
+      # 7. wait for the tls certs to be generated
+      # echo "Waiting 10m for ingress pods to be ready ..."
+      # oc --kubeconfig=$TOP/remote.kubeconfig wait --for="condition=Available=True" deployment router-default -n openshift-ingress --timeout=600s
+      # oc --kubeconfig=$TOP/remote.kubeconfig get pods -n openshift-ingress
+
+      oc --kubeconfig=$TOP/remote.kubeconfig get certificates -A
+      oc --kubeconfig=$TOP/remote.kubeconfig get certificaterequests -A
 
       exit 0
     command:
