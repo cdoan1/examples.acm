@@ -1,8 +1,8 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: cert-manager
-  namespace: cert-manager
+  name: redhat-cert-manager
+  namespace: redhat-cert-manager
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     argocd.argoproj.io/compare-options: IgnoreExtraneous
@@ -11,4 +11,4 @@ spec:
   installPlanApproval: Automatic
   name: cert-manager-operator
   source: addon-cert-manager-catalog
-  sourceNamespace: cert-manager
+  sourceNamespace: redhat-cert-manager
