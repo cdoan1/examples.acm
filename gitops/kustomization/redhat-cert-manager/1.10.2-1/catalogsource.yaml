@@ -6,8 +6,7 @@ metadata:
   namespace: cert-manager
 spec:
   displayName: cdoan Cert Manager
-  image: quay.io/osd-addons/cert-manager-operator-index@sha256:323e3904d7cf0b43c9267294371239d62009e8775a708f20ee621382c5178134
-  # image: quay.io/osd-addons/cert-manager-operator-index@sha256:4281eacf2cd957e844310ec40ecd5d42a401e74c2e48f6a031a19e02d87c3e8f
+  image: quay.io/osd-addons/cert-manager-operator-index@sha256:42524f8631f6d8c77ed2f16a743c92d73a3b59e5d4e285ef9cd9becf0be659d0
   publisher: Red Hat
   sourceType: grpc
   updateStrategy:
