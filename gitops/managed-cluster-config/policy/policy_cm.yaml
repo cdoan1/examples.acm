@@ -44,16 +44,14 @@ spec:
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
-  name: alpha-cm-1-exists-placement
+  name: select-hosted-cluster-true
   namespace: default
 spec:
   clusterConditions: []
-  clusterSelector:
-    matchExpressions:
-      - key: name
-        operator: In
-        values:
-          - hs-ci-managed-cluster
+  clusterLabels:
+    matchLabels:
+      hypershift.open-cluster-management.io/hosted-cluster: true
+
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
@@ -61,7 +59,7 @@ metadata:
   name: alpha-cm-1-exists-placement
   namespace: default
 placementRef:
-  name: alpha-cm-1-exists-placement
+  name: select-hosted-cluster-true
   apiGroup: apps.open-cluster-management.io
   kind: PlacementRule
 subjects:
