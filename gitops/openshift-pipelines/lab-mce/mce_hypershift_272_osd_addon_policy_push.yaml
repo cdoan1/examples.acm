@@ -172,6 +172,15 @@ spec:
     - name: source
       workspace: shared-workspace
 
+  - name: deploy-cert-manager-addon
+    runAfter:
+    - ensure-prereqs
+    taskRef:
+      name: task-deploy-cert-manager-addon
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
   # - name: ensure-prereqs-mc
   #   runAfter:
   #   - ensure-prereqs
@@ -210,17 +219,6 @@ spec:
     - name: source
       workspace: shared-workspace
 
-  - name: deploy-cert-manager-addon
-    runAfter:
-    - login-to-hub-cluster
-    # params:
-    # - name: kubeconfig
-    #   value: $(params.kubeconfig)
-    taskRef:
-      name: task-deploy-cert-manager-addon
-    workspaces:
-    - name: source
-      workspace: shared-workspace
 
   - name: wait-ready
     runAfter:
@@ -258,6 +256,25 @@ spec:
       value: $(params.clusterClaimNameMC)
     taskRef:
       name: task-attach-managed-cluster
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
+  - name: attach-policy-alpha
+    runAfter:
+    - import-managedcluster
+    - deploy-cert-manager-addon
+    taskRef:
+      name: task-attach-policy-alpha
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
+  - name: verify-policy
+    runAfter:
+    - attach-policy-alpha
+    taskRef:
+      name: task-attach-policy-alpha-verify
     workspaces:
     - name: source
       workspace: shared-workspace

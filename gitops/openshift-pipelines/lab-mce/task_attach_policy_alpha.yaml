@@ -1,0 +1,101 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-attach-policy-alpha
+spec:
+  params:
+  - name: clusterClaimName
+    default: ""
+    type: string
+  steps:
+  - args:
+    - |-
+      set -e
+      set -x
+
+      TOP=$(pwd)
+
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -f - <<EOF
+      ---
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: Policy
+      metadata:
+        name: alpha-cm-1-exists
+        namespace: default
+        annotations:
+          policy.open-cluster-management.io/categories: CM Configuration Management
+          policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+          policy.open-cluster-management.io/standards: NIST SP 800-53
+      spec:
+        disabled: false
+        policy-templates:
+          - objectDefinition:
+              apiVersion: policy.open-cluster-management.io/v1
+              kind: ConfigurationPolicy
+              metadata:
+                name: alpha-cm-1
+              spec:
+                namespaceSelector:
+                  exclude:
+                    - kube-*
+                  include:
+                    - default
+                object-templates:
+                  - complianceType: musthave
+                    objectDefinition:
+                      apiVersion: v1
+                      kind: ConfigMap
+                      metadata:
+                        name: alpha-cm-1
+                        namespace: default
+                      data:
+                        song: "as-it-was"
+                        tls.key: |
+                          {{hub ( index ( lookup "v1" "Secret" "default" "managed-cluster-certs-tls" ).data "tls.key" ) | base64dec | autoindent hub}}
+                        tls.crt: |
+                          {{hub ( index ( lookup "v1" "Secret" "default" "managed-cluster-certs-tls" ).data "tls.crt" ) | base64dec | autoindent hub}}
+                pruneObjectBehavior: DeleteAll
+                remediationAction: inform
+                severity: low
+        remediationAction: enforce
+      ---
+      apiVersion: apps.open-cluster-management.io/v1
+      kind: PlacementRule
+      metadata:
+        name: alpha-cm-1-exists-placement
+        namespace: default
+      spec:
+        clusterConditions: []
+        clusterSelector:
+          matchExpressions:
+            - key: name
+              operator: In
+              values:
+                - hs-ci-managed-cluster
+      ---
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: PlacementBinding
+      metadata:
+        name: alpha-cm-1-exists-placement
+        namespace: default
+      placementRef:
+        name: alpha-cm-1-exists-placement
+        apiGroup: apps.open-cluster-management.io
+        kind: PlacementRule
+      subjects:
+        - name: alpha-cm-1-exists
+          apiGroup: policy.open-cluster-management.io
+          kind: Policy
+      EOF
+
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/cdoan_rh22/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source

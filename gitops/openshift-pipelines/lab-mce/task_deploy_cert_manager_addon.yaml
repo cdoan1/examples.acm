@@ -20,7 +20,7 @@ spec:
       oc get secret brew-pull-secret -oyaml > brew-pull-secret.yaml
 
       cat cert-manager-dns-credentials.yaml \
-      | sed "s/namespace: open-cluster-management-pipelines-mce/namespace: cert-manager/g" \
+      | sed "s/namespace: open-cluster-management-pipelines-mce/namespace: openshift-cert-manager/g" \
       | sed "/  resourceVersion:/d" \
       | sed "/  uid:/d" \
       | sed "/  creationTimestamp:/d" > cert-manager-dns-credentials.yaml.secret
@@ -31,7 +31,7 @@ spec:
       | sed "/  uid:/d" \
       | sed "/  creationTimestamp:/d" > brew-pull-secret.yaml.secret
 
-      oc --kubeconfig=$TOP/remote.kubeconfig apply -f brew-pull-secret.yaml.secret
+      # oc --kubeconfig=$TOP/remote.kubeconfig apply -f brew-pull-secret.yaml.secret
 
       oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/kustomization/redhat-cert-manager/1.10.2-1
       
@@ -42,7 +42,7 @@ spec:
       
       oc --kubeconfig=$TOP/remote.kubeconfig get pods -n cert-manager
 
-      oc --kubeconfig=$TOP/remote.kubeconfig get pods -n cert-manager-operator
+      oc --kubeconfig=$TOP/remote.kubeconfig get pods -n openshift-cert-manager
 
       # oc adm policy add-role-to-user cluster-admin system:serviceaccount:cert-manager:cert-manager
       
@@ -69,7 +69,7 @@ spec:
             args:
             - --dns01-recursive-nameservers=1.1.1.1:53,8.8.8.8:53
             - --dns01-recursive-nameservers-only
-            - --cluster-resource-namespace=cert-manager
+            - --cluster-resource-namespace=openshift-cert-manager
       EOF
 
       sleep 20
@@ -79,7 +79,7 @@ spec:
       kind: ClusterIssuer
       metadata:
         name: public-issuer
-        namespace: cert-manager
+        namespace: openshift-cert-manager
       spec:
         acme:
           email: cdoan@redhat.com

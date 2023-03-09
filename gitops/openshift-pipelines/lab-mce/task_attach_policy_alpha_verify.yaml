@@ -1,0 +1,34 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-attach-policy-alpha-verify
+spec:
+  params:
+  - name: clusterClaimName
+    default: ""
+    type: string
+  steps:
+  - args:
+    - |-
+      set -e
+      set -x
+
+      TOP=$(pwd)
+
+      OC="oc --kubeconfig=$TOP/managedcluster.kubeconfig"
+      
+      oc --kubeconfig=$TOP/managedcluster.kubeconfig get cm -A -l app=alpha
+
+      $OC get cm alpha-cm-1 -n default -o yaml
+
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/cdoan_rh22/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source

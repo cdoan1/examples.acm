@@ -52,6 +52,17 @@ spec:
       oc wait --for="condition=ManagedClusterConditionAvailable" managedcluster $(inputs.params.clusterClaimName) --timeout=600s || true
 
       echo "Managed Cluster successfully imported"
+
+      oc apply -f - <<EOF
+      apiVersion: addon.open-cluster-management.io/v1alpha1
+      kind: ManagedClusterAddOn
+      metadata:
+        name: hypershift-addon
+        namespace: $(inputs.params.clusterClaimName)
+      spec:
+        installNamespace: open-cluster-management-agent-addon
+      EOF
+
       exit 0 
     command:
     - /bin/bash
