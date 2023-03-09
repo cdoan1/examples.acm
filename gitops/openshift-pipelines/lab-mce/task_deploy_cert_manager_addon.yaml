@@ -75,6 +75,9 @@ spec:
                 secretAccessKeySecretRef:
                   key: aws_secret_access_key
                   name: cert-manager-dns-credentials
+                accessKeyIDSecretRef:
+                  key: aws_access_key_id
+                  name: cert-manager-dns-credentials
       EOF
 
       exit 0
