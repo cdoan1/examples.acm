@@ -3,7 +3,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: mce-hypershift-271-osd-addon-e2e
+  name: mce-hypershift-272-osd-addon-e2e
   namespace: open-cluster-management-pipelines-mce
 spec:
   params:
@@ -150,7 +150,7 @@ spec:
     - name: use-brew
       value: $(params.use-brew)
     taskRef:
-      name: mce-install-acm-271-osd-addon
+      name: mce-install-acm-272-osd-addon
     workspaces:
     - name: source
       workspace: shared-workspace
@@ -199,17 +199,17 @@ spec:
     - name: source
       workspace: shared-workspace
 
-  - name: create-hostedcluster
-    runAfter:
-    - enable-hypershift
-    params:
-    - name: kubeconfig
-      value: $(params.kubeconfig)
-    taskRef:
-      name: mce-hypershift-create-hostedcluster
-    workspaces:
-    - name: source
-      workspace: shared-workspace
+  # - name: create-hostedcluster
+  #   runAfter:
+  #   - enable-hypershift
+  #   params:
+  #   - name: kubeconfig
+  #     value: $(params.kubeconfig)
+  #   taskRef:
+  #     name: mce-hypershift-create-hostedcluster
+  #   workspaces:
+  #   - name: source
+  #     workspace: shared-workspace
 
   - name: run-canary-container-test
     runAfter:
@@ -223,17 +223,17 @@ spec:
     - name: source
       workspace: shared-workspace
 
-  - name: delete-hostedcluster
-    runAfter:
-    - create-hostedcluster
-    params:
-    - name: kubeconfig
-      value: $(params.kubeconfig)
-    taskRef:
-      name: mce-hypershift-delete-hostedcluster
-    workspaces:
-    - name: source
-      workspace: shared-workspace
+  # - name: delete-hostedcluster
+  #   runAfter:
+  #   - create-hostedcluster
+  #   params:
+  #   - name: kubeconfig
+  #     value: $(params.kubeconfig)
+  #   taskRef:
+  #     name: mce-hypershift-delete-hostedcluster
+  #   workspaces:
+  #   - name: source
+  #     workspace: shared-workspace
 
   workspaces:
   - name: shared-workspace

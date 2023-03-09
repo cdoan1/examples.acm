@@ -1,0 +1,91 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-deploy-cert-manager-addon
+spec:
+  params:
+  - name: clusterClaimName
+    default: ""
+    type: string
+  steps:
+  - args:
+    - |-
+      set -e
+      set -x
+
+      TOP=$(pwd)
+
+      oc get secret cert-manager-dns-credentials -oyaml > cert-manager-dns-credentials.yaml
+      oc get secret brew-pull-secret -oyaml > brew-pull-secret.yaml
+
+      cat cert-manager-dns-credentials.yaml \
+      | sed "s/namespace: open-cluster-management-pipelines-mce/namespace: cert-manager/g" \
+      | sed "/  resourceVersion:/d" \
+      | sed "/  uid:/d" \
+      | sed "/  creationTimestamp:/d" > cert-manager-dns-credentials.yaml.secret
+
+      cat brew-pull-secret.yaml | sed 's/brew-pull-secret/pull-secret/g' \
+      | sed 's/open-cluster-management-pipelines-mce/openshift-config/g' \
+      | sed "/  resourceVersion:/d" \
+      | sed "/  uid:/d" \
+      | sed "/  creationTimestamp:/d" > brew-pull-secret.yaml.secret
+
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -f brew-pull-secret.yaml.secret
+
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -k gitops/kustomization/redhat-cert-manager/1.10.2-1
+      
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -f cert-manager-dns-credentials.yaml.secret
+      
+      echo "wait 60s"
+      sleep 60
+      
+      oc --kubeconfig=$TOP/remote.kubeconfig get pods -n cert-manager
+
+      oc --kubeconfig=$TOP/remote.kubeconfig get pods -n cert-manager-operator
+
+      # oc adm policy add-role-to-user cluster-admin system:serviceaccount:cert-manager:cert-manager
+      
+      BASE_DOMAIN=$(oc --kubeconfig=$TOP/remote.kubeconfig get dns cluster -o json | jq -r ".spec.baseDomain")
+
+      echo "BASE_DOMAIN: $BASE_DOMAIN"
+
+      oc --kubeconfig=$TOP/remote.kubeconfig patch certmanager cluster --type merge \
+        -p '{"spec":{"unsupportedConfigOverrides":{"controller":{"args":["--dns01-recursive-nameservers=1.1.1.1:53,8.8.8.8:53","--dns01-recursive-nameservers-only"]}}}}'
+
+      sleep 20
+
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -f - <<EOF
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: public-issuer
+        namespace: cert-manager
+      spec:
+        acme:
+          email: cdoan@redhat.com
+          preferredChain: ""
+          privateKeySecretRef:
+            name: letsencrypt-staging
+          server: https://acme-v02.api.letsencrypt.org/directory
+          solvers:
+          - dns01:
+              route53:
+                accessKeyID: AKIAQ2TJYMEVFW2JAWXG
+                hostedZoneID: Z09965488LPI4RA97QCA
+                region: us-east-1
+                secretAccessKeySecretRef:
+                  key: aws_secret_access_key
+                  name: cert-manager-dns-credentials
+      EOF
+
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/cdoan_rh22/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source

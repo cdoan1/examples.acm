@@ -25,3 +25,16 @@ Secrets will use external secrets to a vault.
 |------|----|-------------|
 | mce-pool-basic | open-cluster-management-pipelines-mce | |
 | mce-pool-service-cluster | open-cluster-management-pipelines-mce | 8x32 worker nodes to handle hypershift hosted clusters |
+
+
+## Pipeline - policy push remote secret
+
+1. Checkout a Cluster 1
+2. Deploy ACM on Cluster 1
+3. Deploy Cert-Manager on Cluster 1
+
+4. Checkout a Cluster 2
+5. Import Cluster 2 to Cluster 1
+
+6. Create a certificate on Cluster 1
+7. Use policy to move the secret to a configmap on Cluster 2

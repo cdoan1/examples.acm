@@ -46,7 +46,9 @@ spec:
         echo "Generated admin password for OCM cluster and saved as secret ..."
       fi
 
-      ocm login --token=$TOKEN --url 'staging'
+      ocm login --token=$TOKEN --url "https://api.integration.openshift.com"
+      # ocm login --token=$TOKEN --url 'integration'
+      # ocm login --token=$TOKEN --url 'staging'
       ocm get clusters
 
       echo "Waiting for OCM cluster to be ready ..."

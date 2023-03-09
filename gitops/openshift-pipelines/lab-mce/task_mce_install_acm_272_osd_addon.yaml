@@ -1,0 +1,79 @@
+---
+
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: mce-install-acm-272-osd-addon
+  namespace: open-cluster-management-pipelines-mce
+spec:
+  params:
+  - name: kubeconfig
+    default: ""
+    description: "base64 encoded kubeconfig of the cluster we want to run this task on. Default to empty string, use the current cluster."
+    type: string
+  - name: managed-cluster
+    default: "osdprestaging"
+    description: "name of the managed cluster to run tasks on."
+    type: string
+  - name: start-snapshot
+    default: "2.7.0-DOWNSTREAM-2022-10-07-00-46-31"
+    description: "sprint 18"
+    type: string
+  - name: upgrade-snapshot
+    default: "2.7.0-DOWNSTREAM-2022-10-20-05-23-04"
+    description: "sprint 19"
+    type: string
+  - name: use-brew
+    default: "false"
+    description: "OPTIONAL: set use-brew=true to deploy ACM from brew registry"
+  steps:
+  - args:
+    - |-
+      set -ex
+      
+      if [ -f $(pwd)/remote.kubeconfig ]; then
+        export KUBECONFIG=$(pwd)/remote.kubeconfig
+      else
+        exit 1
+      fi
+      
+      oc cluster-info
+
+      if [[ $(params.use-brew) == "true" ]]; then
+        SOURCE1=gitops/kustomization/rhacm-operator/base-downstream-release-2.7.2-acm-osd-addon-3.7.2-1-brew
+        SOURCE2=gitops/kustomization/rhacm-instance-ocm-addon/overlays/addon-release-2.7.2-acm-ocm-addon-3.7.2-1-brew
+      else
+        SOURCE1=gitops/kustomization/rhacm-operator/base-downstream-release-2.7.2-acm-osd-addon-3.7.2-1
+        SOURCE2=gitops/kustomization/rhacm-instance-ocm-addon/overlays/addon-release-2.7.2-acm-ocm-addon-3.7.2-1
+      fi
+
+      KUSTON=$SOURCE1/kustomization.yaml
+
+      S=$(params.start-snapshot)
+
+      oc apply -k $SOURCE1
+
+      sleep 60
+      
+      oc wait --for condition=Ready pods -n redhat-open-cluster-management -l name=multiclusterhub-operator --timeout=300s || true
+      
+      oc get secret pull-secret -n openshift-config -o yaml \
+        | sed "s/namespace: openshift-config/namespace: redhat-open-cluster-management/g" \
+        | sed "s/name: pull-secret/name: multiclusterhub-operator-pull-secret/g" \
+        | sed "/  resourceVersion:/d" \
+        | sed "/  uid:/d" \
+        | sed "/  creationTimestamp:/d" \
+        | oc apply -f -
+      
+      oc apply -k $SOURCE2
+
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/acm-sre/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source

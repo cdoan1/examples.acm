@@ -56,7 +56,7 @@ spec:
 
       oc get secret brew-pull-secret -n open-cluster-management-pipelines-mce -o yaml \
       | sed "s/namespace: open-cluster-management-pipelines-mce/namespace: openshift-config/g" \
-      | sed "s/name: multiclusterhub-operator-pull-secret/name: pull-secret/g" \
+      | sed "s/name: brew-pull-secret/name: pull-secret/g" \
       | sed "/  resourceVersion:/d" \
       | sed "/  uid:/d" \
       | sed "/  creationTimestamp:/d" > update-global-pull-secret.yaml
@@ -65,7 +65,9 @@ spec:
         oc --kubeconfig=$TOP/remote.kubeconfig apply -f update-global-pull-secret.yaml
       fi
 
-      
+      if [ -f $TOP/managedcluster.kubeconfig ]; then
+        oc --kubeconfig=$TOP/managedcluster.kubeconfig apply -f update-global-pull-secret.yaml
+      fi
 
     command:
     - /bin/bash

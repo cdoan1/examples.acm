@@ -1,0 +1,106 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: mce-hypershift-canary-container-test
+  namespace: open-cluster-management-pipelines-mce
+spec:
+  params:
+  - name: kubeconfig
+    default: ""
+    description: "base64 encoded kubeconfig of the cluster we want to run this task on. Default to empty string, use the current cluster."
+    type: string
+  - name: managed-cluster
+    default: "chc"
+    description: "name of this managed cluster, will use this value to construct the hostedcluster name."
+    type: string
+  steps:
+  - args:
+    - |-
+      set -e
+      set -x
+
+      TOP=$(pwd)
+
+      PULL_SECRET=$TOP/pull-secret-hypershift.json
+      export NS=open-cluster-management-pipelines-rhacm
+      oc get secret multiclusterhub-operator-pull-secret-basic -n $NS -ojsonpath='{.data.\.dockerconfigjson}' | base64 --decode > $PULL_SECRET
+
+      if [ -f $(pwd)/remote.kubeconfig ]; then
+        export KUBECONFIG=$(pwd)/remote.kubeconfig
+      else
+        echo "Expected to find remote.kubeconfig. Existing."
+        exit 1
+      fi
+
+      AWS_CREDS=credentials
+      
+      if [ ! -f $AWS_CREDS ]; then
+        echo "Requires AWS credentials file."
+        exit 1
+      fi
+      
+      oc cluster-info
+      
+      podman pull quay.io/stolostron/hypershift-addon-operator-canary-test:2.7.2-SNAPSHOT-2023-03-03-19-18-35
+
+      exit 0
+      
+      OUTPUT_INFRA_FILE=$TOP/hypershift_test_infra.json
+      OUTPUT_IAM_FILE=$TOP/hypershift_test_iam.json
+      export HYPERSHIFT=$(pwd)/hypershift/bin/hypershift.12
+
+      KUBECONFIG_PATH=$KUBECONFIG
+      OCP_PULL_SECRET=$TOP/pull-secret-hypershift.json
+
+      BASE_DOMAIN=cdoan.stolostron.io
+      EXT_DNS_DOMAIN=hypershift.cdoan.stolostron.io
+
+      # hs-mc-7ftpbsi20
+      HOSTING_CLUSTER_NAME=local-host 
+      CLUSTER_NAME_PREFIX=acm-it-
+      REGION=us-west-1
+
+      AWS_ACCESS_KEY_ID=$(cat ~/.aws/credentials | grep aws_access_key_id | cut -d'=' -f2 | tr -d " ")
+      AWS_SECRET_ACCESS_KEY=$(cat ~/.aws/credentials | grep aws_secret_access_key | cut -d'=' -f2 | tr -d " ")
+
+      S3_BUCKET_NAME=cdoan-hypershift
+      OCP_RELEASE_IMAGE=quay.io/openshift-release-dev/ocp-release:4.12.1-x86_64
+      HUB_OCP_VERSION=4.12.1
+      UNSUPPORTED_OCP_VERSION=4.10.0
+      RESULTS_DIR=$TOP/results
+
+      mkdir $TOP/results
+      
+      podman run \
+        --volume $KUBECONFIG_PATH:/kubeconfig \
+        --volume $RESULTS_DIR:/results \
+        --env KUBECONFIG=/kubeconfig \
+        --env OCP_RELEASE_IMAGE=$OCP_RELEASE_IMAGE \
+        --env HUB_OCP_VERSION=$HUB_OCP_VERSION \
+        --env UNSUPPORTED_OCP_VERSION=$UNSUPPORTED_OCP_VERSION \
+        --env OCP_PULL_SECRET=$OCP_PULL_SECRET \
+        --env HOSTING_CLUSTER_NAME=$HOSTING_CLUSTER_NAME \
+        --env CLUSTER_NAME_PREFIX=$CLUSTER_NAME_PREFIX \
+        --env REGION=$REGION \
+        --env BASE_DOMAIN=$BASE_DOMAIN \
+        --env EXT_DNS_DOMAIN=$EXT_DNS_DOMAIN \
+        --env S3_BUCKET_NAME=$S3_BUCKET_NAME \
+        --env AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+        --env AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+        quay.io/stolostron/hypershift-addon-operator-canary-test:latest
+
+      ls -al $RESULTS_DIR
+
+      set +x
+      set +e
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/acm-sre/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source
