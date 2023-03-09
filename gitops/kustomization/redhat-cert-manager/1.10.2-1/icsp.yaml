@@ -22,3 +22,6 @@ spec:
   - mirrors:
     - brew.registry.redhat.io/rh-osbs/cert-manager-jetstack-cert-manager-rhel8
     source: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel8
+  - mirrors:
+    - brew.registry.redhat.io/rh-osbs
+    source: registry.redhat.io/cert-manager
