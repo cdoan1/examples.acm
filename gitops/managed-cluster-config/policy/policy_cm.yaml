@@ -35,7 +35,7 @@ spec:
                   tls.key: |
                     {{hub ( index ( lookup "v1" "Secret" "default" .ManagedClusterName ).data "tls.key" ) | base64dec | autoindent hub}}
                   tls.crt: |
-                    {{hub ( index ( lookup "v1" "Secret" "default" "managed-cluster-certs-tls" ).data "tls.crt" ) | base64dec | autoindent hub}}
+                    {{hub ( index ( lookup "v1" "Secret" "default" .ManagedClusterName ).data "tls.crt" ) | base64dec | autoindent hub}}
           pruneObjectBehavior: DeleteAll
           remediationAction: inform
           severity: low
