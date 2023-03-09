@@ -50,7 +50,7 @@ spec:
   clusterConditions: []
   clusterSelector:
     matchLabels:
-      hypershift.open-cluster-management.io/hosted-cluster: true
+      hypershift.open-cluster-management.io/hosted-cluster: "true"
 
 ---
 apiVersion: policy.open-cluster-management.io/v1
