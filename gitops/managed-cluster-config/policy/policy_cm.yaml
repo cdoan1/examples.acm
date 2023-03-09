@@ -48,7 +48,7 @@ metadata:
   namespace: default
 spec:
   clusterConditions: []
-  clusterLabels:
+  clusterSelector:
     matchLabels:
       hypershift.open-cluster-management.io/hosted-cluster: true
 
