@@ -1,0 +1,14 @@
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: addon-cert-manager-catalog
+  namespace: redhat-cert-manager
+spec:
+  displayName: cdoan Cert Manager
+  image: quay.io/osd-addons/cert-manager-operator-index@sha256:42524f8631f6d8c77ed2f16a743c92d73a3b59e5d4e285ef9cd9becf0be659d0
+  publisher: Red Hat
+  sourceType: grpc
+  updateStrategy:
+    registryPoll:
+      interval: 30m
