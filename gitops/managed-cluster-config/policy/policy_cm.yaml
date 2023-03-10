@@ -1,3 +1,7 @@
+# This policy should be deployed to the Service Cluster / ACM Hub
+# if there are managed clusters matching the cluster label
+# policy will copy the secret contents to a configmap in the Managed Cluster
+# reconciliation interval is default: 10s
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
@@ -15,7 +19,7 @@ spec:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: ingress-certificate-cp
+          name: ingress-certificate-policy
         spec:
           namespaceSelector:
             exclude:
@@ -39,6 +43,7 @@ spec:
           remediationAction: inform
           severity: low
   remediationAction: enforce
+
 ---
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
@@ -55,7 +60,7 @@ spec:
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
-  name: alpha-cm-1-exists-placement
+  name: ingress-certificate-policy-placement
   namespace: default
 placementRef:
   name: select-hosted-cluster-true
