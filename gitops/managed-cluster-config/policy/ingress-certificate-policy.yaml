@@ -1,0 +1,72 @@
+# This policy should be deployed to the Service Cluster / ACM Hub
+# if there are managed clusters matching the cluster label
+# policy will copy the secret contents to a configmap in the Managed Cluster
+# reconciliation interval is default: 10s
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: ingress-certificate-policy
+  namespace: default
+  annotations:
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+spec:
+  disabled: false
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: ingress-certificate-policy
+        spec:
+          namespaceSelector:
+            exclude:
+              - kube-*
+            include:
+              - default
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: v1
+                kind: ConfigMap
+                metadata:
+                  name: ingress-certificate-cm
+                  namespace: default
+                data:
+                  tls.key: |
+                    {{hub ( index ( lookup "v1" "Secret" "default" .ManagedClusterName ).data "tls.key" ) | base64dec | autoindent hub}}
+                  tls.crt: |
+                    {{hub ( index ( lookup "v1" "Secret" "default" .ManagedClusterName ).data "tls.crt" ) | base64dec | autoindent hub}}
+          pruneObjectBehavior: DeleteAll
+          remediationAction: inform
+          severity: low
+  remediationAction: enforce
+
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: select-hosted-cluster-true
+  namespace: default
+spec:
+  clusterConditions: []
+  clusterSelector:
+    matchLabels:
+      hypershift.open-cluster-management.io/hosted-cluster: "true"
+
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: ingress-certificate-policy-placement
+  namespace: default
+placementRef:
+  name: select-hosted-cluster-true
+  apiGroup: apps.open-cluster-management.io
+  kind: PlacementRule
+subjects:
+  - name: ingress-certificate-policy
+    apiGroup: policy.open-cluster-management.io
+    kind: Policy
