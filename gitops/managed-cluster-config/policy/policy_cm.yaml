@@ -2,7 +2,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
-  name: alpha-cm-1-exists
+  name: ingress-certificate-policy
   namespace: default
   annotations:
     policy.open-cluster-management.io/categories: CM Configuration Management
@@ -15,7 +15,7 @@ spec:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: alpha-cm-1
+          name: ingress-certificate-cp
         spec:
           namespaceSelector:
             exclude:
@@ -28,10 +28,9 @@ spec:
                 apiVersion: v1
                 kind: ConfigMap
                 metadata:
-                  name: alpha-cm-1
+                  name: ingress-certificate-cm
                   namespace: default
                 data:
-                  song: "as-it-was"
                   tls.key: |
                     {{hub ( index ( lookup "v1" "Secret" "default" .ManagedClusterName ).data "tls.key" ) | base64dec | autoindent hub}}
                   tls.crt: |
@@ -63,6 +62,6 @@ placementRef:
   apiGroup: apps.open-cluster-management.io
   kind: PlacementRule
 subjects:
-  - name: alpha-cm-1-exists
+  - name: ingress-certificate-policy
     apiGroup: policy.open-cluster-management.io
     kind: Policy
