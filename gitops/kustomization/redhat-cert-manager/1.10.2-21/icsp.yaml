@@ -1,0 +1,12 @@
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: brew-registry-redhat-io
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - brew.registry.redhat.io
+    source: registry-proxy.engineering.redhat.com
+  - mirrors:
+    - brew.registry.redhat.io
+    source: registry.redhat.io
