@@ -7,3 +7,4 @@ resources:
 - operatorgroup.yaml
 - catalogsource.yaml
 - subscription.yaml
+- servicemonitor.yaml
