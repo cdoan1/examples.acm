@@ -18,17 +18,72 @@ spec:
 
       oc --kubeconfig=$TOP/remote.kubeconfig cluster-info
 
+      # give prometheus SA cluster admin
+      oc --kubeconfig=$TOP/remote.kubeconfig adm policy add-role-to-user cluster-admin system:serviceaccount:openshift-monitoring:prometheus-k8s -n cert-manager
+
+      # reference: https://github.com/openshift/cert-manager-operator/blob/master/docs/OPERAND_METRICS.md
+      oc --kubeconfig=$TOP/remote.kubeconfig -n openshift-monitoring get prometheus k8s \
+        --template='{{.spec.serviceMonitorNamespaceSelector}}{{"\n"}}{{.spec.serviceMonitorSelector}}{{"\n"}}'
+
+      # allow prometheus to scrape cert-manager metrics as Workload metrics
+      oc --kubeconfig=$TOP/remote.kubeconfig label namespace cert-manager openshift.io/cluster-monitoring=true --overwrite
+
+      # oc get cm cluster-monitoring-config -n openshift-monitoring -o yaml || true
+
+      # patch
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -f - <<EOF
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: cluster-monitoring-config
+        namespace: openshift-monitoring
+      data:
+        config.yaml: |
+          enableUserWorkload: true
+      EOF
+
+      echo "waiting 120s"
+      sleep 120
+
+      # deploy service monitor in the cert-manager namespace
       oc --kubeconfig=$TOP/remote.kubeconfig apply -f gitops/kustomization/redhat-cert-manager/1.10.2-21/servicemonitor.yaml
 
+      BASE_DOMAIN=$(oc --kubeconfig=$TOP/remote.kubeconfig get dns cluster -o json | jq -r ".spec.baseDomain")
 
-      # 7. wait for the tls certs to be generated
-      # echo "Waiting 10m for ingress pods to be ready ..."
-      # oc --kubeconfig=$TOP/remote.kubeconfig wait --for="condition=Available=True" deployment router-default -n openshift-ingress --timeout=600s
-      # oc --kubeconfig=$TOP/remote.kubeconfig get pods -n openshift-ingress
-
-      # oc --kubeconfig=$TOP/remote.kubeconfig get certificates -A
-      # oc --kubeconfig=$TOP/remote.kubeconfig get certificaterequests -A
-
+      # create 25 certificates
+      for i in {1..10}
+      do
+        oc --kubeconfig=$TOP/remote.kubeconfig apply -f - <<EOF
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        labels:
+          use-dns01-solver: "true"
+        name: example-$i
+        namespace: default
+      spec:
+        dnsNames:
+        - example-$i.$BASE_DOMAIN
+        duration: 1h
+        issuerRef:
+          group: cert-manager.io
+          kind: ClusterIssuer
+          name: public-issuer
+        privateKey:
+          algorithm: RSA
+          encoding: PKCS1
+          size: 2048
+        renewBefore: 5m
+        secretName: example-$i
+        subject:
+          organizations:
+          - Advanced Cluster Management
+        usages:
+        - server auth
+        - client auth
+      EOF
+      done
+      
       exit 0
     command:
     - /bin/bash
