@@ -79,40 +79,52 @@ spec:
     - name: source
       workspace: shared-workspace
 
-  - name: vault-setup
-    runAfter:
-    - login-to-hub-cluster
-    params:
-    - name: cluster-name
-      value: $(params.cluster-name)
-    taskRef:
-      name: task-vault-setup
-    workspaces:
-    - name: source
-      workspace: shared-workspace
+  # - name: vault-setup
+  #   runAfter:
+  #   - login-to-hub-cluster
+  #   params:
+  #   - name: cluster-name
+  #     value: $(params.cluster-name)
+  #   taskRef:
+  #     name: task-vault-setup
+  #   workspaces:
+  #   - name: source
+  #     workspace: shared-workspace
 
-  - name: vault-argocd-import
-    runAfter:
-    - vault-setup
-    params:
-    - name: cluster-name
-      value: $(params.cluster-name)
-    - name: clusterClaimName
-      value: $(params.clusterClaimName)
-    taskRef:
-      name: task-argocd-import
-    workspaces:
-    - name: source
-      workspace: shared-workspace
+  # - name: vault-argocd-import
+  #   runAfter:
+  #   - vault-setup
+  #   params:
+  #   - name: cluster-name
+  #     value: $(params.cluster-name)
+  #   - name: clusterClaimName
+  #     value: $(params.clusterClaimName)
+  #   taskRef:
+  #     name: task-argocd-import
+  #   workspaces:
+  #   - name: source
+  #     workspace: shared-workspace
 
   - name: deploy-cert-manager-addon
     runAfter:
-    - vault-setup
+    - login-to-hub-cluster
     params:
     - name: clusterClaimName
       value: $(params.clusterClaimName)
     taskRef:
       name: task-deploy-cert-manager-addon
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
+  - name: enable-cert-manager-metrics
+    runAfter:
+    - deploy-cert-manager-addon
+    params:
+    - name: clusterClaimName
+      value: $(params.clusterClaimName)
+    taskRef:
+      name: task-enable-cert-manager-metrics
     workspaces:
     - name: source
       workspace: shared-workspace

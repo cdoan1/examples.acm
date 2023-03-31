@@ -1,0 +1,41 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-enable-cert-manager-metrics
+spec:
+  params:
+  - name: clusterClaimName
+    default: ""
+    type: string
+  steps:
+  - args:
+    - |-
+      set -e
+      set -x
+
+      TOP=$(pwd)
+
+      oc --kubeconfig=$TOP/remote.kubeconfig cluster-info
+
+      oc --kubeconfig=$TOP/remote.kubeconfig apply -f gitops/kustomization/redhat-cert-manager/1.10.2-21/servicemonitor.yaml
+
+
+      # 7. wait for the tls certs to be generated
+      # echo "Waiting 10m for ingress pods to be ready ..."
+      # oc --kubeconfig=$TOP/remote.kubeconfig wait --for="condition=Available=True" deployment router-default -n openshift-ingress --timeout=600s
+      # oc --kubeconfig=$TOP/remote.kubeconfig get pods -n openshift-ingress
+
+      # oc --kubeconfig=$TOP/remote.kubeconfig get certificates -A
+      # oc --kubeconfig=$TOP/remote.kubeconfig get certificaterequests -A
+
+      exit 0
+    command:
+    - /bin/bash
+    - -c
+    image: quay.io/cdoan_rh22/ocm-utils:latest
+    name: apply
+    resources: {}
+    workingDir: /workspace/source
+  workspaces:
+  - name: source
