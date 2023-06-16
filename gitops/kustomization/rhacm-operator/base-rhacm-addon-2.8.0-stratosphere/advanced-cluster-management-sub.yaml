@@ -7,6 +7,6 @@ spec:
   channel: stable
   installPlanApproval: Automatic
   name: advanced-cluster-management
-  source: rhacm-addon-catalog
+  source: addon-rhacm-catalog
   sourceNamespace: redhat-open-cluster-management
   startingCSV: advanced-cluster-management.v2.8.0
