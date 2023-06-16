@@ -1,0 +1,23 @@
+# ---
+# apiVersion: operators.coreos.com/v1alpha1
+# kind: CatalogSource
+# metadata:
+#   name: addon-rhacm-catalog
+#   namespace: redhat-open-cluster-management
+# spec:
+#   displayName: Advanced Cluster Management
+#   image: quay.io/osd-addons/advanced-cluster-management-index@sha256:616297066ac25c76b7b82a335284692452db60294afa551af09c31bd60a6e4b7
+#   publisher: Red Hat
+#   sourceType: grpc
+
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: addon-rhacm-catalog
+  namespace: openshift-marketplace
+spec:
+  displayName: MultiCluster Engine
+  image: quay.io/osd-addons/rhacm-index@sha256:63858b283129c132cda88c2d1895ee3403792fa067f063d3f4abaa445ed17af0
+  publisher: Red Hat
+  sourceType: grpc
