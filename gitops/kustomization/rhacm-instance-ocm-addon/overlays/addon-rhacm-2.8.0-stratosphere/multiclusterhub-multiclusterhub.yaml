@@ -4,6 +4,6 @@ metadata:
   name: multiclusterhub
   namespace: redhat-open-cluster-management
   annotations:
-    installer.open-cluster-management.io/mce-subscription-spec: '{"channel":"stable","installPlanApproval":"Automatic","name":"multicluster-engine","source": "addon-rhacm-catalog","sourceNamespace": "redhat-open-cluster-management"}'
+    installer.open-cluster-management.io/mce-subscription-spec: '{"channel":"stable","installPlanApproval":"Automatic","name":"multicluster-engine","source":"addon-rhacm-catalog","sourceNamespace":"redhat-open-cluster-management"}'
 spec:
   availabilityConfig: Basic
